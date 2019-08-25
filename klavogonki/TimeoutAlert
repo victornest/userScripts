@@ -7,7 +7,7 @@
 // ==/UserScript==
 
 function timeoutAlert() {
-	var sound = new Audio('https://raw.githubusercontent.com/gaben-s-agent/hidden_pool/master/oborona.mp3');
+	var sound = new Audio('https://raw.githubusercontent.com/gaben-s-agent/userScripts/master/klavogonki/oborona.mp3');
 
 	var desc = document.getElementById('gamedesc');
 	if (!desc) {
