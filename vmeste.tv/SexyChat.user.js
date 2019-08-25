@@ -27,7 +27,7 @@
 	}
 
 	async function applyCSS() {
-		var sound = new Audio('https://raw.githubusercontent.com/gaben-s-agent/hidden_pool/master/file-sounds-913-served.mp3');
+		var sound = new Audio('https://raw.githubusercontent.com/gaben-s-agent/klavogonki/master/vmeste.tv/file-sounds-913-served.mp3');
 		if (document.getElementById('users').textContent != '') {
 			var compact =
 				' #chats { ' +
