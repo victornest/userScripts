@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.1
+// @version        3.11
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -53,21 +53,22 @@ function main() {
 		}
 		var myAvgSpeed;
 		var extraGameInfo = [];
-		function extraGameInfoObj (a, b) {
+		function extraGameInfoObj (a, b, c) {
 			this.id = a;
 			this.avgSpeed = b;
+			this.name = c;
 		}
 
 		//sending scores
-		function Send(amount, id, myErrCount, errCount) {
+		function Send(amount, id, name, myErrCount, errCount) {
 			var img = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAASAAAAEgARslrPgAAAAl2cEFnAAAAEAAAABAAXMatwwAAAKRJREFUOMudk0ESwyAMA5dO/mV+hviZ/TL3RNJ2EmiiK7CyNKYAIJInEmVDZLZn7wslX7MLvfcl5BIQEQgREUTEPcBwFsLMcHdKL/8BhrOZfXSl/exX2yp/RODVAb6glwAzAz9c8WOKM8BpB9lydx2gUegS0HvfCxOitcZsT6Z7cBpv1UFrDTq4O0LUqFSvkylEXklSzoTIWxFuT7ASIkfdj7/zG88ZuXfMZDyDAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE3LTA3LTE1VDIzOjExOjM1KzAwOjAwBj7ISAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxNy0wNy0xNVQyMzoxMTozNSswMDowMHdjcPQAAAAASUVORK5CYII=';
 			var url = "http://klavogonki.ru/api/profile/send-scores";
 			try {
-				if (myErrCount && errCount) {
+				if (myErrCount || errCount) {
 					amount += ((myErrCount - errCount) * 50);
 					params = '{"respondentId":' + id + ',"message":"![](' + img + ') Выигрыш в БО-казино!","amount":' + amount + '}';
 					httpPost(url, params);
-					PrintChat(main.value.replace(' won formula', '') + ' обыгрывает казино на ' + amount + ' очков!');
+					PrintChat(name + ' выигрывает ' + amount + ' очков!');
 					main.style.setProperty('background', '#fff');
 					main.style.setProperty('border', 'solid #fff 0px');
 					main.onmouseenter = '';
@@ -76,7 +77,7 @@ function main() {
 				} else {
 					params = '{"respondentId":' + id + ',"message":"![](' + img + ') Выигрыш в БО-казино!","amount":' + amount + '}';
 					httpPost(url, params);
-					PrintChat(main.value.replace(' won ' + amount, '') + ' обыгрывает казино на ' + amount + ' очков!');
+					PrintChat(name + ' выигрывает ' + amount + ' очков!');
 					main.style.setProperty('background', '#fff');
 					main.style.setProperty('border', 'solid #fff 0px');
 					main.onmouseenter = '';
@@ -89,18 +90,18 @@ function main() {
 		}
 
 		//getting scores
-		function Get(amount, id, myErrCount, errCount) {
+		function Get(amount, id, name, myErrCount, errCount) {
 			try {
-				if (myErrCount && errCount) {
-					amount += ((myErrCount - errCount) * 50);
-					PrintChat(main.value.replace(' lost formula', '') + ' в долгу перед казино на ' + amount + ' очков!');
+				if (myErrCount || errCount) {
+					amount += ((errCount - myErrCount) * 50);
+					PrintChat(name + ' проигрывает ' + amount + ' очков!');
 					main.style.setProperty('background', '#fff');
 					main.style.setProperty('border', 'solid #fff 0px');
 					main.onmouseenter = '';
 					main.onmouseleave = '';
 					//main.value += ' get ' + amount;
 				} else {
-					PrintChat(main.value.replace(' lost ' + amount, '') + ' в долгу перед казино на ' + amount + ' очков!');
+					PrintChat(name + ' проигрывает ' + amount + ' очков!');
 					main.style.setProperty('background', '#fff');
 					main.style.setProperty('border', 'solid #fff 0px');
 					main.onmouseenter = '';
@@ -113,9 +114,9 @@ function main() {
 		}
 
 		//draw
-		function Draw() {
+		function Draw(name) {
 			try {
-				PrintChat(main.value.replace(' draw', '') + ' вовремя останавливается и сохраняет объем своей сумы неизменным!');
+				PrintChat(name + ', ничья!');
 				main.style.setProperty('background', '#fff');
 				main.style.setProperty('border', 'solid #fff 0px');
 			} catch(error) {
@@ -172,7 +173,7 @@ function main() {
 				try {
 					for (let j = 0; j < playerList.length; j++) {
 						if (id === gameInfo.players[j].user.id) {
-							extraGameInfo[i] = new extraGameInfoObj(gameInfo.players[j].user.id, gameInfo.players[j].user.avg_speed);
+							extraGameInfo[i] = new extraGameInfoObj(gameInfo.players[j].user.id, gameInfo.players[j].user.avg_speed, gameInfo.players[j].name);
 							//console.log('66', extraGameInfo[i]);
 							break;
 						}
@@ -186,7 +187,9 @@ function main() {
 				//limit computing
 				try {
 					if (extraGameInfo[i].id === 488630) {
+						console.log('deamon\'s avg before ', avgSpeed);
 						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.7925); //_Daemon_
+						console.log('deamon\'s avg after ', avgSpeed);
 					} else {
 						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.9);
 					}
@@ -200,7 +203,8 @@ function main() {
 				try {
 					console.log('speed: ', speed, ', avgSpeed: ', avgSpeed, ', errCount: ', errCount,
 								'\n mySpeed: ', mySpeed, ', myAvgSpeed: ', myAvgSpeed, ', myErrCount: ', myErrCount,
-								'\n', playerList[i], main);
+								'\n', id, playerList[i], main,
+							    '\n', id, 'eq = ', ((id == 490344) || (id == 111001) || (id == 528143)));
 					//host in a limit
 					if (mySpeed > myAvgSpeed) {
 						//player in a limit
@@ -211,19 +215,19 @@ function main() {
                                 if (myErrCount == 0) {
 									main.removeAttribute('disabled');
 									main.onclick = function() {
-										Draw();
+										Draw(extraGameInfo[i].name);
 										main.setAttribute('disabled', '');
 									}
-									main.value += ' draw';
+									main.value += ' ' + errCount + ' draw ' + myErrCount + ' me';
 									return;
                                 //host lose by errors
                                 } else {
 									WonCSS;
 									main.removeAttribute('disabled');
-                                    if (id == (490344 || 111001 || 528143)) {
+									if ((id == 490344) || (id == 111001) || (id == 528143)) {
 										//Send(450, id, myErrCount, errCount);
 										main.onclick = function() {
-											Send(450, id, myErrCount, errCount);
+											Send(450, id, extraGameInfo[i].name, myErrCount, errCount);
 											main.setAttribute('disabled', '');
 										};
 										main.value += ' won formula';
@@ -231,7 +235,7 @@ function main() {
                                     } else {
 										//Send(500, id);
 										main.onclick = function() {
-											Send(500, id);
+											Send(500, id, extraGameInfo[i].name);
 											main.setAttribute('disabled', '');
 										};
 										main.value += ' won 500';
@@ -244,14 +248,19 @@ function main() {
                                 if (myErrCount == 0) {
 									LostCSS();
 									main.removeAttribute('disabled');
-                                    if (id == (490344 || 111001 || 528143)) {
+									if ((id == 490344) || (id == 111001) || (id == 528143)) {
                                         //Get(450, id, myErrCount, errCount);
-										main.onclick = function() { Get(450, id, myErrCount, errCount); main.setAttribute('disabled', '');};
+										main.onclick = function() {
+											Get(450, id, extraGameInfo[i].name, myErrCount, errCount);
+											main.setAttribute('disabled', '');
+										};
 										main.value += ' lost formula';
 										return;
                                     } else {
                                         //Get(500, id);
-										main.onclick = function() { Get(500, id); main.setAttribute('disabled', '');};
+										main.onclick = function() {
+											Get(500, id, extraGameInfo[i].name);
+											main.setAttribute('disabled', '');};
 										main.value += ' lost 500';
 										return;
                                     }
@@ -261,15 +270,21 @@ function main() {
                                     if (myErrCount < errCount) {
 										LostCSS();
 										main.removeAttribute('disabled');
-										if (id == (490344 || 111001 || 528143)) {
+										if ((id == 490344) || (id == 111001) || (id == 528143)) {
 											//Get(150, id, myErrCount, errCount);
-											main.onclick = function() { Get(150, id, myErrCount, errCount); main.setAttribute('disabled', '');};
+											main.onclick = function() {
+												Get(150, id, extraGameInfo[i].name, myErrCount, errCount);
+												main.setAttribute('disabled', '');
+											};
 											main.value += ' lost formula';
 											return;
 										} else {
 											//Get(200, id);
 											console.log('123');
-											main.onclick = function() { Get(200, id); main.setAttribute('disabled', '');};
+											main.onclick = function() {
+												Get(200, id, extraGameInfo[i].name);
+												main.setAttribute('disabled', '');
+											};
 											main.value += ' lost 200';
 											return;
 										}
@@ -278,21 +293,27 @@ function main() {
 										if (myErrCount > errCount) {
 											WonCSS();
 											main.removeAttribute('disabled');
-											if (id == (490344 || 111001 || 528143)) {
+											if ((id == 490344) || (id == 111001) || (id == 528143)) {
 												//Send(150, id, myErrCount, errCount);
-												main.onclick = function() { Send(150, id, myErrCount, errCount); main.setAttribute('disabled', '');};
+												main.onclick = function() {
+													Send(150, id, extraGameInfo[i].name, myErrCount, errCount);
+													main.setAttribute('disabled', '');
+												};
 												main.value += ' won formula';
 												return;
 											} else {
 												//Send(200, id);
-												main.onclick = function() { Send(200, id); main.setAttribute('disabled', '');};
+												main.onclick = function() {
+													Send(200, id, extraGameInfo[i].name);
+													main.setAttribute('disabled', '');
+												};
 												main.value += ' won 200';
 												return;
 											}
 										} else {
 											main.removeAttribute('disabled');
 											main.onclick = function() {
-												Draw();
+												Draw(extraGameInfo[i].name);
 												main.setAttribute('disabled', '');
 											}
 											main.value += ' draw';
@@ -307,14 +328,19 @@ function main() {
 							if (myErrCount == 0) {
 								LostCSS();
 								main.removeAttribute('disabled');
-								if (id == (490344 || 111001 || 528143)) {
+								if ((id == 490344) || (id == 111001) || (id == 528143)) {
 									//Get(450, id, myErrCount, errCount);
-									main.onclick = function() { Get(450, id, myErrCount, errCount); main.setAttribute('disabled', '');};
+									main.onclick = function() {
+										Get(450, id, extraGameInfo[i].name, myErrCount, errCount);
+										main.setAttribute('disabled', '');};
 									main.value += ' lost formula';
 									return;
 								} else {
 									//Get(500, id);
-									main.onclick = function() { Get(500, id); main.setAttribute('disabled', '');};
+									main.onclick = function() {
+										Get(500, id, extraGameInfo[i].name);
+										main.setAttribute('disabled', '');
+									};
 									main.value += ' lost 500';
 									return;
 								}
@@ -322,14 +348,20 @@ function main() {
 							} else {
 								LostCSS();
 								main.removeAttribute('disabled');
-								if (id == (490344 || 111001 || 528143)) {
+								if ((id == 490344) || (id == 111001) || (id == 528143)) {
 									//Get(150, id, myErrCount, errCount);
-									main.onclick = function() { Get(150, id, myErrCount, errCount); main.setAttribute('disabled', '');};
+									main.onclick = function() {
+										Get(150, id, extraGameInfo[i].name, myErrCount, errCount);
+										main.setAttribute('disabled', '');
+									};
 									main.value += ' lost formula';
 									return;
 								} else {
 									//Get(200, id);
-									main.onclick = function() { Get(200, id); main.setAttribute('disabled', '');};
+									main.onclick = function() {
+										Get(200, id, extraGameInfo[i].name);
+										main.setAttribute('disabled', '');
+									};
 									main.value += ' lost 200';
 									return;
                                 }
@@ -343,14 +375,20 @@ function main() {
 							if (errCount == 0) {
 								WonCSS();
 								main.removeAttribute('disabled');
-								if (id == (490344 || 111001 || 528143)) {
+								if ((id == 490344) || (id == 111001) || (id == 528143)) {
 									//Send(450, id, myErrCount, errCount);
-									main.onclick = function() { Send(450, id, myErrCount, errCount); main.setAttribute('disabled', '');};
+									main.onclick = function() {
+										Send(450, id, extraGameInfo[i].name, myErrCount, errCount);
+										main.setAttribute('disabled', '');
+									};
 									main.value += ' won formula';
 									return;
 								} else {
 									//Send(500, id);
-									main.onclick = function() { Send(500, id); main.setAttribute('disabled', '');};
+									main.onclick = function() {
+										Send(500, id, extraGameInfo[i].name);
+										main.setAttribute('disabled', '');
+									};
 									main.value += ' won 500';
 									return;
 								}
@@ -358,14 +396,20 @@ function main() {
 							} else {
 								WonCSS();
 								main.removeAttribute('disabled');
-								if (id == (490344 || 111001 || 528143)) {
+								if ((id == 490344) || (id == 111001) || (id == 528143)) {
 									//Send(150, id, myErrCount, errCount);
-									main.onclick = function() { Send(150, id, myErrCount, errCount); main.setAttribute('disabled', '');};
+									main.onclick = function() {
+										Send(150, id, extraGameInfo[i].name, myErrCount, errCount);
+										main.setAttribute('disabled', '');
+									};
 									main.value += ' won formula';
 									return;
 								} else {
 									//Send(200, id);
-									main.onclick = function() { Send(200, id); main.setAttribute('disabled', '');};
+									main.onclick = function() {
+										Send(200, id, extraGameInfo[i].name);
+										main.setAttribute('disabled', '');
+									};
 									main.value += ' won 200';
 									return;
 								}
@@ -374,7 +418,7 @@ function main() {
 						} else {
 							main.removeAttribute('disabled');
 							main.onclick = function() {
-								Draw();
+								Draw(extraGameInfo[i].name);
 								main.setAttribute('disabled', '');
 							}
 							main.value += ' draw';
