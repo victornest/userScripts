@@ -140,8 +140,8 @@
 					chats.appendChild(chats.childNodes[3]);
 					chats.childNodes[1].onmouseover = function() { chats.childNodes[1].style.setProperty('opacity', '1'); };
 					chats.childNodes[3].onmouseover = function() { chats.childNodes[3].style.setProperty('opacity', '1'); };
-					chats.childNodes[1].onmouseout = function() { chats.childNodes[1].style.setProperty('opacity', '.1'); };
-					chats.childNodes[3].onmouseout = function() { chats.childNodes[3].style.setProperty('opacity', '.1'); };
+					chats.childNodes[1].onmouseout = function() { chats.childNodes[1].style.setProperty('opacity', '.05'); };
+					chats.childNodes[3].onmouseout = function() { chats.childNodes[3].style.setProperty('opacity', '.05'); };
 					chats.childNodes[5].onmouseover = function() {
 						let i = chats.childNodes[5].childNodes[1].childNodes[0].childNodes[0].childNodes.length;
 						let msg = chats.childNodes[5].childNodes[1].childNodes[0].childNodes[0].childNodes;
@@ -240,6 +240,3 @@
 		applyCSS();
 	})
 })()
-
-
-
