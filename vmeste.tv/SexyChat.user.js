@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           vmeste.tv compact style
-// @version        0.12
+// @version        0.13
 // @namespace      vmeste
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://vmeste.tv/*
