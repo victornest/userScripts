@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.11
+// @version        3.12
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -115,19 +115,24 @@ function main() {
 
 		//draw
 		function Draw(name) {
-			try {
-				PrintChat(name + ', ничья!');
-				main.style.setProperty('background', '#fff');
-				main.style.setProperty('border', 'solid #fff 0px');
-			} catch(error) {
-				alert('draw error');
-			}
+			PrintChat(name + ', ничья!');
+			main.style.setProperty('background', '#fff');
+			main.style.setProperty('border', 'solid #fff 0px');
+			main.onmouseenter = '';
+			main.onmouseleave = '';
+		}
+
+		function DrawCSS() {
+			main.onmouseenter = function() { main.style.setProperty('background', '#8d94fc') };
+			main.onmouseleave = function() { main.style.setProperty('background', '#c6c9ff') };
+			main.style.setProperty('background', '#c6c9ff');
+			main.style.setProperty('border', 'solid #949dff 0px');
 		}
 
 		function LostCSS() {
 			main.onmouseenter = function() { main.style.setProperty('background', '#fc8d8d') };
 			main.onmouseleave = function() { main.style.setProperty('background', '#ffc6c6') };
-			main.style.setProperty('background', '#ffb3b3');
+			main.style.setProperty('background', '#ffc6c6');
 			main.style.setProperty('border', 'solid #ff9494 1px');
 		}
 
@@ -213,6 +218,7 @@ function main() {
 							if (errCount == 0) {
                                 //host got 0
                                 if (myErrCount == 0) {
+									DrawCSS();
 									main.removeAttribute('disabled');
 									main.onclick = function() {
 										Draw(extraGameInfo[i].name);
@@ -222,23 +228,22 @@ function main() {
 									return;
                                 //host lose by errors
                                 } else {
-									WonCSS;
 									main.removeAttribute('disabled');
 									if ((id == 490344) || (id == 111001) || (id == 528143)) {
-										//Send(450, id, myErrCount, errCount);
+										WonCSS;
 										main.onclick = function() {
 											Send(450, id, extraGameInfo[i].name, myErrCount, errCount);
 											main.setAttribute('disabled', '');
 										};
-										main.value += ' won formula';
+										main.value += ' won ' + ((myErrCount - errCount) * 50 + 450) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 										return;
                                     } else {
-										//Send(500, id);
+										WonCSS;
 										main.onclick = function() {
 											Send(500, id, extraGameInfo[i].name);
 											main.setAttribute('disabled', '');
 										};
-										main.value += ' won 500';
+										main.value += ' won 500 with ' + errCount + ' vs ' + myErrCount + ' me';
 										return;
                                     }
                                 }
@@ -246,77 +251,74 @@ function main() {
 							} else {
                                 //host got 0
                                 if (myErrCount == 0) {
-									LostCSS();
 									main.removeAttribute('disabled');
 									if ((id == 490344) || (id == 111001) || (id == 528143)) {
-                                        //Get(450, id, myErrCount, errCount);
+										LostCSS();
 										main.onclick = function() {
 											Get(450, id, extraGameInfo[i].name, myErrCount, errCount);
 											main.setAttribute('disabled', '');
 										};
-										main.value += ' lost formula';
+										main.value += ' lost ' + ((myErrCount - errCount) * 50 + 450) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 										return;
                                     } else {
-                                        //Get(500, id);
+										LostCSS();
 										main.onclick = function() {
 											Get(500, id, extraGameInfo[i].name);
 											main.setAttribute('disabled', '');};
-										main.value += ' lost 500';
+										main.value += ' lost 500 with ' + errCount + ' vs ' + myErrCount + ' me';
 										return;
                                     }
                                 //host got 1+
                                 } else {
                                     //host got less
                                     if (myErrCount < errCount) {
-										LostCSS();
 										main.removeAttribute('disabled');
 										if ((id == 490344) || (id == 111001) || (id == 528143)) {
-											//Get(150, id, myErrCount, errCount);
+											LostCSS();
 											main.onclick = function() {
 												Get(150, id, extraGameInfo[i].name, myErrCount, errCount);
 												main.setAttribute('disabled', '');
 											};
-											main.value += ' lost formula';
+											main.value += ' lost ' + ((myErrCount - errCount) * 50 + 150) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 											return;
 										} else {
-											//Get(200, id);
-											console.log('123');
+											LostCSS();
 											main.onclick = function() {
 												Get(200, id, extraGameInfo[i].name);
 												main.setAttribute('disabled', '');
 											};
-											main.value += ' lost 200';
+											main.value += ' lost 200 with ' + errCount + ' vs ' + myErrCount + ' me';
 											return;
 										}
                                     //host got more
                                     } else {
 										if (myErrCount > errCount) {
-											WonCSS();
 											main.removeAttribute('disabled');
 											if ((id == 490344) || (id == 111001) || (id == 528143)) {
-												//Send(150, id, myErrCount, errCount);
+												WonCSS();
 												main.onclick = function() {
 													Send(150, id, extraGameInfo[i].name, myErrCount, errCount);
 													main.setAttribute('disabled', '');
 												};
-												main.value += ' won formula';
+												main.value += ' won ' + ((myErrCount - errCount) * 50 + 150) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 												return;
 											} else {
-												//Send(200, id);
+												WonCSS();
 												main.onclick = function() {
 													Send(200, id, extraGameInfo[i].name);
 													main.setAttribute('disabled', '');
 												};
-												main.value += ' won 200';
+												main.value += ' won 200 with ' + errCount + ' vs ' + myErrCount + ' me';
 												return;
 											}
 										} else {
+											DrawCSS();
 											main.removeAttribute('disabled');
 											main.onclick = function() {
 												Draw(extraGameInfo[i].name);
 												main.setAttribute('disabled', '');
 											}
-											main.value += ' draw';
+											main.value += ' ' + errCount + ' draw ' + myErrCount + ' me';
 											return;
                                         }
                                     }
@@ -326,43 +328,41 @@ function main() {
 						} else {
 							//host got 0
 							if (myErrCount == 0) {
-								LostCSS();
 								main.removeAttribute('disabled');
 								if ((id == 490344) || (id == 111001) || (id == 528143)) {
-									//Get(450, id, myErrCount, errCount);
+									LostCSS();
 									main.onclick = function() {
 										Get(450, id, extraGameInfo[i].name, myErrCount, errCount);
 										main.setAttribute('disabled', '');};
-									main.value += ' lost formula';
+									main.value += ' lost ' + ((myErrCount - errCount) * 50 + 450) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 									return;
 								} else {
-									//Get(500, id);
+									LostCSS();
 									main.onclick = function() {
 										Get(500, id, extraGameInfo[i].name);
 										main.setAttribute('disabled', '');
 									};
-									main.value += ' lost 500';
+									main.value += ' lost 500 with ' + errCount + ' vs ' + myErrCount + ' me';
 									return;
 								}
 								//host got 1+
 							} else {
-								LostCSS();
 								main.removeAttribute('disabled');
 								if ((id == 490344) || (id == 111001) || (id == 528143)) {
-									//Get(150, id, myErrCount, errCount);
+									LostCSS();
 									main.onclick = function() {
 										Get(150, id, extraGameInfo[i].name, myErrCount, errCount);
 										main.setAttribute('disabled', '');
 									};
-									main.value += ' lost formula';
+									main.value += ' lost ' + ((myErrCount - errCount) * 50 + 150) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 									return;
 								} else {
-									//Get(200, id);
+									LostCSS();
 									main.onclick = function() {
 										Get(200, id, extraGameInfo[i].name);
 										main.setAttribute('disabled', '');
 									};
-									main.value += ' lost 200';
+									main.value += ' lost 200 with ' + errCount + ' vs ' + myErrCount + ' me';
 									return;
                                 }
 							}
@@ -373,55 +373,54 @@ function main() {
 						if (speed > avgSpeed) {
 							//player got 0
 							if (errCount == 0) {
-								WonCSS();
 								main.removeAttribute('disabled');
 								if ((id == 490344) || (id == 111001) || (id == 528143)) {
-									//Send(450, id, myErrCount, errCount);
+									WonCSS();
 									main.onclick = function() {
 										Send(450, id, extraGameInfo[i].name, myErrCount, errCount);
 										main.setAttribute('disabled', '');
 									};
-									main.value += ' won formula';
+									main.value += ' won ' + ((myErrCount - errCount) * 50 + 450) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 									return;
 								} else {
-									//Send(500, id);
+									WonCSS();
 									main.onclick = function() {
 										Send(500, id, extraGameInfo[i].name);
 										main.setAttribute('disabled', '');
 									};
-									main.value += ' won 500';
+									main.value += ' won 500 with ' + errCount + ' vs ' + myErrCount + ' me';
 									return;
 								}
 								//player got 1+
 							} else {
-								WonCSS();
 								main.removeAttribute('disabled');
 								if ((id == 490344) || (id == 111001) || (id == 528143)) {
-									//Send(150, id, myErrCount, errCount);
+									WonCSS();
 									main.onclick = function() {
 										Send(150, id, extraGameInfo[i].name, myErrCount, errCount);
 										main.setAttribute('disabled', '');
 									};
-									main.value += ' won formula';
+									main.value += ' won ' + ((myErrCount - errCount) * 50 + 150) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 									return;
 								} else {
-									//Send(200, id);
+									WonCSS();
 									main.onclick = function() {
 										Send(200, id, extraGameInfo[i].name);
 										main.setAttribute('disabled', '');
 									};
-									main.value += ' won 200';
+									main.value += ' won 200 with ' + errCount + ' vs ' + myErrCount + ' me';
 									return;
 								}
 							}
 						//player not in a limit
 						} else {
+							DrawCSS();
 							main.removeAttribute('disabled');
 							main.onclick = function() {
 								Draw(extraGameInfo[i].name);
 								main.setAttribute('disabled', '');
 							}
-							main.value += ' draw';
+							main.value += ' ' + errCount + ' draw ' + myErrCount + ' me';
 							return;
 						}
 					}
