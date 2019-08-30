@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.13
+// @version        3.14
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -129,14 +129,14 @@ function main() {
 			main.style.setProperty('border', 'solid #949dff 0px');
 		}
 
-		function LostCSS() {
+		function WonCSS() {
 			main.onmouseenter = function() { main.style.setProperty('background', '#fc8d8d') };
 			main.onmouseleave = function() { main.style.setProperty('background', '#ffc6c6') };
 			main.style.setProperty('background', '#ffc6c6');
 			main.style.setProperty('border', 'solid #ff9494 1px');
 		}
 
-		function WonCSS() {
+		function LostCSS() {
 			main.onmouseenter = function() { main.style.setProperty('background', '#abfc8d') };
 			main.onmouseleave = function() { main.style.setProperty('background', '#d5ffc6') };
 			main.style.setProperty('background', '#d5ffc6');
