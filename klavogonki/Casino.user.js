@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.12
+// @version        3.13
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -179,7 +179,9 @@ function main() {
 					for (let j = 0; j < playerList.length; j++) {
 						if (id === gameInfo.players[j].user.id) {
 							extraGameInfo[i] = new extraGameInfoObj(gameInfo.players[j].user.id, gameInfo.players[j].user.avg_speed, gameInfo.players[j].name);
-							//console.log('66', extraGameInfo[i]);
+							if (extraGameInfo[i].name[0] == '_') {
+								extraGameInfo[i].name = '\\' + extraGameInfo[i].name;
+							}
 							break;
 						}
 					}
@@ -258,7 +260,7 @@ function main() {
 											Get(450, id, extraGameInfo[i].name, myErrCount, errCount);
 											main.setAttribute('disabled', '');
 										};
-										main.value += ' lost ' + ((myErrCount - errCount) * 50 + 450) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
+										main.value += ' lost ' + ((errCount - myErrCount) * 50 + 450) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 										return;
                                     } else {
 										LostCSS();
@@ -279,7 +281,7 @@ function main() {
 												Get(150, id, extraGameInfo[i].name, myErrCount, errCount);
 												main.setAttribute('disabled', '');
 											};
-											main.value += ' lost ' + ((myErrCount - errCount) * 50 + 150) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
+											main.value += ' lost ' + ((errCount - myErrCount) * 50 + 150) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 											return;
 										} else {
 											LostCSS();
@@ -334,7 +336,7 @@ function main() {
 									main.onclick = function() {
 										Get(450, id, extraGameInfo[i].name, myErrCount, errCount);
 										main.setAttribute('disabled', '');};
-									main.value += ' lost ' + ((myErrCount - errCount) * 50 + 450) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
+									main.value += ' lost ' + ((errCount - myErrCount) * 50 + 450) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 									return;
 								} else {
 									LostCSS();
@@ -354,7 +356,7 @@ function main() {
 										Get(150, id, extraGameInfo[i].name, myErrCount, errCount);
 										main.setAttribute('disabled', '');
 									};
-									main.value += ' lost ' + ((myErrCount - errCount) * 50 + 150) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
+									main.value += ' lost ' + ((errCount - myErrCount) * 50 + 150) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 									return;
 								} else {
 									LostCSS();
@@ -676,7 +678,7 @@ function PrintAnnouncement(text) {
 
 (function(){
 	document.addEventListener('keydown', function(e) {
-		if (e.keyCode == 220) {
+		if (e.keyCode == 192) {
 			e.preventDefault();
 			PrintAnnouncement(':excl: `Играем со мной?` У кого меньше ошибок, тому __200__, но если __0__ ошибок тогда __500__. Минимальная скорость: __-10%__ от средней до заезда. `Пишите, кто участвует`');
 		}
