@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Events in gamelist
-// @version        0.1
+// @version        0.11
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/
@@ -52,7 +52,7 @@
 
 	var css =
 		' :root { ' +
-		' --mainColor: #ff9800; }' +
+		' --mainColor: #ff9800; } ' +
 
 		' a.quickEvent { ' +
 		' background: linear-gradient( to right, var(--mainColor) 0%, var(--mainColor) 5px, transparent 5px); ' +
@@ -65,7 +65,7 @@
 
 		' a.quickEvent:hover { ' +
 		' color: #454545; ' +
-		' background: linear-gradient( to right, var(--mainColor) 0%, var(--mainColor) 5px, transparent ); }';
+		' background: linear-gradient( to right, var(--mainColor) 0%, var(--mainColor) 5px, transparent ); } ';
 
 	var style = document.createElement('style');
 	if (style.styleSheet) {
@@ -76,6 +76,7 @@
 	document.getElementsByTagName('head')[0].appendChild(style);
 
 //fitting head
+	document.getElementById('head').style.setProperty('background', 'white url(/img/top_back_gray.gif) repeat-x 0% 0%');
 	document.getElementById('logo').style.setProperty('width', '6%');
 	document.getElementById('logo').firstElementChild.firstElementChild.style.setProperty('width', '100%');
 	document.getElementsByClassName('right')[1].style.setProperty('padding-top', '0px');
