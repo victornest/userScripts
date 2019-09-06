@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Events in gamelist
-// @version        0.11
+// @version        0.12
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/
@@ -16,18 +16,27 @@
 		xmlHttp.send( null );
 		return xmlHttp.responseText;
 	}
-//getting events
-    var el = document.createElement('html');
-	el.innerHTML = httpGet('http://klavogonki.ru/forum/events/');
+
+//fitting head
+	document.getElementById('head').style.setProperty('background', 'white url(/img/top_back_gray.gif) repeat-x 0% 10%');
+	document.getElementById('logo').style.setProperty('width', '6%');
+	document.getElementById('logo').firstElementChild.firstElementChild.style.setProperty('width', '100%');
+	document.getElementsByClassName('right')[1].style.setProperty('padding-top', '0px');
+	document.getElementsByClassName('right')[1].childNodes[1].style.setProperty('height', '0');
 
 //insert table
-	var table = document.createElement('table');
-	table.innerHTML = "<tbody></tbody>";
+	var table = document.createElement('div');
+	table.innerHTML = "<table><tbody></tbody></table>";
 	document.getElementsByClassName('minwidth_container')[0].insertBefore(table, document.getElementsByClassName('minwidth_container')[0].childNodes[5]);
-	table = document.getElementsByClassName('minwidth_container')[0].childNodes[5].firstElementChild;
+	table.style.setProperty('padding', '6px 0px 6px 0px');
+	table = document.getElementsByClassName('minwidth_container')[0].childNodes[5].firstElementChild.firstElementChild;
 	table.style.setProperty('position', 'relative');
 	table.style.setProperty('left', '10px');
 	table.style.setProperty('top', '15%');
+
+//getting events
+    var el = document.createElement('html');
+	el.innerHTML = httpGet('http://klavogonki.ru/forum/events/');
 
 //insert events
 	var title = el.getElementsByClassName('item');
@@ -74,12 +83,5 @@
 		style.appendChild(document.createTextNode(css));
 	}
 	document.getElementsByTagName('head')[0].appendChild(style);
-
-//fitting head
-	document.getElementById('head').style.setProperty('background', 'white url(/img/top_back_gray.gif) repeat-x 0% 0%');
-	document.getElementById('logo').style.setProperty('width', '6%');
-	document.getElementById('logo').firstElementChild.firstElementChild.style.setProperty('width', '100%');
-	document.getElementsByClassName('right')[1].style.setProperty('padding-top', '0px');
-	document.getElementsByClassName('right')[1].childNodes[1].style.setProperty('height', '0');
 
 })();
