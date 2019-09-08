@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Events in gamelist
-// @version        0.12
+// @version        0.13
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/
@@ -28,7 +28,7 @@
 	var table = document.createElement('div');
 	table.innerHTML = "<table><tbody></tbody></table>";
 	document.getElementsByClassName('minwidth_container')[0].insertBefore(table, document.getElementsByClassName('minwidth_container')[0].childNodes[5]);
-	table.style.setProperty('padding', '6px 0px 6px 0px');
+	table.style.setProperty('padding', '7px 0px 6px 0px');
 	table = document.getElementsByClassName('minwidth_container')[0].childNodes[5].firstElementChild.firstElementChild;
 	table.style.setProperty('position', 'relative');
 	table.style.setProperty('left', '10px');
@@ -40,14 +40,15 @@
 
 //insert events
 	var title = el.getElementsByClassName('item');
-	var date = new Date(Date.now());
+	var dateNow = new Date(Date.now());
 	var j = 0;
 	for (let i = 0; i < 10; i++) {
 		console.log('f');
-		let day = parseInt(title[i + 20].firstElementChild.firstElementChild.innerText.trim().slice(1, 3)) - 1;
+		let date = parseInt(title[i + 20].firstElementChild.firstElementChild.innerText.trim().slice(1, 3));
 		let month = parseInt(title[i + 20].firstElementChild.firstElementChild.innerText.trim().slice(4, 6)) - 1;
 		let year = parseInt('20' + title[i + 20].firstElementChild.firstElementChild.innerText.trim().slice(7, 9));
-		if ((date.getDay() <= day) && (date.getMonth() <= month) && (date.getFullYear() <= year)) {
+		console.log('now', dateNow.getDate(), dateNow.getMonth(), dateNow.getFullYear(), '\n', 'event', date, month, year);
+		if ((dateNow.getDate() <= date) && (dateNow.getMonth() <= month) && (dateNow.getFullYear() <= year)) {
 			table.innerHTML += '<tr><td><a></a></td></tr>';
 			table.childNodes[j].childNodes[0].firstElementChild.innerText = title[i + 20].firstElementChild.firstElementChild.innerText.trim();
 			table.childNodes[j].childNodes[0].firstElementChild.href = title[i + 20].firstElementChild.firstElementChild.firstElementChild.href;
