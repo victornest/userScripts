@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.15
+// @version        3.16
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -231,7 +231,7 @@ function main() {
                                 //host lose by errors
                                 } else {
 									main.removeAttribute('disabled');
-									if ((id == 490344) || (id == 111001) || (id == 528143) || (id == 549338)) {
+									if ((id == 490344) || (id == 111001) || (id == 528143)) {
 										WonCSS;
 										main.onclick = function() {
 											Send(450, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -254,7 +254,7 @@ function main() {
                                 //host got 0
                                 if (myErrCount == 0) {
 									main.removeAttribute('disabled');
-									if ((id == 490344) || (id == 111001) || (id == 528143) || (id == 549338)) {
+									if ((id == 490344) || (id == 111001) || (id == 528143)) {
 										LostCSS();
 										main.onclick = function() {
 											Get(450, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -275,7 +275,7 @@ function main() {
                                     //host got less
                                     if (myErrCount < errCount) {
 										main.removeAttribute('disabled');
-										if ((id == 490344) || (id == 111001) || (id == 528143) || (id == 549338)) {
+										if ((id == 490344) || (id == 111001) || (id == 528143)) {
 											LostCSS();
 											main.onclick = function() {
 												Get(150, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -296,7 +296,7 @@ function main() {
                                     } else {
 										if (myErrCount > errCount) {
 											main.removeAttribute('disabled');
-											if ((id == 490344) || (id == 111001) || (id == 528143) || (id == 549338)) {
+											if ((id == 490344) || (id == 111001) || (id == 528143)) {
 												WonCSS();
 												main.onclick = function() {
 													Send(150, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -331,7 +331,7 @@ function main() {
 							//host got 0
 							if (myErrCount == 0) {
 								main.removeAttribute('disabled');
-								if ((id == 490344) || (id == 111001) || (id == 528143) || (id == 549338)) {
+								if ((id == 490344) || (id == 111001) || (id == 528143)) {
 									LostCSS();
 									main.onclick = function() {
 										Get(450, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -350,7 +350,7 @@ function main() {
 								//host got 1+
 							} else {
 								main.removeAttribute('disabled');
-								if ((id == 490344) || (id == 111001) || (id == 528143) || (id == 549338)) {
+								if ((id == 490344) || (id == 111001) || (id == 528143)) {
 									LostCSS();
 									main.onclick = function() {
 										Get(150, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -376,7 +376,7 @@ function main() {
 							//player got 0
 							if (errCount == 0) {
 								main.removeAttribute('disabled');
-								if ((id == 490344) || (id == 111001) || (id == 528143) || (id == 549338)) {
+								if ((id == 490344) || (id == 111001) || (id == 528143)) {
 									WonCSS();
 									main.onclick = function() {
 										Send(450, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -396,7 +396,7 @@ function main() {
 								//player got 1+
 							} else {
 								main.removeAttribute('disabled');
-								if ((id == 490344) || (id == 111001) || (id == 528143) || (id == 549338)) {
+								if ((id == 490344) || (id == 111001) || (id == 528143)) {
 									WonCSS();
 									main.onclick = function() {
 										Send(150, id, extraGameInfo[i].name, myErrCount, errCount);
