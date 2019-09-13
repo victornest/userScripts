@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           SpeedCoeff
-// @version        0.12
+// @version        0.11
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
