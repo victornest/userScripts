@@ -1,23 +1,36 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.20
+// @version        3.30
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
 // @grant          unsafeWindow
 // ==/UserScript==
 
-unsafeWindow.casinoBlacklist = false;
+unsafeWindow.casinoBlacklistAdd = false;
+unsafeWindow.casinoBlacklistRemove = false;
 function abc() {
-	if (unsafeWindow.casinoBlacklist) {
+	var blacklistShow = function(){ return JSON.parse(localStorage.casino).blacklist; };
+	unsafeWindow.casinoBlacklistShow = blacklistShow();
+	if (unsafeWindow.casinoBlacklistAdd) {
 		if (localStorage.casino == undefined) {
 			localStorage.casino = "{\"blacklist\":[]}";
 		}
-		var blacklist = JSON.parse(localStorage.casino);
-		blacklist.blacklist[blacklist.blacklist.length] = unsafeWindow.casinoBlacklist;
+		let blacklist = JSON.parse(localStorage.casino);
+		blacklist.blacklist[blacklist.blacklist.length] = unsafeWindow.casinoBlacklistAdd;
 		localStorage.casino = JSON.stringify(blacklist);
-		unsafeWindow.casinoBlacklist = false;
+		unsafeWindow.casinoBlacklistAdd = false;
 	}
+	if (unsafeWindow.casinoBlacklistRemove) {
+		let blacklist = JSON.parse(localStorage.casino);
+		blacklist.blacklist.splice(blacklist.blacklist.findIndex(function(element){return element == unsafeWindow.casinoBlacklistRemove}), 1)
+		localStorage.casino = JSON.stringify(blacklist);
+		unsafeWindow.casinoBlacklistRemove = false;
+	}
+	/*if (unsafeWindow.casinoBlacklistShow) {
+		console.log(JSON.parse(localStorage.casino).blacklist);
+		unsafeWindow.casinoBlacklistShow = false;
+	}*/
 }
 setInterval(abc, 1000);
 
@@ -72,17 +85,10 @@ function main() {
 			this.name = c;
 		}
 
-		function CheckBlacklist(id) {
-			if (JSON.parse(localStorage.casino).blacklist.find(function(element){return element == id})) {
-				//doSomething
-				return true;
-			}
-		}
-
 		//sending scores
 		function Send(amount, id, name, myErrCount, errCount) {
 			//blacklist check
-			if (CheckBlacklist(id)) {
+			if (JSON.parse(localStorage.casino).blacklist.find(function(element){return element == id})) {
 				PrintChat('Упс! ' + name + ' оказался неплательщиком! В участии отказано! Казино вызвало охрану.');
 				main.style.setProperty('background', '#fff');
 				main.style.setProperty('border', 'solid #fff 0px');
