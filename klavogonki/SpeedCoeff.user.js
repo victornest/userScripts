@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           SpeedCoeff
-// @version        0.1
+// @version        0.11
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -19,7 +19,7 @@
 				if (this.responseText == '{"ok":1}') {
 					//console.log(this.responseText);
 				} else {
-					alert(this.responseText);
+					//alert(this.responseText);
 				}
 			}
 		});
