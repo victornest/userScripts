@@ -17,9 +17,9 @@
 		xmlHttp.onreadystatechange = (function() {
 			if (this.readyState == 4 && this.status == 200) {
 				if (this.responseText == '{"ok":1}') {
-					//console.log(this.responseText);
+					
 				} else {
-					//alert(this.responseText);
+					
 				}
 			}
 		});
