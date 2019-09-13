@@ -1,12 +1,25 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.16
+// @version        3.2
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
-// @grant          none
+// @grant          unsafeWindow
 // ==/UserScript==
 
+unsafeWindow.casinoBlacklist = false;
+function abc() {
+	if (unsafeWindow.casinoBlacklist) {
+		if (localStorage.casino == undefined) {
+			localStorage.casino = "{\"blacklist\":[]}";
+		}
+		var blacklist = JSON.parse(localStorage.casino);
+		blacklist.blacklist[blacklist.blacklist.length] = unsafeWindow.casinoBlacklist;
+		localStorage.casino = JSON.stringify(blacklist);
+		unsafeWindow.casinoBlacklist = false;
+	}
+}
+setInterval(abc, 1000);
 
 function main() {
 	var gmid = document.location.href.slice(-6).replace(/[^\d]/g, '');
@@ -36,16 +49,16 @@ function main() {
 	}
 
 	async function c(id, main) {
-		console.log('start');
+		//console.log('start');
 		var amount;
 		var params;
 		var avgSpeed;
 		var speed;
 		var errCount;
 		try {
-		var myId = parseInt(document.querySelectorAll( '[class="player you ng-scope"]' )[0].querySelectorAll( '[href]' )[0].pathname.replace(/[^\d]/g, ''));
-		var mySpeed = parseInt(document.querySelectorAll( '[class="player you ng-scope"]' )[0].getElementsByClassName('bitmore')[3].textContent);
-		var myErrCount = parseInt(document.querySelectorAll( '[class="player you ng-scope"]' )[0].getElementsByClassName('bitmore')[4].textContent);
+			var myId = parseInt(document.querySelectorAll( '[class="player you ng-scope"]' )[0].querySelectorAll( '[href]' )[0].pathname.replace(/[^\d]/g, ''));
+			var mySpeed = parseInt(document.querySelectorAll( '[class="player you ng-scope"]' )[0].getElementsByClassName('bitmore')[3].textContent);
+			var myErrCount = parseInt(document.querySelectorAll( '[class="player you ng-scope"]' )[0].getElementsByClassName('bitmore')[4].textContent);
 		} catch(error) {
 			await Sleep(500);
 			c(id, main);
@@ -59,8 +72,25 @@ function main() {
 			this.name = c;
 		}
 
+		function CheckBlacklist(id) {
+			if (JSON.parse(localStorage.casino).blacklist.find(function(element){return element == id})) {
+				//doSomething
+				return true;
+			}
+		}
+
 		//sending scores
 		function Send(amount, id, name, myErrCount, errCount) {
+			//blacklist check
+			if (CheckBlacklist(id)) {
+				PrintChat('Упс! ' + name + ' оказался неплательщиком! В участии отказано! Казино вызвало охрану.');
+				main.style.setProperty('background', '#fff');
+				main.style.setProperty('border', 'solid #fff 0px');
+				main.onmouseenter = '';
+				main.onmouseleave = '';
+				return;
+			}
+
 			var img = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAASAAAAEgARslrPgAAAAl2cEFnAAAAEAAAABAAXMatwwAAAKRJREFUOMudk0ESwyAMA5dO/mV+hviZ/TL3RNJ2EmiiK7CyNKYAIJInEmVDZLZn7wslX7MLvfcl5BIQEQgREUTEPcBwFsLMcHdKL/8BhrOZfXSl/exX2yp/RODVAb6glwAzAz9c8WOKM8BpB9lydx2gUegS0HvfCxOitcZsT6Z7cBpv1UFrDTq4O0LUqFSvkylEXklSzoTIWxFuT7ASIkfdj7/zG88ZuXfMZDyDAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE3LTA3LTE1VDIzOjExOjM1KzAwOjAwBj7ISAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxNy0wNy0xNVQyMzoxMTozNSswMDowMHdjcPQAAAAASUVORK5CYII=';
 			var url = "http://klavogonki.ru/api/profile/send-scores";
 			try {
@@ -515,7 +545,7 @@ function main() {
 				try {
 					speed = parseInt(document.querySelectorAll( '[id^="car"]' )[i].parentNode.childNodes[1].childNodes[3].childNodes[1].innerText);
 				} catch (error) {
-					console.log('speed is undefined', playerList[i]);
+					//console.log('speed is undefined', playerList[i]);
 					continue;
 				}
 			}
@@ -541,7 +571,7 @@ function main() {
 			}
 
 			try {
-				console.log(avgSpeed, speed, playerList[i]);
+				//console.log(avgSpeed, speed, playerList[i]);
 				if (avgSpeed > speed) {
 					CSS('red', i);
 				} else {
@@ -678,7 +708,7 @@ function PrintAnnouncement(text) {
 
 (function(){
 	document.addEventListener('keydown', function(e) {
-		if (e.keyCode == 192) {
+		if (e.keyCode == 220) {
 			e.preventDefault();
 			PrintAnnouncement(':excl: `Играем со мной?` У кого меньше ошибок, тому __200__, но если __0__ ошибок тогда __500__. Минимальная скорость: __-10%__ от средней до заезда. `Пишите, кто участвует`');
 		}
