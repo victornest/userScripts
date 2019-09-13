@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           SpeedCoeff
-// @version        0.14
+// @version        0.15
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -17,9 +17,9 @@
 		xmlHttp.onreadystatechange = (function() {
 			if (this.readyState == 4 && this.status == 200) {
 				if (this.responseText == '{"ok":1}') {
-					
+
 				} else {
-					
+
 				}
 			}
 		});
@@ -78,23 +78,28 @@
 				var gameInfo = GetGameInfo();
 				var player = document.getElementById('players').childNodes;
 				for (var i = 0; i < player.length; i++) {
-					var car = player[i].getElementsByClassName('car ng-isolate-scope')[0];
-					car.onmouseenter = function() {
-						if (CalculateCoeff(this, gameInfo, player)) {
-							this.onmouseenter = function() {
-								this.style.setProperty('display', 'none');
-								this.previousSibling.style.setProperty('display', '');
-							};
-							this.previousSibling.onmouseleave = function() {
-								this.style.setProperty('display', 'none');
-								this.nextSibling.style.setProperty('display', '');
-							};
+					if (player[i].getElementsByClassName('car ng-isolate-scope')[0] != undefined) {
+						var car = player[i].getElementsByClassName('car ng-isolate-scope')[0];
+						car.onmouseenter = function() {
+							if (CalculateCoeff(this, gameInfo, player)) {
+								this.onmouseenter = function() {
+									this.style.setProperty('display', 'none');
+									this.previousSibling.style.setProperty('display', '');
+								};
+								this.previousSibling.onmouseleave = function() {
+									this.style.setProperty('display', 'none');
+									this.nextSibling.style.setProperty('display', '');
+								};
+							}
 						}
+					} else {
+						console.log('car is undefined');
+						continue;
 					}
 				}
 			}
 		} catch(error) {
-			console.log('erop');
+			console.log(error);
 			main();
 			return;
 		}
