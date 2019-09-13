@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           SpeedCoeff
-// @version        0.13
+// @version        0.11
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -17,7 +17,7 @@
 		xmlHttp.onreadystatechange = (function() {
 			if (this.readyState == 4 && this.status == 200) {
 				if (this.responseText == '{"ok":1}') {
-					//console.log(this.responseText)
+					//console.log(this.responseText);
 				} else {
 					//alert(this.responseText);
 				}
