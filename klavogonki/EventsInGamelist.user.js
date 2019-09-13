@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Events in gamelist
-// @version        0.13
+// @version        0.14
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/
@@ -43,11 +43,11 @@
 	var dateNow = new Date(Date.now());
 	var j = 0;
 	for (let i = 0; i < 10; i++) {
-		console.log('f');
+		//console.log('f');
 		let date = parseInt(title[i + 20].firstElementChild.firstElementChild.innerText.trim().slice(1, 3));
 		let month = parseInt(title[i + 20].firstElementChild.firstElementChild.innerText.trim().slice(4, 6)) - 1;
 		let year = parseInt('20' + title[i + 20].firstElementChild.firstElementChild.innerText.trim().slice(7, 9));
-		console.log('now', dateNow.getDate(), dateNow.getMonth(), dateNow.getFullYear(), '\n', 'event', date, month, year);
+		//console.log('now', dateNow.getDate(), dateNow.getMonth(), dateNow.getFullYear(), '\n', 'event', date, month, year);
 		if ((dateNow.getDate() <= date) && (dateNow.getMonth() <= month) && (dateNow.getFullYear() <= year)) {
 			table.innerHTML += '<tr><td><a></a></td></tr>';
 			table.childNodes[j].childNodes[0].firstElementChild.innerText = title[i + 20].firstElementChild.firstElementChild.innerText.trim();
