@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.2
+// @version        3.20
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
