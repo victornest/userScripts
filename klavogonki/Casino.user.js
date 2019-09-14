@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.32
+// @version        3.33
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -27,10 +27,6 @@ function abc() {
 		localStorage.casino = JSON.stringify(blacklist);
 		unsafeWindow.casinoBlacklistRemove = false;
 	}
-	/*if (unsafeWindow.casinoBlacklistShow) {
-		console.log(JSON.parse(localStorage.casino).blacklist);
-		unsafeWindow.casinoBlacklistShow = false;
-	}*/
 }
 setInterval(abc, 1000);
 
@@ -150,7 +146,16 @@ function main() {
 		}
 
 		//draw
-		function Draw(name) {
+		function Draw(id, name) {
+			//blacklist check
+			if (JSON.parse(localStorage.casino).blacklist.find(function(element){return element == id})) {
+				PrintChat('Упс! ' + name + ' оказался неплательщиком! В участии отказано! Казино вызвало охрану.');
+				main.style.setProperty('background', '#fff');
+				main.style.setProperty('border', 'solid #fff 0px');
+				main.onmouseenter = '';
+				main.onmouseleave = '';
+				return;
+			}
 			PrintChat(name + ', ничья!');
 			main.style.setProperty('background', '#fff');
 			main.style.setProperty('border', 'solid #fff 0px');
@@ -259,7 +264,7 @@ function main() {
 									DrawCSS();
 									main.removeAttribute('disabled');
 									main.onclick = function() {
-										Draw(extraGameInfo[i].name);
+										Draw(id, extraGameInfo[i].name);
 										main.setAttribute('disabled', '');
 									}
 									main.value += ' ' + errCount + ' draw ' + myErrCount + ' me';
@@ -353,7 +358,7 @@ function main() {
 											DrawCSS();
 											main.removeAttribute('disabled');
 											main.onclick = function() {
-												Draw(extraGameInfo[i].name);
+												Draw(id, extraGameInfo[i].name);
 												main.setAttribute('disabled', '');
 											}
 											main.value += ' ' + errCount + ' draw ' + myErrCount + ' me';
@@ -455,7 +460,7 @@ function main() {
 							DrawCSS();
 							main.removeAttribute('disabled');
 							main.onclick = function() {
-								Draw(extraGameInfo[i].name);
+								Draw(id, extraGameInfo[i].name);
 								main.setAttribute('disabled', '');
 							}
 							main.value += ' ' + errCount + ' draw ' + myErrCount + ' me';
