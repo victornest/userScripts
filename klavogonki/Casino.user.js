@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.31
+// @version        3.32
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -10,12 +10,12 @@
 unsafeWindow.casinoBlacklistAdd = false;
 unsafeWindow.casinoBlacklistRemove = false;
 function abc() {
+    if (localStorage.casino == undefined) {
+			localStorage.casino = "{\"blacklist\":[]}";
+    }
 	var blacklistShow = function(){ return JSON.parse(localStorage.casino).blacklist; };
 	unsafeWindow.casinoBlacklistShow = blacklistShow();
 	if (unsafeWindow.casinoBlacklistAdd) {
-		if (localStorage.casino == undefined) {
-			localStorage.casino = "{\"blacklist\":[]}";
-		}
 		let blacklist = JSON.parse(localStorage.casino);
 		blacklist.blacklist[blacklist.blacklist.length] = unsafeWindow.casinoBlacklistAdd;
 		localStorage.casino = JSON.stringify(blacklist);
