@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.33
+// @version        3.34
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -439,11 +439,19 @@ function main() {
 								main.removeAttribute('disabled');
 								if ((id == 490344) || (id == 111001) || (id == 528143)) {
 									WonCSS();
-									main.onclick = function() {
-										Send(150, id, extraGameInfo[i].name, myErrCount, errCount);
-										main.setAttribute('disabled', '');
-									};
-									main.value += ' won ' + ((myErrCount - errCount) * 50 + 150) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
+									if (myErrCount <= errCount) {
+										main.onclick = function() {
+											Send(200, id, extraGameInfo[i].name);
+											main.setAttribute('disabled', '');
+										};
+										main.value += ' won 200 with ' + errCount + ' vs ' + myErrCount + ' me';
+									} else {
+										main.onclick = function() {
+											Send(150, id, extraGameInfo[i].name, myErrCount, errCount);
+											main.setAttribute('disabled', '');
+										};
+										main.value += ' won ' + ((myErrCount - errCount) * 50 + 150) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
+									}
 									return;
 								} else {
 									WonCSS();
@@ -719,7 +727,7 @@ function PrintAnnouncement(text) {
 
 (function(){
 	document.addEventListener('keydown', function(e) {
-		if (e.keyCode == 192) {
+		if (e.keyCode == 220) {
 			e.preventDefault();
 			PrintAnnouncement(':excl: `Играем со мной?` У кого меньше ошибок, тому __200__, но если __0__ ошибок тогда __500__. Минимальная скорость: __-10%__ от средней до заезда. `Пишите, кто участвует`');
 		}
