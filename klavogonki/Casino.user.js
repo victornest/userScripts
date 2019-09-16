@@ -727,7 +727,7 @@ function PrintAnnouncement(text) {
 
 (function(){
 	document.addEventListener('keydown', function(e) {
-		if (e.keyCode == 220) {
+		if (e.keyCode == 192) {
 			e.preventDefault();
 			PrintAnnouncement(':excl: `Сыграешь против меня?` У кого меньше ошибок, тому __200__, но если __0__ ошибок, тогда __500__. Минимальная скорость: __-10%__ от средней до заезда. `Пишите, кто участвует`');
 		}
