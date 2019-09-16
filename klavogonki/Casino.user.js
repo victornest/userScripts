@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.34
+// @version        3.35
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -729,7 +729,7 @@ function PrintAnnouncement(text) {
 	document.addEventListener('keydown', function(e) {
 		if (e.keyCode == 220) {
 			e.preventDefault();
-			PrintAnnouncement(':excl: `Играем со мной?` У кого меньше ошибок, тому __200__, но если __0__ ошибок тогда __500__. Минимальная скорость: __-10%__ от средней до заезда. `Пишите, кто участвует`');
+			PrintAnnouncement(':excl: `Сыграешь против меня?` У кого меньше ошибок, тому __200__, но если __0__ ошибок, тогда __500__. Минимальная скорость: __-10%__ от средней до заезда. `Пишите, кто участвует`');
 		}
 	}, false);
 	return false;
