@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.36
+// @version        3.37
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -273,7 +273,7 @@ function main() {
                                 } else {
 									main.removeAttribute('disabled');
 									if ((id == 490344) || (id == 111001) || (id == 528143)) {
-										WonCSS;
+										WonCSS();
 										main.onclick = function() {
 											Send(450, id, extraGameInfo[i].name, myErrCount, errCount);
 											main.setAttribute('disabled', '');
@@ -281,7 +281,7 @@ function main() {
 										main.value += ' won ' + ((myErrCount - errCount) * 50 + 450) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
 										return;
                                     } else {
-										WonCSS;
+										WonCSS();
 										main.onclick = function() {
 											Send(500, id, extraGameInfo[i].name);
 											main.setAttribute('disabled', '');
