@@ -235,7 +235,7 @@ function main() {
 				//limit computing
 				try {
 					if (extraGameInfo[i].id === 270277) {
-						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.9); //Виталька
+						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.75); //Виталька
 					}
 					if (extraGameInfo[i].id === 488630) {
 						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.7925); //_Daemon_
