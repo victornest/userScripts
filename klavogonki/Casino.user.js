@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.37
+// @version        3.38
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -234,10 +234,11 @@ function main() {
 				}
 				//limit computing
 				try {
+					if (extraGameInfo[i].id === 270277) {
+						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.9); //Виталька
+					}
 					if (extraGameInfo[i].id === 488630) {
-						console.log('deamon\'s avg before ', avgSpeed);
 						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.7925); //_Daemon_
-						console.log('deamon\'s avg after ', avgSpeed);
 					} else {
 						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.9);
 					}
@@ -727,7 +728,7 @@ function PrintAnnouncement(text) {
 
 (function(){
 	document.addEventListener('keydown', function(e) {
-		if (e.keyCode == 192) {
+		if (e.keyCode == localStorage.casinoAnnouncementButton) {
 			e.preventDefault();
 			PrintAnnouncement(':excl: `Сыграешь против меня?` У кого из нас двоих меньше ошибок, тому __200__, но если __0__ ошибок, тогда __500__. Минимальная скорость: __-10%__ от средней до заезда. `Пишите, кто участвует`');
 		}
