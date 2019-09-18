@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.41
+// @version        3.42
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -231,13 +231,12 @@ function main() {
 				}
 				//limit computing
 				try {
+					avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.9);
 					if (extraGameInfo[i].id === 270277) {
 						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.74); //Виталька
 					}
 					if (extraGameInfo[i].id === 488630) {
 						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.7925); //_Daemon_
-					} else {
-						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.9);
 					}
 				} catch (error) {
 					alert('limit computing error');
