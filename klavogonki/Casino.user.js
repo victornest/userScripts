@@ -7,6 +7,7 @@
 // @grant          unsafeWindow
 // ==/UserScript==
 
+
 unsafeWindow.casinoBlacklistAdd = false;
 unsafeWindow.casinoBlacklistRemove = false;
 function abc() {
@@ -246,10 +247,10 @@ function main() {
 				}
 				//determining winner
 				try {
-					console.log('speed: ', speed, ', avgSpeed: ', avgSpeed, ', errCount: ', errCount,
-								'\n mySpeed: ', mySpeed, ', myAvgSpeed: ', myAvgSpeed, ', myErrCount: ', myErrCount,
-								'\n', id, playerList[i], main,
-							    '\n', id, 'eq = ', ((id == 490344) || (id == 111001) || (id == 528143)));
+					//console.log('speed: ', speed, ', avgSpeed: ', avgSpeed, ', errCount: ', errCount,
+					//			'\n mySpeed: ', mySpeed, ', myAvgSpeed: ', myAvgSpeed, ', myErrCount: ', myErrCount,
+					//			'\n', id, playerList[i], main,
+					//		    '\n', id, 'eq = ', ((id == 490344) || (id == 111001) || (id == 528143)));
 					//host in a limit
 					if (mySpeed > myAvgSpeed) {
 						//player in a limit
