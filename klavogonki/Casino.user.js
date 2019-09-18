@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.40
+// @version        3.41
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -232,7 +232,7 @@ function main() {
 				//limit computing
 				try {
 					if (extraGameInfo[i].id === 270277) {
-						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.75); //Виталька
+						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.74); //Виталька
 					}
 					if (extraGameInfo[i].id === 488630) {
 						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.7925); //_Daemon_
