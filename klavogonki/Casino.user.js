@@ -247,6 +247,7 @@ function main() {
 				}
 				//determining winner
 				try {
+					console.log('d');
 					//console.log('speed: ', speed, ', avgSpeed: ', avgSpeed, ', errCount: ', errCount,
 					//			'\n mySpeed: ', mySpeed, ', myAvgSpeed: ', myAvgSpeed, ', myErrCount: ', myErrCount,
 					//			'\n', id, playerList[i], main,
