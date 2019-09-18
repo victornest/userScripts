@@ -58,7 +58,6 @@ function main() {
 	}
 
 	async function c(id, main) {
-		//console.log('start');
 		var amount;
 		var params;
 		var avgSpeed;
@@ -131,14 +130,12 @@ function main() {
 					main.style.setProperty('border', 'solid #fff 0px');
 					main.onmouseenter = '';
 					main.onmouseleave = '';
-					//main.value += ' get ' + amount;
 				} else {
 					PrintChat(name + ' проигрывает ' + amount + ' очков!');
 					main.style.setProperty('background', '#fff');
 					main.style.setProperty('border', 'solid #fff 0px');
 					main.onmouseenter = '';
 					main.onmouseleave = '';
-					//main.value += ' get ' + amount
 				}
 			} catch(error) {
 				alert('get scores error');
@@ -211,7 +208,6 @@ function main() {
 					speed = parseInt(document.querySelectorAll( '[id^="car"]' )[i].parentNode.childNodes[1].childNodes[2].childNodes[1].innerText);
 					errCount = parseInt(document.querySelectorAll( '[id^="car"]' )[i].parentNode.childNodes[1].childNodes[2].childNodes[2].childNodes[0].innerText);
 				} catch (error) {
-					//console.log('54', 'speed is undefined', playerList[i]);
 					continue;
 				}
 
