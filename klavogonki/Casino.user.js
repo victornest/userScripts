@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.42
+// @version        3.43
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -196,7 +196,7 @@ function main() {
 						}
 					}
 				} catch (error) {
-					alert('getting my avgspeed error');
+					alert(error);
 					await Sleep(500);
 					c(id, main);
 					return;
@@ -252,9 +252,9 @@ function main() {
 					//			'\n', id, playerList[i], main,
 					//		    '\n', id, 'eq = ', ((id == 490344) || (id == 111001) || (id == 528143)));
 					//host in a limit
-					if (mySpeed > myAvgSpeed) {
+					if (mySpeed >= myAvgSpeed) {
 						//player in a limit
-						if (speed > avgSpeed) {
+						if (speed >= avgSpeed) {
 							//player got 0
 							if (errCount == 0) {
                                 //host got 0
@@ -411,7 +411,7 @@ function main() {
 					//host not in a limit
 					} else {
 						//player in a limit
-						if (speed > avgSpeed) {
+						if (speed >= avgSpeed) {
 							//player got 0
 							if (errCount == 0) {
 								main.removeAttribute('disabled');
