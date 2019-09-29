@@ -27,7 +27,7 @@
 		if (time > 60) {
 			time = (Math.floor(time / 60) + ':' + time % 60)
 		}
-		return console.log('' + time);
+		return console.log(time);
 	};
 
 })();
