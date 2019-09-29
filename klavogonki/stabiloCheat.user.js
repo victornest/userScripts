@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.02
+// @version        0.03
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -25,7 +25,7 @@
 	unsafeWindow.timeForSpeed = function(speed) {
 		var time = (60 / (speed / length));
 		if (time > 60) {
-			time = (Math.round(time / 60) + ':' + time % 60)
+			time = (Math.floor(time / 60) + ':' + time % 60)
 		}
 		return console.log('' + time);
 	};
