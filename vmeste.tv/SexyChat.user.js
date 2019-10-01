@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           vmeste.tv compact style
-// @version        0.13
+// @version        0.14
 // @namespace      vmeste
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://vmeste.tv/*
@@ -27,7 +27,7 @@
 	}
 
 	async function applyCSS() {
-		var sound = new Audio('https://raw.githubusercontent.com/gaben-s-agent/klavogonki/master/vmeste.tv/file-sounds-913-served.mp3');
+		var sound = new Audio('https://vk.com/mp3/bb2.mp3');
 		if (document.getElementById('users').textContent != '') {
 			var compact =
 				' #chats { ' +
