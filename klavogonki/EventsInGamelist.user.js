@@ -1,9 +1,8 @@
 // ==UserScript==
 // @name           Events in gamelist
-// @version        0.14
+// @version        0.15
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
-// @include        http://klavogonki.ru/
 // @include        http://klavogonki.ru/gamelist/
 // @include        http://klavogonki.ru/g/*
 // @grant          none
@@ -18,8 +17,6 @@
 	}
 
 //fitting head
-	document.getElementById('head').style.setProperty('background', 'white url(/img/top_back_gray.gif) repeat-x 0% 10%');
-	document.getElementById('logo').style.setProperty('width', '6%');
 	document.getElementById('logo').firstElementChild.firstElementChild.style.setProperty('width', '100%');
 	document.getElementsByClassName('right')[1].style.setProperty('padding-top', '0px');
 	document.getElementsByClassName('right')[1].childNodes[1].style.setProperty('height', '0');
@@ -29,10 +26,13 @@
 	table.innerHTML = "<table><tbody></tbody></table>";
 	document.getElementsByClassName('minwidth_container')[0].insertBefore(table, document.getElementsByClassName('minwidth_container')[0].childNodes[5]);
 	table.style.setProperty('padding', '7px 0px 6px 0px');
+	table.setAttribute('class', 'event-table');
 	table = document.getElementsByClassName('minwidth_container')[0].childNodes[5].firstElementChild.firstElementChild;
+	table.setAttribute('class', 'event-table-tbody');
 	table.style.setProperty('position', 'relative');
 	table.style.setProperty('left', '10px');
 	table.style.setProperty('top', '15%');
+	table.style.setProperty('z-index', '1');
 
 //getting events
     var el = document.createElement('html');
@@ -63,6 +63,32 @@
 	var css =
 		' :root { ' +
 		' --mainColor: #ff9800; } ' +
+
+		' #head { ' +
+		' position: absolute; ' +
+		' background: white url(/img/top_back_gray.gif) repeat-x 0% 10% !important;' +
+		' border-bottom-left-radius: 60px; ' +
+		' border-bottom-right-radius: 60px; ' +
+		' box-shadow: 0px 0px 10px -3px; ' +
+		' width: -moz-available; ' +
+		' top: 44px; } ' +
+
+		' #logo { ' +
+		' width: 108px; }' +
+
+		' #content { ' +
+		' padding-top: 50px; } ' +
+
+		' .event-table { ' +
+		' max-height: 50px; ' +
+		' overflow: hidden; } ' +
+
+		' .event-table:hover { ' +
+		' overflow: visible; }' +
+
+		' .event-table-tbody { ' +
+		' background: rgba(235,235,235,0.9); ' +
+		' box-shadow: 0px 0px 5px 1px gray; } ' +
 
 		' a.quickEvent { ' +
 		' background: linear-gradient( to right, var(--mainColor) 0%, var(--mainColor) 5px, transparent 5px); ' +
