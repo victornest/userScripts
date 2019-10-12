@@ -1,6 +1,6 @@
 // ==UserScript==
-// @name           realAvgSpeed
-// @version        0.01
+// @name           RTavgSpeed
+// @version        0.10
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -17,7 +17,8 @@
 			main();
 			return;
 		} else {
-			await sleep(1);
+			unsafeWindow.txt = text;
+			await sleep(10);
 			checkInputActivity();
 			return;
 		}
@@ -26,11 +27,11 @@
 	async function checkInputDisability() {
 		if (document.getElementById('typeplayblock').style.display == 'none') {
 			endTime = Date.now();
-			var avgSpeed = ((60 / ((endTime - startTime) / 1000)) * length);
-			var speedpanel = document.getElementById('speedpanel');
+			var avgSpeed = ((60 / ((endTime - startTime) / 1000)) * length) + 4;
+			//var speedpanel = document.getElementById('speedpanel');
 			var avgSpeedLabel = document.getElementsByClassName('speedLabel')[0];
-			avgSpeedLabel.style.color = "red";
-			avgSpeedLabel.innerText = avgSpeed.toFixed(1);
+			//avgSpeedLabel.style.color = "red";
+			avgSpeedLabel.innerText = avgSpeed.toFixed(0);
 			console.log(avgSpeed);
 			return;
 		} else {
@@ -50,14 +51,19 @@
 			try {
 				var json = JSON.parse(this.responseText);
 				if ('text' in json) {
-					text = json.text.text;
-					unsafeWindow.txt = text.text;
+					text = parseText(json.text.text);
 					length = text.length;
 				}
 			} catch (e) {}
 		}.bind(this));
 		return proxied.apply(this, [].slice.call(arguments));
 	};
+
+	function parseText(text) {
+		text = text.replace(RegExp(/[«»]/g), '"');
+		text = text.replace(RegExp(/[−–—]/g), '-');
+		return text;
+	}
 
 	function main() {
 		var arrText = [];
@@ -68,7 +74,7 @@
 				arrText.push(text.split(' ')[i] += ' ');
 			}
 		}
-console.log(arrText);
+
 		var input = document.getElementById('inputtext');
 		var iterCurrentRightString = 0;
 		var iterLetters = 0;
@@ -91,27 +97,29 @@ console.log(arrText);
 
 
 
+
+
+
+
 		//////////FUNCTIONS//////////
 
 		async function getAvgSpeed(startTime) {
 			if (document.getElementById('typeplayblock').style.display == 'none') {
 				return;
 			}
-			var avgSpeed = ((60 / ((Date.now() - startTime) / 1000)) * currentRightLength());
-			avgSpeedLabel.innerText = avgSpeed.toFixed(1);
+			var avgSpeed = ((60 / ((Date.now() - startTime) / 1000)) * currentRightLength()) + 4;
+			avgSpeedLabel.innerText = avgSpeed.toFixed(0);
 			avgSpeedLabel.style.color = "white";
-			await sleep (300);
+			await sleep (50);
 			getAvgSpeed(startTime);
 			return;
 		}
 
 		function checkError(key) {
-			if (checkInput(input.value)) {
-				if (key == arrText[iterWords][iterLetters]) {
+			if (checkInput(input.value + key)) {
+				if ((input.value + key) == arrText[iterWords].slice(0, (input.value + key).length)) {
 					iterCurrentRightString++;
-					iterLetters++;
-					if (iterLetters == arrText[iterWords].length) {
-						iterLetters = 0;
+					if ((input.value + key) == arrText[iterWords]) {
 						iterCurrentRightString = 0;
 						iterWords++;
 					}
