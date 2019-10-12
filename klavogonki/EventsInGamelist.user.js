@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Events in gamelist
-// @version        0.15
+// @version        0.16
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/gamelist/
@@ -69,8 +69,8 @@
 		' background: white url(/img/top_back_gray.gif) repeat-x 0% 10% !important;' +
 		' border-bottom-left-radius: 60px; ' +
 		' border-bottom-right-radius: 60px; ' +
-		' box-shadow: 0px 0px 10px -3px; ' +
-		' width: -moz-available; ' +
+		' box-shadow: 0px 0px 5px -3px; ' +
+		' width: 100%; ' +
 		' top: 44px; } ' +
 
 		' #logo { ' +
@@ -87,7 +87,7 @@
 		' overflow: visible; }' +
 
 		' .event-table-tbody { ' +
-		' background: rgba(235,235,235,0.9); ' +
+		' background: rgba(245,245,245,0.9); ' +
 		' box-shadow: 0px 0px 5px 1px gray; } ' +
 
 		' a.quickEvent { ' +
