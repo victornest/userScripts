@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.04
+// @version        0.05
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -10,17 +10,21 @@
 (function() {
 	var proxied = window.XMLHttpRequest.prototype.send;
 	var length;
-    window.XMLHttpRequest.prototype.send = function () {
-        this.addEventListener('load', function () {
-            try {
-                var json = JSON.parse(this.responseText);
-                if ('text' in json) {
-                    length = (json.text.length);
-                }
-            } catch (e) {}
-        }.bind(this));
-        return proxied.apply(this, [].slice.call(arguments));
-    };
+	window.XMLHttpRequest.prototype.send = function () {
+		this.addEventListener('load', function () {
+			try {
+				var json = JSON.parse(this.responseText);
+				if ('text' in json) {
+					length = (json.text.length);
+					if (localStorage.stabiloCheat) {
+						document.getElementById('inputSpeed').value = +localStorage.stabiloCheat;
+						getTime(document.getElementById('inputSpeed').value);
+					}
+				}
+			} catch (e) {}
+		}.bind(this));
+		return proxied.apply(this, [].slice.call(arguments));
+	};
 
 	unsafeWindow.timeForSpeed = function(speed) {
 		var time = (60 / (speed / length));
@@ -43,8 +47,10 @@
 	inputSpeed.style.setProperty('max-width', '40px');
 	inputSpeed.style.setProperty('border', 'solid 1px #d5d5d5');
 	inputSpeed.style.setProperty('text-align', 'center');
+	inputSpeed.setAttribute('id', 'inputSpeed');
 	inputSpeed.addEventListener('keyup', function () {
-		document.getElementById('tfs').innerText = getTime(this.value);
+		getTime(this.value);
+		localStorage.stabiloCheat = this.value;
 	});
 
 	tfs.style.setProperty('display', 'inline');
@@ -56,8 +62,12 @@
 		if (time > 60) {
 			time = (Math.floor(time / 60) + ':' + time % 60)
 		}
-		return time;
+		document.getElementById('tfs').innerText = time;
+		return;
 	}
 
+	function sleep(ms) {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
 
 })();
