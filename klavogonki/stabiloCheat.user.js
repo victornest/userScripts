@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.06
+// @version        0.07
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -40,9 +40,9 @@ document.addEventListener('load', function() {
 	unsafeWindow.timeForSpeed = function(speed) {
 		var time = (60 / (speed / length));
 		if (time > 60) {
-			time = (Math.floor(time / 60) + ':' + time % 60)
+			time = (Math.floor(time / 60) + ':' + (time % 60).toFixed(1));
 		}
-		return console.log(time);
+		return console.log(time.toFixed(2));
 	};
 
 
@@ -70,14 +70,16 @@ document.addEventListener('load', function() {
 		setInt(inputSpeed.value, length);
 	});
 
-	tfs.style.setProperty('display', 'inline');
-	tfs.style.setProperty('padding-left', '5px');
 	tfs.setAttribute('id', 'tfs');
+	tfs.style.setProperty('display', 'inline');
+	tfs.style.setProperty('padding', '0 5px 0 5px');
+	tfs.style.setProperty('border-right', 'solid black 1px');
 
 	function getTime(speed) {
-		var time = (60 / (speed / length));
+		var time = (60 / (speed / length)).toFixed(2);
 		if (time > 60) {
-			time = (Math.floor(time / 60) + ':' + time % 60)
+			console.log(time);
+			time = (Math.floor(time / 60) + ':' + (time % 60).toFixed(1));
 		}
 		document.getElementById('tfs').innerText = time;
 		return;
@@ -91,20 +93,42 @@ document.addEventListener('load', function() {
 	var rtBarInjPlace = document.getElementById('sortable');
 	var rtBarInjNode = document.createElement('div');
 	var rtBar = document.createElement('input');
+	var colorBar = document.createElement('div');
 
 	rtBarInjNode.insert(rtBar);
-	console.log(rtBarInjPlace.childNodes);
+	rtBarInjNode.insert(colorBar);
+	//console.log(rtBarInjPlace.childNodes);
 	rtBarInjPlace.insertBefore(rtBarInjNode, rtBarInjPlace.childNodes[1]);
 
 	rtBar.type = 'range';
 	rtBar.min = 0;
-	// rtBar.max at line 24
+	// rtBar.max at line ~29
 	rtBar.step = 1;
 	rtBar.value = 0;
 	rtBar.setAttribute('disabled', 'true');
-	rtBar.style.setProperty('width', '100%');
+	//rtBar.style.setProperty('width', '100%');
+	rtBar.style.setProperty('display', 'none');
 
 	rtBarInjNode.setAttribute('id', 'rtBar');
+	rtBarInjNode.style.setProperty('padding-bottom', '30px');
+
+	colorBar.style.setProperty('position', 'absolute');
+	colorBar.style.setProperty('height', '30px');
+	colorBar.style.setProperty('border-radius', '10px');
+
+	var colorProgressBar = colorBar.cloneNode();
+	colorBar.insert(colorProgressBar);
+
+	colorProgressBar.style.setProperty('background', 'white');
+	colorProgressBar.style.setProperty('max-width', '740px');
+	colorProgressBar.style.setProperty('width', '0px');
+	colorProgressBar.style.setProperty('transition-property', 'width');
+	colorProgressBar.style.setProperty('transition-timing-function', 'cubic-bezier(0,0,1,1)');
+
+	colorBar.style.setProperty('width', '740px');
+	colorBar.style.setProperty('background', 'linear-gradient(90deg, #ffece5, #ff5435 80%, red 95%');
+	colorBar.style.setProperty('box-shadow', '2px 2px 10px -7px');
+
 
 	var b = [];
 	var timer;
@@ -113,8 +137,12 @@ document.addEventListener('load', function() {
 
 	async function checkInputActivity() {
 		if (document.getElementById('inputtext').className == 'normal') {
+			//console.log((1000 * (60 / (inputSpeed.value / length))) + 'ms');
+			colorProgressBar.style.setProperty('transition-duration', (1000 * (60 / (inputSpeed.value / length))) + 'ms');
+			colorProgressBar.style.setProperty('width', '740px');
 			timeA = Date.now();
 			timer = setTimeout(startBar(), interval);
+			//console.log((60 / (inputSpeed.value / length)));
 			return;
 		} else {
 			await sleep(10);
@@ -140,13 +168,12 @@ document.addEventListener('load', function() {
 			return;
 		}
 		clearInterval(timer);
-		var o = 0; for (let i = 0; i < b.length; i++) { o += b[i]; } console.log(o); // <-- complete in time
+		//var o = 0; for (let i = 0; i < b.length; i++) { o += b[i]; } console.log(o); // <-- complete in time
 		return;
 	}
 
 	function setInt(speed, length) {
 		interval = (1000 / (length / (60 / (speed / length)))).toFixed();
-		//console.log(interval * length);
 		return;
 	}
 
