@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.07
+// @version        0.08
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -15,6 +15,9 @@ document.addEventListener('load', function() {
 	var text;
 	var sourceTime;
 	var interval;
+	if (localStorage.stabiloCheat == undefined) {
+		localStorage.stabiloCheat = JSON.stringify({speed: 500, showRemainingTime: true});
+	}
 
 	window.XMLHttpRequest.prototype.send = function () {
 		this.addEventListener('load', function () {
@@ -24,7 +27,7 @@ document.addEventListener('load', function() {
 					text = json.text;
 					length = json.text.length;
 					if (localStorage.stabiloCheat) {
-						document.getElementById('inputSpeed').value = +localStorage.stabiloCheat;
+						document.getElementById('inputSpeed').value = JSON.parse(localStorage.stabiloCheat).speed;
 						getTime(document.getElementById('inputSpeed').value);
 						rtBar.max = length;
 						unsafeWindow.txt = text;
@@ -51,13 +54,50 @@ document.addEventListener('load', function() {
 // ******** TIME FOR SPEED INPUT ********
 
 	var tfsInputInjPlace = document.getElementById('params').getElementsByClassName('rc')[0];
-	var tfsInputInjNode = document.createElement('div');
+
+	var tfsContainer = document.createElement('div');
 	var inputSpeed = document.createElement('input');
 	var tfs = document.createElement('div');
 
-	tfsInputInjNode.insert(inputSpeed);
-	tfsInputInjNode.insert(tfs);
-	tfsInputInjPlace.insertBefore(tfsInputInjNode, tfsInputInjPlace.childNodes[3]);
+	var bestSpeedLabel = document.createElement('div');
+
+	var barSwitchContainer = document.createElement('div');
+	var barSwitchBtn = document.createElement('input');
+	var barSwitchBtnLabel = document.createElement('div');
+
+	tfsContainer.insert(inputSpeed);
+	tfsContainer.insert(tfs);
+	tfsContainer.insert(barSwitchBtn);
+	tfsContainer.insert(barSwitchBtnLabel);
+
+	barSwitchContainer.insert(barSwitchBtn);
+	barSwitchContainer.insert(barSwitchBtnLabel);
+
+	tfsInputInjPlace.insertBefore(tfsContainer, tfsInputInjPlace.childNodes[3]);
+	tfsInputInjPlace.insertBefore(bestSpeedLabel, tfsInputInjPlace.childNodes[4]);
+	tfsInputInjPlace.insertBefore(barSwitchContainer, tfsInputInjPlace.childNodes[5]);
+
+	barSwitchBtn.setAttribute('type', 'checkbox');
+	barSwitchBtn.style.setProperty('outline', 'none');
+	barSwitchBtn.style.setProperty('margin', '0 5px 0 5px');
+	barSwitchBtn.style.setProperty('display', 'inline');
+	barSwitchBtn.checked = JSON.parse(localStorage.stabiloCheat).showRemainingTime;
+	barSwitchBtn.addEventListener('change', function () {
+		if (this.checked) {
+			document.getElementById('rtBar').style.removeProperty('display');
+			let data = JSON.parse(localStorage.stabiloCheat);
+			data.showRemainingTime = true;
+			localStorage.stabiloCheat = JSON.stringify(data);
+		} else {
+			document.getElementById('rtBar').style.setProperty('display', 'none');
+			let data = JSON.parse(localStorage.stabiloCheat);
+			data.showRemainingTime = false;
+			localStorage.stabiloCheat = JSON.stringify(data);
+		}
+	});
+
+	barSwitchBtnLabel.innerText = 'Оставшееся время';
+	barSwitchBtnLabel.style.setProperty('display', 'inline');
 
 	inputSpeed.style.setProperty('display', 'inline');
 	inputSpeed.style.setProperty('max-width', '40px');
@@ -66,14 +106,17 @@ document.addEventListener('load', function() {
 	inputSpeed.setAttribute('id', 'inputSpeed');
 	inputSpeed.addEventListener('keyup', function () {
 		getTime(this.value);
-		localStorage.stabiloCheat = this.value;
+		let data = JSON.parse(localStorage.stabiloCheat);
+		data.speed = this.value;
+		localStorage.stabiloCheat = JSON.stringify(data);
 		setInt(inputSpeed.value, length);
 	});
 
 	tfs.setAttribute('id', 'tfs');
 	tfs.style.setProperty('display', 'inline');
-	tfs.style.setProperty('padding', '0 5px 0 5px');
-	tfs.style.setProperty('border-right', 'solid black 1px');
+	tfs.style.setProperty('padding', '0 5px');
+	//tfs.style.setProperty('border-right', 'solid black 1px');
+
 
 	function getTime(speed) {
 		var time = (60 / (speed / length)).toFixed(2);
@@ -98,7 +141,7 @@ document.addEventListener('load', function() {
 	rtBarInjNode.insert(rtBar);
 	rtBarInjNode.insert(colorBar);
 	//console.log(rtBarInjPlace.childNodes);
-	rtBarInjPlace.insertBefore(rtBarInjNode, rtBarInjPlace.childNodes[1]);
+	rtBarInjPlace.insertBefore(rtBarInjNode, document.getElementById('main-block'));
 
 	rtBar.type = 'range';
 	rtBar.min = 0;
@@ -115,25 +158,43 @@ document.addEventListener('load', function() {
 	colorBar.style.setProperty('position', 'absolute');
 	colorBar.style.setProperty('height', '30px');
 	colorBar.style.setProperty('border-radius', '10px');
+	colorBar.style.setProperty('z-index', '895');
 
 	var colorProgressBar = colorBar.cloneNode();
 	colorBar.insert(colorProgressBar);
 
-	colorProgressBar.style.setProperty('background', 'white');
+	colorProgressBar.style.setProperty('background', '#797979e0');
 	colorProgressBar.style.setProperty('max-width', '740px');
 	colorProgressBar.style.setProperty('width', '0px');
 	colorProgressBar.style.setProperty('transition-property', 'width');
 	colorProgressBar.style.setProperty('transition-timing-function', 'cubic-bezier(0,0,1,1)');
+	colorProgressBar.style.setProperty('z-index', '0');
 
 	colorBar.style.setProperty('width', '740px');
 	colorBar.style.setProperty('background', 'linear-gradient(90deg, #ffece5, #ff5435 80%, red 95%');
-	colorBar.style.setProperty('box-shadow', '2px 2px 10px -7px');
+	colorBar.style.setProperty('box-shadow', '2px 2px 10px -8px');
 
+	if (barSwitchBtn.checked) {
+		document.getElementById('rtBar').style.removeProperty('display');
+	} else {
+		document.getElementById('rtBar').style.setProperty('display', 'none');
+	}
 
 	var b = [];
 	var timer;
 	var timeA = 0;
 	var passedTime = 0;
+	var gmid = document.location.href.slice(-6).replace(/[^\d]/g, '');
+	var url = "http://klavogonki.ru/g/" + gmid + ".info";
+	var gameInfo = JSON.parse(httpGet(url));
+	var name = document.getElementsByClassName('name')[0].innerText.trim();
+	var bestSpeed;
+
+	for (let i = 0; i < gameInfo.players.length; i++) {
+		if (gameInfo.players[0].name == name) {
+			bestSpeed = gameInfo.players[0].user.best_speed;
+		}
+	}
 
 	async function checkInputActivity() {
 		if (document.getElementById('inputtext').className == 'normal') {
@@ -142,11 +203,24 @@ document.addEventListener('load', function() {
 			colorProgressBar.style.setProperty('width', '740px');
 			timeA = Date.now();
 			timer = setTimeout(startBar(), interval);
+			checkInputDisability();
 			//console.log((60 / (inputSpeed.value / length)));
 			return;
 		} else {
 			await sleep(10);
 			checkInputActivity();
+			return;
+		}
+	}
+
+	async function checkInputDisability() {
+		let speed = document.getElementsByClassName('you')[0].getElementsByClassName('bitmore')[2];
+		if (speed != undefined) {
+			bestSpeedLabel.innerText = 'Скорость ' + ((speed.innerText * 100) / bestSpeed).toFixed(1) + '% от рекорда';
+			return;
+		} else {
+			await sleep(100);
+			checkInputDisability();
 			return;
 		}
 	}
@@ -175,6 +249,13 @@ document.addEventListener('load', function() {
 	function setInt(speed, length) {
 		interval = (1000 / (length / (60 / (speed / length)))).toFixed();
 		return;
+	}
+
+	function httpGet(theUrl) {
+		var xmlHttp = new XMLHttpRequest();
+		xmlHttp.open( "GET", theUrl, false );
+		xmlHttp.send( null );
+		return xmlHttp.responseText;
 	}
 
 	function sleep(ms) {
