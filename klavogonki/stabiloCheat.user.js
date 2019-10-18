@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.09
+// @version        0.10
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -113,7 +113,10 @@ document.addEventListener('load', function() {
 	inputSpeed.addEventListener('keydown', function (e) {
 		if (+e.key == +e.key.replace(/[\^d]/g,'')) {
 			let speed = this.value + e.key;
-			getTime(speed);
+			if (getTime(speed) == 'Infinity:NaN') {
+				document.getElementById('tfs').innerText = 'Вжух!';
+				return;
+			}
 			let data = JSON.parse(localStorage.stabiloCheat);
 			data.speed = speed;
 			localStorage.stabiloCheat = JSON.stringify(data);
@@ -147,7 +150,10 @@ document.addEventListener('load', function() {
 			document.getElementById('tfs').innerText = 'Вжух!';
 		} else {
 			let speed = this.value;
-			getTime(speed);
+			if (getTime(speed) == 'Infinity:NaN') {
+				document.getElementById('tfs').innerText = 'Вжух!';
+				return;
+			}
 			let data = JSON.parse(localStorage.stabiloCheat);
 			data.speed = speed;
 			localStorage.stabiloCheat = JSON.stringify(data);
