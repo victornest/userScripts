@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.13
+// @version        0.14
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -281,6 +281,12 @@ document.addEventListener('load', function() {
 		document.getElementById('rtBar').style.removeProperty('display');
 	} else {
 		document.getElementById('rtBar').style.setProperty('display', 'none');
+	}
+
+	if (avgSpeed.checked) {
+		document.getElementById('avgSpeedCount').style.removeProperty('display');
+	} else {
+		document.getElementById('avgSpeedCount').style.setProperty('display', 'none');
 	}
 
 	var b = [];
