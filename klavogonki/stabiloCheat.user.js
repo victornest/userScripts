@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.11
+// @version        0.12
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -19,10 +19,13 @@ document.addEventListener('load', function() {
 		localStorage.stabiloCheat = JSON.stringify({speed: 500, showRemainingTime: true});
 	} else {
 		let data = JSON.parse(localStorage.stabiloCheat);
-		if (data.speed == '')
+		if (data.speed == '') {
 			data.speed = 500;
-		if (typeof(data.showRemainingTime) != 'boolean')
-			data.showReminingTime = true;
+		}
+		if (typeof(data.showRemainingTime) != 'boolean') {
+			data.showRemainingTime = true;
+		}
+		localStorage.stabiloCheat = JSON.stringify(data);
 	}
 
 	window.XMLHttpRequest.prototype.send = function () {
