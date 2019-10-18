@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.10
+// @version        0.11
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -33,8 +33,10 @@ document.addEventListener('load', function() {
 					text = json.text;
 					length = json.text.length;
 					if (localStorage.stabiloCheat) {
-						document.getElementById('inputSpeed').value = JSON.parse(localStorage.stabiloCheat).speed;
-						getTime(document.getElementById('inputSpeed').value);
+						if (document.getElementById('inputSpeed').value == '') {
+							document.getElementById('inputSpeed').value = JSON.parse(localStorage.stabiloCheat).speed;
+							getTime(document.getElementById('inputSpeed').value);
+						}
 						rtBar.max = length;
 						unsafeWindow.txt = text;
 					}
