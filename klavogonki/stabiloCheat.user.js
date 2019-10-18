@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.08
+// @version        0.09
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -17,6 +17,12 @@ document.addEventListener('load', function() {
 	var interval;
 	if (localStorage.stabiloCheat == undefined) {
 		localStorage.stabiloCheat = JSON.stringify({speed: 500, showRemainingTime: true});
+	} else {
+		let data = JSON.parse(localStorage.stabiloCheat);
+		if (data.speed == '')
+			data.speed = 500;
+		if (typeof(data.showRemainingTime) != 'boolean')
+			data.showReminingTime = true;
 	}
 
 	window.XMLHttpRequest.prototype.send = function () {
@@ -104,12 +110,49 @@ document.addEventListener('load', function() {
 	inputSpeed.style.setProperty('border', 'solid 1px #d5d5d5');
 	inputSpeed.style.setProperty('text-align', 'center');
 	inputSpeed.setAttribute('id', 'inputSpeed');
+	inputSpeed.addEventListener('keydown', function (e) {
+		if (+e.key == +e.key.replace(/[\^d]/g,'')) {
+			let speed = this.value + e.key;
+			getTime(speed);
+			let data = JSON.parse(localStorage.stabiloCheat);
+			data.speed = speed;
+			localStorage.stabiloCheat = JSON.stringify(data);
+			setInt(speed, length);
+		} else if (e.key == 'Backspace') {
+			let speed = this.value.slice(0, -1);
+			if (getTime(speed) == 'Infinity:NaN') {
+				document.getElementById('tfs').innerText = 'Вжух!';
+				return;
+			}
+			let data = JSON.parse(localStorage.stabiloCheat);
+			data.speed = speed;
+			localStorage.stabiloCheat = JSON.stringify(data);
+			setInt(speed, length);
+		} else if (['Delete', 'ArrowLeft', 'ArrowUp', 'ArrowDown', 'ArrowRight'].include(e.key)) {
+			let speed = this.value;
+			if (getTime(speed) == 'Infinity:NaN') {
+				document.getElementById('tfs').innerText = 'Вжух!';
+				return;
+			}
+			let data = JSON.parse(localStorage.stabiloCheat);
+			data.speed = speed;
+			localStorage.stabiloCheat = JSON.stringify(data);
+			setInt(speed, length);
+		} else {
+			e.preventDefault();
+		}
+	});
 	inputSpeed.addEventListener('keyup', function () {
-		getTime(this.value);
-		let data = JSON.parse(localStorage.stabiloCheat);
-		data.speed = this.value;
-		localStorage.stabiloCheat = JSON.stringify(data);
-		setInt(inputSpeed.value, length);
+		if (this.value == '') {
+			document.getElementById('tfs').innerText = 'Вжух!';
+		} else {
+			let speed = this.value;
+			getTime(speed);
+			let data = JSON.parse(localStorage.stabiloCheat);
+			data.speed = speed;
+			localStorage.stabiloCheat = JSON.stringify(data);
+			setInt(speed, length);
+		}
 	});
 
 	tfs.setAttribute('id', 'tfs');
@@ -125,7 +168,7 @@ document.addEventListener('load', function() {
 			time = (Math.floor(time / 60) + ':' + (time % 60).toFixed(1));
 		}
 		document.getElementById('tfs').innerText = time;
-		return;
+		return time;
 	}
 
 
@@ -191,8 +234,8 @@ document.addEventListener('load', function() {
 	var bestSpeed;
 
 	for (let i = 0; i < gameInfo.players.length; i++) {
-		if (gameInfo.players[0].name == name) {
-			bestSpeed = gameInfo.players[0].user.best_speed;
+		if (gameInfo.players[i].name == name) {
+			bestSpeed = gameInfo.players[i].user.best_speed;
 		}
 	}
 
