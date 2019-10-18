@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.12
+// @version        0.13
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -16,7 +16,7 @@ document.addEventListener('load', function() {
 	var sourceTime;
 	var interval;
 	if (localStorage.stabiloCheat == undefined) {
-		localStorage.stabiloCheat = JSON.stringify({speed: 500, showRemainingTime: true});
+		localStorage.stabiloCheat = JSON.stringify({speed: 500, showRemainingTime: true, showAvgSpeed: true});
 	} else {
 		let data = JSON.parse(localStorage.stabiloCheat);
 		if (data.speed == '') {
@@ -24,6 +24,9 @@ document.addEventListener('load', function() {
 		}
 		if (typeof(data.showRemainingTime) != 'boolean') {
 			data.showRemainingTime = true;
+		}
+		if (typeof(data.showAvgSpeed) != 'boolean') {
+			data.showAvgSpeed = true;
 		}
 		localStorage.stabiloCheat = JSON.stringify(data);
 	}
@@ -76,6 +79,10 @@ document.addEventListener('load', function() {
 	var barSwitchBtn = document.createElement('input');
 	var barSwitchBtnLabel = document.createElement('div');
 
+	var avgSpeedContainer = document.createElement('div');
+	var avgSpeed = document.createElement('input');
+	var avgSpeedLabel = document.createElement('div');
+
 	tfsContainer.insert(inputSpeed);
 	tfsContainer.insert(tfs);
 	tfsContainer.insert(barSwitchBtn);
@@ -84,13 +91,17 @@ document.addEventListener('load', function() {
 	barSwitchContainer.insert(barSwitchBtn);
 	barSwitchContainer.insert(barSwitchBtnLabel);
 
+	avgSpeedContainer.insert(avgSpeed);
+	avgSpeedContainer.insert(avgSpeedLabel);
+
 	tfsInputInjPlace.insertBefore(tfsContainer, tfsInputInjPlace.childNodes[3]);
 	tfsInputInjPlace.insertBefore(bestSpeedLabel, tfsInputInjPlace.childNodes[4]);
 	tfsInputInjPlace.insertBefore(barSwitchContainer, tfsInputInjPlace.childNodes[5]);
+	tfsInputInjPlace.insertBefore(avgSpeedContainer, tfsInputInjPlace.childNodes[6]);
 
 	barSwitchBtn.setAttribute('type', 'checkbox');
 	barSwitchBtn.style.setProperty('outline', 'none');
-	barSwitchBtn.style.setProperty('margin', '0 5px 0 5px');
+	barSwitchBtn.style.setProperty('margin-right', '5px');
 	barSwitchBtn.style.setProperty('display', 'inline');
 	barSwitchBtn.checked = JSON.parse(localStorage.stabiloCheat).showRemainingTime;
 	barSwitchBtn.addEventListener('change', function () {
@@ -171,6 +182,28 @@ document.addEventListener('load', function() {
 	tfs.style.setProperty('padding', '0 5px');
 	//tfs.style.setProperty('border-right', 'solid black 1px');
 
+	avgSpeed.setAttribute('type', 'checkbox');
+	avgSpeed.style.setProperty('outline', 'none');
+	avgSpeed.style.setProperty('margin-right', '5px');
+	avgSpeed.style.setProperty('display', 'inline');
+	avgSpeed.checked = JSON.parse(localStorage.stabiloCheat).showAvgSpeed;
+	avgSpeed.addEventListener('change', function () {
+		if (this.checked) {
+			document.getElementById('avgSpeedCount').style.removeProperty('display');
+			let data = JSON.parse(localStorage.stabiloCheat);
+			data.showAvgSpeed = true;
+			localStorage.stabiloCheat = JSON.stringify(data);
+		} else {
+			document.getElementById('avgSpeedCount').style.setProperty('display', 'none');
+			let data = JSON.parse(localStorage.stabiloCheat);
+			data.showAvgSpeed = false;
+			localStorage.stabiloCheat = JSON.stringify(data);
+		}
+	});
+
+	avgSpeedLabel.innerText = 'Средняя скорость';
+	avgSpeedLabel.style.setProperty('display', 'inline');
+
 
 	function getTime(speed) {
 		var time = (60 / (speed / length)).toFixed(2);
@@ -180,6 +213,11 @@ document.addEventListener('load', function() {
 		}
 		document.getElementById('tfs').innerText = time;
 		return time;
+	}
+
+	function getSpeed(time) {
+		var speed = (60 / time * length * 1000).toFixed();
+		return speed;
 	}
 
 
@@ -192,19 +230,24 @@ document.addEventListener('load', function() {
 	var rtBar = document.createElement('input');
 	var colorBar = document.createElement('div');
 
+	var avgSpeedCount = document.createElement('div');
+
 	rtBarInjNode.insert(rtBar);
 	rtBarInjNode.insert(colorBar);
+	colorBar.insert(avgSpeedCount);
 	//console.log(rtBarInjPlace.childNodes);
 	rtBarInjPlace.insertBefore(rtBarInjNode, document.getElementById('main-block'));
 
 	rtBar.type = 'range';
 	rtBar.min = 0;
-	// rtBar.max at line ~29
+	// rtBar.max at line ~43
 	rtBar.step = 1;
 	rtBar.value = 0;
 	rtBar.setAttribute('disabled', 'true');
 	//rtBar.style.setProperty('width', '100%');
 	rtBar.style.setProperty('display', 'none');
+
+	avgSpeedCount.setAttribute('id', 'avgSpeedCount');
 
 	rtBarInjNode.setAttribute('id', 'rtBar');
 	rtBarInjNode.style.setProperty('padding-bottom', '30px');
@@ -228,6 +271,12 @@ document.addEventListener('load', function() {
 	colorBar.style.setProperty('background', 'linear-gradient(90deg, #ffece5, #ff5435 80%, red 95%');
 	colorBar.style.setProperty('box-shadow', '2px 2px 10px -8px');
 
+	avgSpeedCount.style.setProperty('position', 'absolute');
+	avgSpeedCount.style.setProperty('z-index', '1');
+	avgSpeedCount.style.setProperty('left', '49%');
+	avgSpeedCount.style.setProperty('color', '#460000');
+	avgSpeedCount.style.setProperty('font', '26px consolas');
+
 	if (barSwitchBtn.checked) {
 		document.getElementById('rtBar').style.removeProperty('display');
 	} else {
@@ -237,6 +286,7 @@ document.addEventListener('load', function() {
 	var b = [];
 	var timer;
 	var timeA = 0;
+	var timeB = 0;
 	var passedTime = 0;
 	var gmid = document.location.href.slice(-6).replace(/[^\d]/g, '');
 	var url = "http://klavogonki.ru/g/" + gmid + ".info";
@@ -257,6 +307,7 @@ document.addEventListener('load', function() {
 			colorProgressBar.style.setProperty('width', '740px');
 			timeA = Date.now();
 			timer = setTimeout(startBar(), interval);
+			timeB = Date.now();
 			checkInputDisability();
 			//console.log((60 / (inputSpeed.value / length)));
 			return;
@@ -274,6 +325,7 @@ document.addEventListener('load', function() {
 			return;
 		} else {
 			await sleep(100);
+			avgSpeedCount.innerText = getSpeed(Date.now() - timeB);
 			checkInputDisability();
 			return;
 		}
