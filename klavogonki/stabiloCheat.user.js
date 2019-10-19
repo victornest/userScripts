@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.14
+// @version        0.15
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -15,8 +15,26 @@ document.addEventListener('load', function() {
 	var text;
 	var sourceTime;
 	var interval;
+	var defaultColorPickerColors = ['#ffece5', '#ff5435', '#ff0000'];
+	var defaultColorPickerPercents = [0, 90, 99];
 	if (localStorage.stabiloCheat == undefined) {
-		localStorage.stabiloCheat = JSON.stringify({speed: 500, showRemainingTime: true, showAvgSpeed: true});
+		localStorage.stabiloCheat = JSON.stringify({
+			speed: 500,
+			showRemainingTime: true,
+			showAvgSpeed: true,
+			colorPicker: {
+				color: [
+					'#ffffe8',
+					'#ffd900',
+					'#ff0000'
+				],
+				percent: [
+					0,
+					90,
+					102
+				]
+			}
+		});
 	} else {
 		let data = JSON.parse(localStorage.stabiloCheat);
 		if (data.speed == '') {
@@ -27,6 +45,14 @@ document.addEventListener('load', function() {
 		}
 		if (typeof(data.showAvgSpeed) != 'boolean') {
 			data.showAvgSpeed = true;
+		}
+		for (let i = 0; i < 3; i++) {
+			if (data.colorPicker.color[i].slice(0, 1) != '#') {
+				data.colorPicker.color[i] = defaultColorPickerColors[i];
+			}
+			if (typeof(+data.colorPicker.percent[i]) != 'number') {
+				data.colorPicker.percent[i] = defaultColorPickerPercents[i];
+			}
 		}
 		localStorage.stabiloCheat = JSON.stringify(data);
 	}
@@ -79,6 +105,17 @@ document.addEventListener('load', function() {
 	var barSwitchBtn = document.createElement('input');
 	var barSwitchBtnLabel = document.createElement('div');
 
+	var barColorPickerColor = [
+		document.createElement('input'),
+		document.createElement('input'),
+		document.createElement('input')
+	];
+	var barColorPickerPercent = [
+		document.createElement('input'),
+		document.createElement('input'),
+		document.createElement('input')
+	];
+
 	var avgSpeedContainer = document.createElement('div');
 	var avgSpeed = document.createElement('input');
 	var avgSpeedLabel = document.createElement('div');
@@ -90,6 +127,12 @@ document.addEventListener('load', function() {
 
 	barSwitchContainer.insert(barSwitchBtn);
 	barSwitchContainer.insert(barSwitchBtnLabel);
+	barSwitchContainer.insert(barColorPickerColor[0]);
+	barSwitchContainer.insert(barColorPickerPercent[0]);
+	barSwitchContainer.insert(barColorPickerColor[1]);
+	barSwitchContainer.insert(barColorPickerPercent[1]);
+	barSwitchContainer.insert(barColorPickerColor[2]);
+	barSwitchContainer.insert(barColorPickerPercent[2]);
 
 	avgSpeedContainer.insert(avgSpeed);
 	avgSpeedContainer.insert(avgSpeedLabel);
@@ -120,6 +163,67 @@ document.addEventListener('load', function() {
 
 	barSwitchBtnLabel.innerText = 'Оставшееся время';
 	barSwitchBtnLabel.style.setProperty('display', 'inline');
+
+	function setStyle(name, key, value, attr) {
+		if (attr) {
+			name[0].setAttribute(key, value);
+			name[1].setAttribute(key, value);
+			name[2].setAttribute(key, value);
+		} else {
+			name[0].style.setProperty(key, value);
+			name[1].style.setProperty(key, value);
+			name[2].style.setProperty(key, value);
+		}
+	}
+	setStyle(barColorPickerColor, 'type', 'color', true);
+	setStyle(barColorPickerColor, 'border', 'none');
+	setStyle(barColorPickerColor, 'width', '15px');
+	setStyle(barColorPickerColor, 'height', '15px');
+	setStyle(barColorPickerColor, 'padding', '0 0');
+	setStyle(barColorPickerColor, 'margin-left', '5px');
+	setStyle(barColorPickerColor, 'top', '3px');
+
+	setStyle(barColorPickerPercent, 'border', 'none');
+	setStyle(barColorPickerPercent, 'width', '22px');
+	setStyle(barColorPickerPercent, 'height', '16px');
+	setStyle(barColorPickerPercent, 'padding', '0 0');
+	setStyle(barColorPickerPercent, 'vertical-align', 'text-top');
+	setStyle(barColorPickerPercent, 'text-align', 'center');
+
+	for (let i = 0; i < 3; i++) {
+		let data = JSON.parse(localStorage.stabiloCheat);
+		barColorPickerColor[i].value = data.colorPicker.color[i];
+		barColorPickerPercent[i].value = data.colorPicker.percent[i];
+	}
+
+	for (let i = 0; i < 3; i++) {
+		barColorPickerColor[i].addEventListener('change', function() {
+			let data = JSON.parse(localStorage.stabiloCheat);
+			data.colorPicker.color[i] = this.value;
+			localStorage.stabiloCheat = JSON.stringify(data);
+			colorBar.style.setProperty('background', 'linear-gradient(90deg, ' +
+									   barColorPickerColor[0].value + ' ' +
+									   barColorPickerPercent[0].value + '%, ' +
+									   barColorPickerColor[1].value + ' ' +
+									   barColorPickerPercent[1].value + '%, ' +
+									   barColorPickerColor[2].value + ' ' +
+									   barColorPickerPercent[2].value + '%)'
+									  );
+		});
+		barColorPickerPercent[i].addEventListener('keyup', function() {
+			let data = JSON.parse(localStorage.stabiloCheat);
+			data.colorPicker.percent[i] = this.value;
+			localStorage.stabiloCheat = JSON.stringify(data);
+			colorBar.style.setProperty('background', 'linear-gradient(90deg, ' +
+									   barColorPickerColor[0].value + ' ' +
+									   barColorPickerPercent[0].value + '%, ' +
+									   barColorPickerColor[1].value + ' ' +
+									   barColorPickerPercent[1].value + '%, ' +
+									   barColorPickerColor[2].value + ' ' +
+									   barColorPickerPercent[2].value + '%)'
+									  );
+		});
+	}
 
 	inputSpeed.style.setProperty('display', 'inline');
 	inputSpeed.style.setProperty('max-width', '40px');
@@ -268,7 +372,14 @@ document.addEventListener('load', function() {
 	colorProgressBar.style.setProperty('z-index', '0');
 
 	colorBar.style.setProperty('width', '740px');
-	colorBar.style.setProperty('background', 'linear-gradient(90deg, #ffece5, #ff5435 80%, red 95%');
+	colorBar.style.setProperty('background', 'linear-gradient(90deg, ' +
+							   barColorPickerColor[0].value + ' ' +
+							   barColorPickerPercent[0].value + '%, ' +
+							   barColorPickerColor[1].value + ' ' +
+							   barColorPickerPercent[1].value + '%, ' +
+							   barColorPickerColor[2].value + ' ' +
+							   barColorPickerPercent[2].value + '%)'
+							  );
 	colorBar.style.setProperty('box-shadow', '2px 2px 10px -8px');
 
 	avgSpeedCount.style.setProperty('position', 'absolute');
