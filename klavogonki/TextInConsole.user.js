@@ -11,16 +11,15 @@
 
 (function() {
 	var proxied = window.XMLHttpRequest.prototype.send;
-    window.XMLHttpRequest.prototype.send = function () {
-        this.addEventListener('load', function () {
-            try {
-                var json = JSON.parse(this.responseText);
-                if ('text' in json) {
-                    console.log(json.text.text);
-					return;
-                }
-            } catch (e) {}
-        }.bind(this));
-        return proxied.apply(this, [].slice.call(arguments));
-    };
+	window.XMLHttpRequest.prototype.send = function () {
+		this.addEventListener('load', function () {
+			try {
+				var json = JSON.parse(this.responseText);
+				if ('text' in json) {
+					console.log(json.text.text);
+				}
+			} catch (e) {}
+		}.bind(this));
+		return proxied.apply(this, [].slice.call(arguments));
+	};
 })();
