@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.17
+// @version        0.18
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -21,7 +21,7 @@ document.addEventListener('load', function() {
             speed: 500,
             showRemainingTime: true,
             showAvgSpeed: true,
-			showScale: true,
+						showScale: true,
             colorPicker: {
                 color: [
                     '#ffffe8',
@@ -573,11 +573,11 @@ document.addEventListener('load', function() {
 		ctx.beginPath();
 		for (let i = 1; i < 10; i++) {
 			ctx.moveTo(74*i, 30);
-			ctx.lineTo(74*i, 15);
+			ctx.lineTo(74*i, 25);
 			if (i >= 9)
 				break;
 			ctx.moveTo(74*(i+1), 30);
-			ctx.lineTo(74*(i+1), 25);
+			ctx.lineTo(74*(i+1), 15);
 			i++;
 		}
 		ctx.stroke();
@@ -589,20 +589,25 @@ document.addEventListener('load', function() {
 		for (let i = 1; i < 10; i++) {
 			if (i === 5) {
 				ctx.moveTo(74*(i+1), 30);
-				ctx.lineTo(74*(i+1), 25);
+				ctx.lineTo(74*(i+1), 15);
 				i++;
 				continue;
 			}
 			ctx.moveTo(74*i, 30);
-			ctx.lineTo(74*i, 15);
+			ctx.lineTo(74*i, 25);
 			if (i >= 9)
 				break;
 			ctx.moveTo(74*(i+1), 30);
-			ctx.lineTo(74*(i+1), 25);
+			ctx.lineTo(74*(i+1), 15);
 			i++;
 		}
 		ctx.stroke();
 		ctx.stroke();
+	}
+
+	function drawDigits(ctx) {
+		ctx.font = '14px consolas';
+		ctx.fillText('1 0', 74, 25);
 	}
 
 	function clearCanvas(ctx) {
