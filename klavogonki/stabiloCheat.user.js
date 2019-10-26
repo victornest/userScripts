@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.18
+// @version        0.19
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
+// @include        https://klavogonki.ru/g/*
 // @grant          unsafeWindow
 // ==/UserScript==
 
