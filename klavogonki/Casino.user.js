@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.43
+// @version        3.44
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -391,11 +391,19 @@ function main() {
 								main.removeAttribute('disabled');
 								if ((id == 490344) || (id == 111001) || (id == 528143)) {
 									LostCSS();
-									main.onclick = function() {
-										Get(150, id, extraGameInfo[i].name, myErrCount, errCount);
-										main.setAttribute('disabled', '');
-									};
-									main.value += ' lost ' + ((errCount - myErrCount) * 50 + 150) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
+									if (errCount <= myErrCount) {
+										main.onclick = function() {
+											Get(200, id, extraGameInfo[i].name);
+											main.setAttribute('disabled', '');
+										};
+										main.value += ' lost 200 with' + errCount + ' vs ' + myErrCount + ' me';
+									} else {
+										main.onclick = function() {
+											Get(150, id, extraGameInfo[i].name, myErrCount, errCount);
+											main.setAttribute('disabled', '');
+										};
+										main.value += ' lost ' + ((errCount - myErrCount) * 50 + 150) + ' with ' + errCount + ' vs ' + myErrCount + ' me';
+									}
 									return;
 								} else {
 									LostCSS();
