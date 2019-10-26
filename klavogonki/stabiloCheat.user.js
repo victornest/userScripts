@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.16
+// @version        0.17
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -21,6 +21,7 @@ document.addEventListener('load', function() {
             speed: 500,
             showRemainingTime: true,
             showAvgSpeed: true,
+			showScale: true,
             colorPicker: {
                 color: [
                     '#ffffe8',
@@ -36,22 +37,19 @@ document.addEventListener('load', function() {
         });
     } else {
         let data = JSON.parse(localStorage.stabiloCheat);
-        if (data.speed === '') {
+        if (data.speed === '')
             data.speed = 500;
-        }
-        if (typeof(data.showRemainingTime) !== 'boolean') {
+        if (typeof(data.showRemainingTime) !== 'boolean')
             data.showRemainingTime = true;
-        }
-        if (typeof(data.showAvgSpeed) !== 'boolean') {
+        if (typeof(data.showAvgSpeed) !== 'boolean')
             data.showAvgSpeed = true;
-        }
+		if (typeof(data.showScale) !== 'boolean')
+			data.showScale = true;
         for (let i = 0; i < 3; i++) {
-            if (data.colorPicker.color[i].slice(0, 1) !== '#') {
+            if (data.colorPicker.color[i].slice(0, 1) !== '#')
                 data.colorPicker.color[i] = defaultColorPickerColors[i];
-            }
-            if (typeof(+data.colorPicker.percent[i]) !== 'number') {
+            if (typeof(+data.colorPicker.percent[i]) !== 'number')
                 data.colorPicker.percent[i] = defaultColorPickerPercents[i];
-            }
         }
         localStorage.stabiloCheat = JSON.stringify(data);
     }
@@ -159,10 +157,11 @@ document.addEventListener('load', function() {
     //bar toggle on|off
     var barSwitchContainer = document.createElement('div');
     var barSwitchBtn = document.createElement('input');
-    var barSwitchBtnLabel = document.createElement('div');
+    var barSwitchBtnLabel = document.createElement('label');
 
     barSwitchBtn.setAttribute('type', 'checkbox');
     barSwitchBtn.setAttribute('class', 'SC-checkbox');
+	barSwitchBtn.setAttribute('id', 'SC-barSwitchBtn');
     barSwitchBtn.checked = JSON.parse(localStorage.stabiloCheat).showRemainingTime;
     barSwitchBtn.addEventListener('change', function () {
         if (this.checked) {
@@ -178,6 +177,7 @@ document.addEventListener('load', function() {
         }
     });
 
+	barSwitchBtnLabel.setAttribute('for', 'SC-barSwitchBtn');
     barSwitchBtnLabel.setAttribute('class', 'SC-label');
     barSwitchBtnLabel.innerText = 'Оставшееся время';
 
@@ -240,18 +240,47 @@ document.addEventListener('load', function() {
     //avg speed toggle on|off
     var avgSpeedContainer = document.createElement('div');
     var avgSpeedBtn = document.createElement('input');
-    var avgSpeedLabel = document.createElement('div');
+    var avgSpeedLabel = document.createElement('label');
 
     avgSpeedBtn.setAttribute('type', 'checkbox');
     avgSpeedBtn.setAttribute('class', 'SC-checkbox');
+	avgSpeedBtn.setAttribute('id', 'SC-avgSpeedBtn');
     avgSpeedBtn.checked = JSON.parse(localStorage.stabiloCheat).showAvgSpeed;
     avgSpeedBtn.addEventListener('change', function () {
         if (this.checked) {
+			//
+			let ctx = canvas.getContext('2d');
+			if (scaleBtn.checked) {
+				if (avgSpeedBtn.checked) {
+					clearCanvas(ctx);
+					drawWithoutCenter(ctx);
+				} else {
+					clearCanvas(ctx);
+					drawWithCenter(ctx);
+				}
+			} else {
+				clearCanvas(ctx);
+			}
+			//
             document.getElementById('SC-avgSpeedCount').style.removeProperty('display');
             let data = JSON.parse(localStorage.stabiloCheat);
             data.showAvgSpeed = true;
             localStorage.stabiloCheat = JSON.stringify(data);
         } else {
+			//
+			let ctx = canvas.getContext('2d');
+			if (scaleBtn.checked) {
+				if (avgSpeedBtn.checked) {
+					clearCanvas(ctx);
+					drawWithoutCenter(ctx);
+				} else {
+					clearCanvas(ctx);
+					drawWithCenter(ctx);
+				}
+			} else {
+				clearCanvas(ctx);
+			}
+			//
             document.getElementById('SC-avgSpeedCount').style.setProperty('display', 'none');
             let data = JSON.parse(localStorage.stabiloCheat);
             data.showAvgSpeed = false;
@@ -261,6 +290,41 @@ document.addEventListener('load', function() {
 
     avgSpeedLabel.innerText = 'Средняя скорость';
     avgSpeedLabel.setAttribute('class', 'SC-label');
+	avgSpeedLabel.setAttribute('for', 'SC-avgSpeedBtn');
+
+	//scale toggle on|off
+	var scaleContainer = document.createElement('div');
+    var scaleBtn = document.createElement('input');
+	var scaleLabel = document.createElement('label');
+
+	scaleBtn.setAttribute('type', 'checkbox');
+    scaleBtn.setAttribute('class', 'SC-checkbox');
+	scaleBtn.setAttribute('id', 'SC-scaleBtn');
+    scaleBtn.checked = JSON.parse(localStorage.stabiloCheat).showScale;
+	scaleBtn.addEventListener('change', function () {
+		let ctx = canvas.getContext('2d');
+        if (this.checked) {
+            if (avgSpeedBtn.checked) {
+				clearCanvas(ctx);
+				drawWithoutCenter(ctx);
+			} else {
+				clearCanvas(ctx);
+				drawWithCenter(ctx);
+			}
+			let data = JSON.parse(localStorage.stabiloCheat);
+            data.showScale = true;
+            localStorage.stabiloCheat = JSON.stringify(data);
+        } else {
+            clearCanvas(ctx);
+			let data = JSON.parse(localStorage.stabiloCheat);
+            data.showScale = false;
+            localStorage.stabiloCheat = JSON.stringify(data);
+        }
+    });
+
+    scaleLabel.innerText = 'Шкала';
+    scaleLabel.setAttribute('class', 'SC-label');
+	scaleLabel.setAttribute('for', 'SC-scaleBtn');
 
     //inserting
     tfsContainer.insert(inputSpeed);
@@ -275,10 +339,13 @@ document.addEventListener('load', function() {
     barSwitchContainer.insert(barColorPickerPercent[2]);
     avgSpeedContainer.insert(avgSpeedBtn);
     avgSpeedContainer.insert(avgSpeedLabel);
+	scaleContainer.insert(scaleBtn);
+	scaleContainer.insert(scaleLabel);
     tfsInputInjPlace.insertBefore(tfsContainer, tfsInputInjPlace.childNodes[3]);
     tfsInputInjPlace.insertBefore(bestSpeedLabel, tfsInputInjPlace.childNodes[4]);
     tfsInputInjPlace.insertBefore(barSwitchContainer, tfsInputInjPlace.childNodes[5]);
     tfsInputInjPlace.insertBefore(avgSpeedContainer, tfsInputInjPlace.childNodes[6]);
+	tfsInputInjPlace.insertBefore(scaleContainer, tfsInputInjPlace.childNodes[7]);
 
 // ******** REMAINING TIME BAR ********
 
@@ -287,6 +354,7 @@ document.addEventListener('load', function() {
     var rtBarInjNode = document.createElement('div');
     var rtBar = document.createElement('input');
     var colorBar = document.createElement('div');
+	var canvas = document.createElement('canvas');
 
     rtBar.type = 'range';
     rtBar.min = 0;
@@ -299,11 +367,16 @@ document.addEventListener('load', function() {
     var colorProgressBar = colorBar.cloneNode();
     var avgSpeedCount = document.createElement('div');
 
+	canvas.setAttribute('id', 'SC-canvas');
+	canvas.width = 740;
+	canvas.height = 30;
+
     //inserting
     rtBarInjNode.insert(rtBar);
     rtBarInjNode.insert(colorBar);
     colorBar.insert(avgSpeedCount);
     colorBar.insert(colorProgressBar);
+	colorBar.insert(canvas);
     rtBarInjPlace.insertBefore(rtBarInjNode, document.getElementById('main-block'));
 
     avgSpeedCount.setAttribute('id', 'SC-avgSpeedCount');
@@ -314,17 +387,31 @@ document.addEventListener('load', function() {
     colorProgressBar.setAttribute('class', 'SC-bar');
 
     //applying checkboxes
-    if (barSwitchBtn.checked) {
+    if (barSwitchBtn.checked)
         document.getElementById('SC-rtBar').style.removeProperty('display');
-    } else {
+    else
         document.getElementById('SC-rtBar').style.setProperty('display', 'none');
-    }
 
-    if (avgSpeedBtn.checked) {
+    if (avgSpeedBtn.checked)
         document.getElementById('SC-avgSpeedCount').style.removeProperty('display');
-    } else {
+    else
         document.getElementById('SC-avgSpeedCount').style.setProperty('display', 'none');
-    }
+
+	if (scaleBtn.checked) {
+		let ctx = canvas.getContext('2d');
+		if (scaleBtn.checked) {
+			if (avgSpeedBtn.checked) {
+				clearCanvas(ctx);
+				drawWithoutCenter(ctx);
+			} else {
+				clearCanvas(ctx);
+				drawWithCenter(ctx);
+			}
+		}
+	} else {
+		clearCanvas(canvas.getContext('2d'));
+	}
+
 
     //var b = [];
     //
@@ -347,6 +434,10 @@ document.addEventListener('load', function() {
     checkInputActivity();
 
     var css =
+		' #SC-canvas { ' +
+		' left: 0; ' +
+		' position: absolute; } ' +
+
         ' #tfs { ' +
         ' display: inline; ' +
         ' padding: 0 5px; } ' +
@@ -377,12 +468,14 @@ document.addEventListener('load', function() {
         ' #SC-avgSpeedCount { ' +
         ' position: absolute; ' +
         ' z-index: 1; ' +
-        ' left: 49%; ' +
+        ' left: 50%; ' +
+		' top: 50%; ' +
+		' transform: translate(-50%, -50%); ' +
         ' color: #460000; ' +
         ' font: 26px consolas; } ' +
 
         ' .SC-checkbox { ' +
-        ' outline: none; ' +
+        ' outline: none !important; ' +
         ' margin-right: 5px; ' +
         ' display: inline; }' +
 
@@ -475,6 +568,46 @@ document.addEventListener('load', function() {
         clearInterval(timer);
         //var o = 0; for (let i = 0; i < b.length; i++) { o += b[i]; } console.log(o); // <-- complete in time
     }
+
+	function drawWithCenter(ctx) {
+		ctx.beginPath();
+		for (let i = 1; i < 10; i++) {
+			ctx.moveTo(74*i, 30);
+			ctx.lineTo(74*i, 15);
+			if (i >= 9)
+				break;
+			ctx.moveTo(74*(i+1), 30);
+			ctx.lineTo(74*(i+1), 25);
+			i++;
+		}
+		ctx.stroke();
+		ctx.stroke();
+	}
+
+	function drawWithoutCenter(ctx) {
+		ctx.beginPath();
+		for (let i = 1; i < 10; i++) {
+			if (i === 5) {
+				ctx.moveTo(74*(i+1), 30);
+				ctx.lineTo(74*(i+1), 25);
+				i++;
+				continue;
+			}
+			ctx.moveTo(74*i, 30);
+			ctx.lineTo(74*i, 15);
+			if (i >= 9)
+				break;
+			ctx.moveTo(74*(i+1), 30);
+			ctx.lineTo(74*(i+1), 25);
+			i++;
+		}
+		ctx.stroke();
+		ctx.stroke();
+	}
+
+	function clearCanvas(ctx) {
+		ctx.clearRect(0,0,ctx.canvas.width, ctx.canvas.height);
+	}
 
     function getTime(speed) {
         var time = (60 / (speed / length)).toFixed(2);
