@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           stabiloCheat
-// @version        0.19
+// @version        0.20
 // @namespace      klavogonki
 // @author         490344
 // @include        http://klavogonki.ru/g/*
@@ -22,7 +22,7 @@ document.addEventListener('load', function() {
             speed: 500,
             showRemainingTime: true,
             showAvgSpeed: true,
-						showScale: true,
+            showScale: true,
             colorPicker: {
                 color: [
                     '#ffffe8',
@@ -154,6 +154,8 @@ document.addEventListener('load', function() {
 
     //best speed percent
     var bestSpeedLabel = document.createElement('div');
+	//succesful coeff
+	var succCoeff = document.createElement('div');
 
     //bar toggle on|off
     var barSwitchContainer = document.createElement('div');
@@ -344,9 +346,10 @@ document.addEventListener('load', function() {
 	scaleContainer.insert(scaleLabel);
     tfsInputInjPlace.insertBefore(tfsContainer, tfsInputInjPlace.childNodes[3]);
     tfsInputInjPlace.insertBefore(bestSpeedLabel, tfsInputInjPlace.childNodes[4]);
-    tfsInputInjPlace.insertBefore(barSwitchContainer, tfsInputInjPlace.childNodes[5]);
-    tfsInputInjPlace.insertBefore(avgSpeedContainer, tfsInputInjPlace.childNodes[6]);
-	tfsInputInjPlace.insertBefore(scaleContainer, tfsInputInjPlace.childNodes[7]);
+	tfsInputInjPlace.insertBefore(succCoeff, tfsInputInjPlace.childNodes[5]);
+    tfsInputInjPlace.insertBefore(barSwitchContainer, tfsInputInjPlace.childNodes[6]);
+    tfsInputInjPlace.insertBefore(avgSpeedContainer, tfsInputInjPlace.childNodes[7]);
+	tfsInputInjPlace.insertBefore(scaleContainer, tfsInputInjPlace.childNodes[8]);
 
 // ******** REMAINING TIME BAR ********
 
@@ -421,8 +424,12 @@ document.addEventListener('load', function() {
     var timeB = 0; //source time
     var passedTime = 0; //passed time between chars
     var gmid = document.location.href.slice(-6).replace(/[^\d]/g, '');
-    var url = "http://klavogonki.ru/g/" + gmid + ".info";
+	if (location.protocol === 'http:')
+		var url = "http://klavogonki.ru/g/" + gmid + ".info";
+	else
+		var url = "https://klavogonki.ru/g/" + gmid + ".info";
     var gameInfo = JSON.parse(httpGet(url));
+	unsafeWindow.gameInfo = gameInfo;
     var name = document.getElementsByClassName('name')[0].innerText.trim();
     var bestSpeed;
 
@@ -544,12 +551,26 @@ document.addEventListener('load', function() {
     async function checkInputDisability() {
         let speed = document.getElementsByClassName('you')[0].getElementsByClassName('bitmore')[2];
         if (speed !== undefined) {
-            bestSpeedLabel.innerText = 'Скорость ' + ((speed.innerText * 100) / bestSpeed).toFixed(1) + '% от рекорда';
-        } else {
+            bestSpeedLabel.innerText = 'Скорость: ' + ((speed.innerText * 100) / bestSpeed).toFixed(1) + '% от рекорда';
+			writeSuccCoeff();
+		} else {
             await sleep(100);
             avgSpeedCount.innerText = getSpeed(Date.now() - timeB);
             return checkInputDisability();
         }
+		function writeSuccCoeff() {
+			let complexity = document.getElementById('statistics').getElementsByTagName('span');
+			complexity = complexity[0].innerText + complexity[1].innerText;
+			let succCoeffValue = (speed.innerText * Math.log(10 + +complexity) / Math.log(10)).toFixed();
+
+			if (succCoeffValue.slice(-1) == 1)
+				succCoeff.innerText = 'Успешность: ' + succCoeffValue + ' балл';
+			else if ([2, 3, 4].include(succCoeffValue.slice(-1)))
+				succCoeff.innerText = 'Успешность: ' + succCoeffValue + ' балла';
+			else
+				succCoeff.innerText = 'Успешность: ' + succCoeffValue + ' баллов';
+			return;
+		}
     }
 
     function startBar() {
