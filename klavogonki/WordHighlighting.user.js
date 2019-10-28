@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WordHighlighting
 // @namespace    klavogonki
-// @version      0.01
+// @version      0.02
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
