@@ -30,11 +30,19 @@
 	const callback = function(mutationsList, observer) {
 		for(let mutation of mutationsList) {
 			if (mutation.type === 'childList') {
-				applyCss();
+				observer.disconnect();
+				if (document.getElementById('WH-span') !== null) {
+					document.getElementById('WH-span').remove();
+				}
+				var el = document.createElement('span');
+				el.setAttribute('id', 'WH-span');
+				document.getElementById('typefocus').insert(el);
+				highlightCss();
+				observer.observe(targetNode, config);
 			}
 		}
 	};
-	const observer = new MutationObserver(callback);
+	var observer = new MutationObserver(callback);
 
 //adding color button and transparency
 	var injPlace = document.getElementById('param_highlight').parentNode;
@@ -43,10 +51,12 @@
 	var color = document.createElement('input');
 	var transparency = document.createElement('input');
 
+	settingsContainer.style.setProperty('display', 'inline');
+
 	color.setAttribute('id', 'WH-color');
 	color.type = 'color';
 	color.addEventListener('input', function() {
-		applyCss();
+		highlightCss();
 		let data = JSON.parse(localStorage.wordHighlighting);
 		data.color = color.value;
 		localStorage.wordHighlighting = JSON.stringify(data);
@@ -60,7 +70,7 @@
 	transparency.step = 1;
 	transparency.valueAsNumber = 0;
 	transparency.addEventListener('input', function() {
-		applyCss();
+		highlightCss();
 		let data = JSON.parse(localStorage.wordHighlighting);
 		data.transparency = transparency.valueAsNumber;
 		localStorage.wordHighlighting = JSON.stringify(data);
@@ -69,9 +79,10 @@
 
 	settingsContainer.insert(color);
 	settingsContainer.insert(transparency);
-	injPlace.parentNode.insertBefore(settingsContainer, injPlace);
+	injPlace.insertBefore(settingsContainer, injPlace.getElementsByTagName('br')[0]);
 
 	waitingForStart();
+	settingsCss();
 
 //FUNCTIONS
 
@@ -84,15 +95,19 @@
 		}
 	}
 
-	function applyCss() {
+	function highlightCss() {
 		if (document.getElementById('WH-style') !== null)
 			document.getElementById('WH-style').remove();
 		var css =
-			' #typefocus { ' +
-			//' background: aquamarine; ' +
-			' position: relative; } ' +
+			' #typeblock { ' +
+			' z-index: 10; } ' +
 
-			' #typefocus::before { ' +
+			' .highlight { ' +
+			' position: relative; ' +
+			' text-decoration: none !important; ' +
+			' color: #222222 !important; }' +
+
+			' #WH-span::before { ' +
 			' content: ""; ' +
 			' position: absolute; ' +
 			' border-radius: 10px; ' +
@@ -103,11 +118,35 @@
 			' height: ' + (document.getElementById('typefocus').getHeight() + 5) + 'px; ' +
 			' z-index: -1; } ' +
 
-			' #typeblock { ' +
-			' z-index: 10; } '
+			' .highlight_error { ' +
+			' position: relative; ' +
+			' text-decoration: none !important; ';
+
 
 		var style = document.createElement('style');
 		style.setAttribute('id', 'WH-style');
+		if (style.styleSheet)
+			style.stylesheet.cssText = css;
+		else
+			style.appendChild(document.createTextNode(css));
+		document.getElementsByTagName('head')[0].appendChild(style);
+	}
+
+	function settingsCss() {
+		var css =
+			' #WH-color { ' +
+			' border: none; ' +
+			' padding: 0 0; ' +
+			' width: 15px; ' +
+			' height: 15px; ' +
+			' top: 3px !important; ' +
+			' left: 10px; } ' +
+
+			' #WH-transparency { ' +
+			' padding: 0 0; ' +
+			' left: 20px; ' +
+			' top: 8px !important; } ';
+		var style = document.createElement('style');
 		if (style.styleSheet)
 			style.stylesheet.cssText = css;
 		else
