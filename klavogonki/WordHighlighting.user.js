@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WordHighlighting
 // @namespace    klavogonki
-// @version      0.02
+// @version      0.03
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
@@ -145,7 +145,11 @@
 			' #WH-transparency { ' +
 			' padding: 0 0; ' +
 			' left: 20px; ' +
-			' top: 8px !important; } ';
+			' top: 8px !important; } ' +
+
+			' #typetext { ' +
+			' word-break: keep-all; } ';
+
 		var style = document.createElement('style');
 		if (style.styleSheet)
 			style.stylesheet.cssText = css;
