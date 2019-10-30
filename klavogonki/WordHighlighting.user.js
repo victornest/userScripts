@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WordHighlighting
 // @namespace    klavogonki
-// @version      0.06
+// @version      0.07
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
@@ -55,7 +55,7 @@
 				var el = document.createElement('span');
 				el.setAttribute('id', 'WH-span');
 				document.getElementById('typefocus').insert(el);
-				highlightCss();
+				highlightCss(document.getElementById('typefocus').getWidth(), document.getElementById('typefocus').getHeight());
 				observer.observe(targetNode, config);
 			}
 		}
@@ -117,7 +117,7 @@
 	color.setAttribute('id', 'WH-color');
 	color.type = 'color';
 	color.addEventListener('input', function() {
-		highlightCss();
+		highlightCss(document.getElementById('typefocus').getWidth(), document.getElementById('typefocus').getHeight());
 		let data = JSON.parse(localStorage.wordHighlighting);
 		data.color = color.value;
 		localStorage.wordHighlighting = JSON.stringify(data);
@@ -131,7 +131,7 @@
 	transparency.step = 1;
 	transparency.valueAsNumber = 0;
 	transparency.addEventListener('input', function() {
-		highlightCss();
+		highlightCss(document.getElementById('typefocus').getWidth(), document.getElementById('typefocus').getHeight());
 		let data = JSON.parse(localStorage.wordHighlighting);
 		data.transparency = transparency.valueAsNumber;
 		localStorage.wordHighlighting = JSON.stringify(data);
@@ -247,10 +247,11 @@
 		}
 	}
 
-	function highlightCss() {
+	function highlightCss(w, h) {
 		if (document.getElementById('WH-style') !== null) {
 			document.getElementById('WH-style').remove();
 		}
+
 		var css =
 			' #typeblock { ' +
 			' z-index: 10; } ' +
@@ -267,14 +268,13 @@
 			' background: ' + color.value + decimalToHex(transparency.valueAsNumber) + '; ' +
 			' top: -2px; ' +
 			' left: -4px; ' +
-			' width: ' + (document.getElementById('typefocus').getWidth() + 6) + 'px; ' +
-			' height: ' + (document.getElementById('typefocus').getHeight() + 5) + 'px; ' +
+			' width: ' + (w + 7) + 'px; ' +
+			' height: ' + (h + 5) + 'px; ' +
 			' z-index: -1; } ' +
 
 			' .highlight_error { ' +
 			' position: relative; ' +
 			' text-decoration: none !important; ';
-
 
 		var style = document.createElement('style');
 		style.setAttribute('id', 'WH-style');
@@ -313,7 +313,8 @@
 			' transform: translate(150%, -110%); } ' +
 
 			' #typetext { ' +
-			' word-break: keep-all; } ' +
+			' word-break: keep-all; ' +
+            ' display: -webkit-box; } ' +
 
 			' #beforefocus { ' +
 			' opacity: ' + transparencyBFRange.value / 100 + '; } ' +
