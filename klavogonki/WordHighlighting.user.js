@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WordHighlighting
 // @namespace    klavogonki
-// @version      0.04
+// @version      0.05
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
@@ -100,7 +100,7 @@
 	highlightBtn.style.setProperty('display', 'none');
 
 //color button and transparency range
-	{
+
 	var injPlace = document.getElementById('param_highlight').parentNode;
 
 	var settingsContainer = document.createElement('div');
@@ -136,7 +136,7 @@
 	settingsContainer.insert(color);
 	settingsContainer.insert(transparency);
 	injPlace.insertBefore(settingsContainer, injPlace.getElementsByTagName('br')[0]);
-	}
+
 //error highlight button
 
 	var eHighlightContainer = document.createElement('div');
@@ -191,6 +191,7 @@
 	var transparencyBFRange = document.createElement('input');
 	var transparencyBFLabel = document.createElement('div');
 
+	transparencyBFRange.setAttribute('id', 'WH-transparencyBFRange');
 	transparencyBFRange.type = 'range';
 	transparencyBFRange.value = JSON.parse(localStorage.wordHighlighting).transparencyBF * 100;
 	transparencyBFRange.addEventListener('input', function () {
@@ -199,6 +200,11 @@
 		data.transparencyBF = this.value / 100;
 		localStorage.wordHighlighting = JSON.stringify(data);
 	});
+
+	transparencyBFLabel.setAttribute('id', 'WH-transparencyBFLabel');
+	transparencyBFLabel.innerText = 'Прозрачность набранного текста';
+
+	transparencyBFContainer.setAttribute('id', 'WH-transparencyBFContainer');
 
 	transparencyBFContainer.insert(transparencyBFLabel);
 	transparencyBFContainer.insert(transparencyBFRange);
@@ -274,14 +280,13 @@
 			' border: none; ' +
 			' padding: 0 0; ' +
 			' width: 15px; ' +
-			' height: 15px; ' +
-			' top: 3px !important; ' +
-			' left: 10px; } ' +
+			' height: 15px; } ' +
 
 			' #WH-transparency { ' +
 			' padding: 0 0; ' +
-			' left: 20px; ' +
-			' top: 8px !important; } ' +
+			' left: 7px; ' +
+			' top: 6px !important; ' +
+			' width: 110px; } ' +
 
 			' #param_highlight { ' +
 			' position: absolute; ' +
@@ -292,15 +297,26 @@
 			' display: ; } ' +
 
 			' #WH-settingsContainer { ' +
-			' position: relative; ' +
-			' top: -6px; ' +
-			' left: -10px; } ' +
+			' position: absolute; ' +
+			' transform: translate(150%, -110%); } ' +
 
 			' #typetext { ' +
 			' word-break: keep-all; } ' +
 
 			' #beforefocus { ' +
-			' opacity: ' + transparencyBFRange.value / 100 + '; } ';
+			' opacity: ' + transparencyBFRange.value / 100 + '; } ' +
+
+			' #WH-transparencyBFRange { ' +
+			' width: 110px; ' +
+			' padding: 0 0; ' +
+			' top: 8px !important; ' +
+			' left: 13px; } ' +
+
+			' #WH-transparencyBFLabel { ' +
+			' display: inline; } ' +
+
+			' #WH-transparencyBFContainer { ' +
+			' margin-top: -6px; } ';
 
 		var style = document.createElement('style');
 		if (style.styleSheet) {
