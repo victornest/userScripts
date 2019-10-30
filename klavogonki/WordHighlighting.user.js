@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WordHighlighting
 // @namespace    klavogonki
-// @version      0.03
+// @version      0.04
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
@@ -10,23 +10,36 @@
 
 (function() {
 
+//settings initialization
+
 	if (localStorage.wordHighlighting === undefined) {
 		localStorage.wordHighlighting = JSON.stringify({
 			color: '#6fff7d',
-			transparency: 128
+			transparency: 128,
+			highlightMode: 'слово + слово',
+			transparencyBF: 0.4
 		});
 	} else {
 		let data = JSON.parse(localStorage.wordHighlighting);
-		if ((data.color.slice(0, 1) !== '#') && (data.color.length !== 7))
+		if ((data.color.slice(0, 1) !== '#') && (data.color.length !== 7)) {
 			data.color = '#6fff7d';
-		if ((data.transparency < 0) || (data.transparency > 255))
+		}
+		if ((data.transparency < 0) || (data.transparency > 255)) {
 			data.transparency = 128;
+		}
+		if (!['слово + слово', 'слово + символ', 'символ + символ', 'нет'].includes(data.highlightMode)) {
+			data.highlightMode = 'слово + слово';
+		}
+		if ((data.transparencyBF > 1) || (data.transparencyBF < 0)) {
+			data.transparencyBF = 0.4;
+		}
 		localStorage.wordHighlighting = JSON.stringify(data);
 	}
 
-//adding observation for #typefocus
-	const targetNode = document.getElementById('typetext');
-	const config = { attributes: true, childList: true, subtree: true };
+//#typefocus change observation
+
+	var targetNode = document.getElementById('typetext');
+	var config = { attributes: true, childList: true, subtree: true };
 	const callback = function(mutationsList, observer) {
 		for(let mutation of mutationsList) {
 			if (mutation.type === 'childList') {
@@ -44,14 +57,57 @@
 	};
 	var observer = new MutationObserver(callback);
 
-//adding color button and transparency
+//making error observation
+
+	var ifError = function(mutationsList, observer) {
+		for(let mutation of mutationsList) {
+			if (mutation.target.className === 'highlight_error') {
+				observerIfError.disconnect();
+				if (eHighlightBtn.innerText === 'слово + слово') {
+					changeHL('слово');
+				} else if (eHighlightBtn.innerText === 'слово + символ') {
+					changeHL('символ');
+				} else if (eHighlightBtn.innerText === 'символ + символ') {
+					changeHL('символ');
+				} else {
+					changeHL('выкл');
+				}
+				observerIfNotError.observe(targetNode, config);
+			}
+		}
+	};
+	var ifNotError = function(mutationsList, observer) {
+		for(let mutation of mutationsList) {
+			if (mutation.target.className === 'highlight') {
+				observerIfNotError.disconnect();
+				if (eHighlightBtn.innerText === 'слово + слово') {
+					changeHL('слово');
+				} else if (eHighlightBtn.innerText === 'слово + символ') {
+					changeHL('слово');
+				} else if (eHighlightBtn.innerText === 'символ + символ') {
+					changeHL('символ');
+				} else {
+					changeHL('выкл');
+				}
+				observerIfError.observe(targetNode, config);
+				console.log('not');
+			}
+		}
+	};
+	var observerIfError = new MutationObserver(ifError);
+	var observerIfNotError = new MutationObserver(ifNotError);
+	var highlightBtn = document.getElementById('param_highlight');
+	highlightBtn.style.setProperty('display', 'none');
+
+//color button and transparency range
+	{
 	var injPlace = document.getElementById('param_highlight').parentNode;
 
 	var settingsContainer = document.createElement('div');
 	var color = document.createElement('input');
 	var transparency = document.createElement('input');
 
-	settingsContainer.style.setProperty('display', 'inline');
+	settingsContainer.setAttribute('id', 'WH-settingsContainer');
 
 	color.setAttribute('id', 'WH-color');
 	color.type = 'color';
@@ -80,9 +136,81 @@
 	settingsContainer.insert(color);
 	settingsContainer.insert(transparency);
 	injPlace.insertBefore(settingsContainer, injPlace.getElementsByTagName('br')[0]);
+	}
+//error highlight button
 
+	var eHighlightContainer = document.createElement('div');
+	var eHighlightBtn = document.createElement('a');
+	//var eHighlightBtnLabel = document.createElement('div');
+
+	eHighlightBtn.setAttribute('id', 'WH-eHLBtn');
+	eHighlightBtn.innerText = JSON.parse(localStorage.wordHighlighting).highlightMode;
+	function hlmode () {
+		console.log('as');
+		if (this.innerText === 'нет') {
+			this.innerText = 'слово + слово';
+			observer.observe(targetNode, config);
+			changeHL('слово');
+			observerIfError.disconnect();
+		} else if (this.innerText === 'слово + слово') {
+			this.innerText = 'слово + символ';
+			changeHL('слово');
+			observerIfError.disconnect();
+			observerIfError.observe(targetNode, config);
+		} else if (this.innerText === 'слово + символ') {
+			this.innerText = 'символ + символ';
+			changeHL('символ');
+			observerIfError.disconnect();
+		} else if (this.innerText === 'символ + символ') {
+			this.innerText = 'нет';
+			changeHL('выкл');
+			observerIfError.disconnect();
+			observer.disconnect();
+			try {
+				document.getElementById('WH-style').remove();
+			} catch(e) {}
+		}
+		let data = JSON.parse(localStorage.wordHighlighting);
+		data.highlightMode = this.innerText;
+		localStorage.wordHighlighting = JSON.stringify(data);
+	}
+	eHighlightBtn.addEventListener('click', hlmode);
+
+	eHighlightContainer.style.setProperty('display', 'inline');
+
+	//eHighlightBtnLabel.setAttribute('id', 'WH-eHLLabel');
+	//eHighlightBtnLabel.innerText = 'Подсветка ошибок — ';
+
+	//eHighlightContainer.insert(eHighlightBtтакnLabel);
+	eHighlightContainer.insert(eHighlightBtn);
+	injPlace.insertBefore(eHighlightContainer, injPlace.getElementsByTagName('div')[0]);
+
+//transparency #beforefocus
+
+	var transparencyBFContainer = document.createElement('div');
+	var transparencyBFRange = document.createElement('input');
+	var transparencyBFLabel = document.createElement('div');
+
+	transparencyBFRange.type = 'range';
+	transparencyBFRange.value = JSON.parse(localStorage.wordHighlighting).transparencyBF * 100;
+	transparencyBFRange.addEventListener('input', function () {
+		document.getElementById('beforefocus').style.setProperty('opacity', this.value / 100)
+		let data = JSON.parse(localStorage.wordHighlighting);
+		data.transparencyBF = this.value / 100;
+		localStorage.wordHighlighting = JSON.stringify(data);
+	});
+
+	transparencyBFContainer.insert(transparencyBFLabel);
+	transparencyBFContainer.insert(transparencyBFRange);
+    injPlace.insert(transparencyBFContainer);
+
+//
+	injPlace.getElementsByTagName('br')[0].remove();
 	waitingForStart();
 	settingsCss();
+	if (eHighlightBtn.innerText === 'слово + символ') {
+		observerIfError.observe(targetNode, config);
+	}
 
 //FUNCTIONS
 
@@ -95,9 +223,16 @@
 		}
 	}
 
+	function changeHL(mode) {
+		while (highlightBtn.innerText !== mode) {
+			highlightBtn.click();
+		}
+	}
+
 	function highlightCss() {
-		if (document.getElementById('WH-style') !== null)
+		if (document.getElementById('WH-style') !== null) {
 			document.getElementById('WH-style').remove();
+		}
 		var css =
 			' #typeblock { ' +
 			' z-index: 10; } ' +
@@ -114,7 +249,7 @@
 			' background: ' + color.value + decimalToHex(transparency.valueAsNumber) + '; ' +
 			' top: -2px; ' +
 			' left: -4px; ' +
-			' width: ' + (document.getElementById('typefocus').getWidth() + 8) + 'px; ' +
+			' width: ' + (document.getElementById('typefocus').getWidth() + 6) + 'px; ' +
 			' height: ' + (document.getElementById('typefocus').getHeight() + 5) + 'px; ' +
 			' z-index: -1; } ' +
 
@@ -125,10 +260,11 @@
 
 		var style = document.createElement('style');
 		style.setAttribute('id', 'WH-style');
-		if (style.styleSheet)
+		if (style.styleSheet) {
 			style.stylesheet.cssText = css;
-		else
+		} else {
 			style.appendChild(document.createTextNode(css));
+		}
 		document.getElementsByTagName('head')[0].appendChild(style);
 	}
 
@@ -147,14 +283,31 @@
 			' left: 20px; ' +
 			' top: 8px !important; } ' +
 
+			' #param_highlight { ' +
+			' position: absolute; ' +
+			' margin: 0 5px; ' +
+			' height: 20px; } ' +
+
+			' #WH-eHLLabel { ' +
+			' display: ; } ' +
+
+			' #WH-settingsContainer { ' +
+			' position: relative; ' +
+			' top: -6px; ' +
+			' left: -10px; } ' +
+
 			' #typetext { ' +
-			' word-break: keep-all; } ';
+			' word-break: keep-all; } ' +
+
+			' #beforefocus { ' +
+			' opacity: ' + transparencyBFRange.value / 100 + '; } ';
 
 		var style = document.createElement('style');
-		if (style.styleSheet)
+		if (style.styleSheet) {
 			style.stylesheet.cssText = css;
-		else
+		} else {
 			style.appendChild(document.createTextNode(css));
+		}
 		document.getElementsByTagName('head')[0].appendChild(style);
 	}
 
