@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         WordHighlighting_TEST
+// @name         WordHighlighting
 // @namespace    klavogonki
-// @version      0.06
+// @version      0.07
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
@@ -267,7 +267,7 @@
 			' background: ' + color.value + decimalToHex(transparency.valueAsNumber) + '; ' +
 			' top: -2px; ' +
 			' left: -4px; ' +
-			' width: ' + (document.getElementById('typefocus').getWidth() + 6) + 'px; ' +
+			' width: ' + document.getElementById('typefocus').getWidth() + 'px; ' +
 			' height: ' + (document.getElementById('typefocus').getHeight() + 5) + 'px; ' +
 			' z-index: -1; } ' +
 
