@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WordHighlighting
 // @namespace    klavogonki
-// @version      0.05
+// @version      0.06
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
@@ -12,13 +12,18 @@
 
 //settings initialization
 
+	const version = '0.06';
+	const defaultSettings = JSON.stringify({
+		color: '#6fff7d',
+		transparency: 128,
+		highlightMode: 'слово + слово',
+		transparencyBF: 0.4,
+		version: version
+	});
 	if (localStorage.wordHighlighting === undefined) {
-		localStorage.wordHighlighting = JSON.stringify({
-			color: '#6fff7d',
-			transparency: 128,
-			highlightMode: 'слово + слово',
-			transparencyBF: 0.4
-		});
+		localStorage.wordHighlighting = defaultSettings;
+	} else if (JSON.parse(localStorage.wordHighlighting).version !== version) {
+		localStorage.wordHighlighting = defaultSettings;
 	} else {
 		let data = JSON.parse(localStorage.wordHighlighting);
 		if ((data.color.slice(0, 1) !== '#') && (data.color.length !== 7)) {
@@ -214,7 +219,14 @@
 	injPlace.getElementsByTagName('br')[0].remove();
 	waitingForStart();
 	settingsCss();
-	if (eHighlightBtn.innerText === 'слово + символ') {
+	if (eHighlightBtn.innerText.slice(1,2) === 'л') {
+		changeHL('слово');
+	} else if (eHighlightBtn.innerText.slice(1,2) === 'и') {
+		changeHL('символ');
+	} else {
+		changeHL('выкл');
+	}
+	if (['слово + слово', 'слово + символ', 'символ + символ'].includes(eHighlightBtn.innerText)) {
 		observerIfError.observe(targetNode, config);
 	}
 
@@ -224,7 +236,7 @@
 		if (!document.getElementById('typefocus')) {
 			await sleep(100);
 			waitingForStart();
-		} else {
+		} else if (['слово + слово', 'слово + символ', 'символ + символ'].includes(eHighlightBtn.innerText)){
 			observer.observe(targetNode, config);
 		}
 	}
