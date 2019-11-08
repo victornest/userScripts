@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WordHighlighting
 // @namespace    klavogonki
-// @version      0.07
+// @version      0.08
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
@@ -12,7 +12,7 @@
 
 //settings initialization
 
-	const version = '0.06';
+	const version = '0.08';
 	const defaultSettings = JSON.stringify({
 		color: '#6fff7d',
 		transparency: 128,
@@ -55,6 +55,7 @@
 				var el = document.createElement('span');
 				el.setAttribute('id', 'WH-span');
 				document.getElementById('typefocus').insert(el);
+				document.getElementById('typefocus').setAttribute('class', 'highlight');
 				highlightCss(document.getElementById('typefocus').getWidth(), document.getElementById('typefocus').getHeight());
 				observer.observe(targetNode, config);
 			}
@@ -95,7 +96,6 @@
 					changeHL('выкл');
 				}
 				observerIfError.observe(targetNode, config);
-				console.log('not');
 			}
 		}
 	};
@@ -146,12 +146,10 @@
 
 	var eHighlightContainer = document.createElement('div');
 	var eHighlightBtn = document.createElement('a');
-	//var eHighlightBtnLabel = document.createElement('div');
 
 	eHighlightBtn.setAttribute('id', 'WH-eHLBtn');
 	eHighlightBtn.innerText = JSON.parse(localStorage.wordHighlighting).highlightMode;
 	function hlmode () {
-		console.log('as');
 		if (this.innerText === 'нет') {
 			this.innerText = 'слово + слово';
 			observer.observe(targetNode, config);
@@ -183,10 +181,6 @@
 
 	eHighlightContainer.style.setProperty('display', 'inline');
 
-	//eHighlightBtnLabel.setAttribute('id', 'WH-eHLLabel');
-	//eHighlightBtnLabel.innerText = 'Подсветка ошибок — ';
-
-	//eHighlightContainer.insert(eHighlightBtтакnLabel);
 	eHighlightContainer.insert(eHighlightBtn);
 	injPlace.insertBefore(eHighlightContainer, injPlace.getElementsByTagName('div')[0]);
 
@@ -216,21 +210,36 @@
     injPlace.insert(transparencyBFContainer);
 
 //
+	init();
 	injPlace.getElementsByTagName('br')[0].remove();
 	waitingForStart();
 	settingsCss();
-	if (eHighlightBtn.innerText.slice(1,2) === 'л') {
-		changeHL('слово');
-	} else if (eHighlightBtn.innerText.slice(1,2) === 'и') {
-		changeHL('символ');
-	} else {
-		changeHL('выкл');
-	}
-	if (['слово + слово', 'слово + символ', 'символ + символ'].includes(eHighlightBtn.innerText)) {
-		observerIfError.observe(targetNode, config);
-	}
 
 //FUNCTIONS
+
+	async function init() {
+		try {
+			while (document.getElementById('main-block').style.getPropertyValue('display') === 'none') {
+				await sleep(100);
+				init();
+				return;
+			}
+			if (eHighlightBtn.innerText.slice(1,2) === 'л') {
+				changeHL('слово');
+			} else if (eHighlightBtn.innerText.slice(1,2) === 'и') {
+				changeHL('символ');
+			} else {
+				changeHL('выкл');
+			}
+
+			if (['слово + слово', 'слово + символ', 'символ + символ'].includes(eHighlightBtn.innerText)) {
+				observerIfError.observe(targetNode, config);
+			}
+		} catch (error) {
+			await sleep(100);
+			init();
+		}
+	}
 
 	async function waitingForStart() {
 		if (!document.getElementById('typefocus')) {
@@ -291,14 +300,14 @@
 			' #WH-color { ' +
 			' border: none; ' +
 			' padding: 0 0; ' +
+			' margin: 0 5px; ' +
 			' width: 15px; ' +
+			' top: 3px !important; ' +
 			' height: 15px; } ' +
 
 			' #WH-transparency { ' +
 			' padding: 0 0; ' +
-			' left: 7px; ' +
-			' top: 6px !important; ' +
-			' width: 110px; } ' +
+			' width: 74px; } ' +
 
 			' #param_highlight { ' +
 			' position: absolute; ' +
@@ -309,8 +318,7 @@
 			' display: ; } ' +
 
 			' #WH-settingsContainer { ' +
-			' position: absolute; ' +
-			' transform: translate(150%, -110%); } ' +
+			' display: inline-flex; } ' +
 
 			' #typetext { ' +
 			' word-break: keep-all; ' +
@@ -320,16 +328,12 @@
 			' opacity: ' + transparencyBFRange.value / 100 + '; } ' +
 
 			' #WH-transparencyBFRange { ' +
-			' width: 110px; ' +
+			' width: 74px; ' +
 			' padding: 0 0; ' +
-			' top: 8px !important; ' +
-			' left: 13px; } ' +
-
-			' #WH-transparencyBFLabel { ' +
-			' display: inline; } ' +
+			' left: 10px; } ' +
 
 			' #WH-transparencyBFContainer { ' +
-			' margin-top: -6px; } ';
+			' display: inline-flex; } ';
 
 		var style = document.createElement('style');
 		if (style.styleSheet) {
