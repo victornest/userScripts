@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WordHighlighting
 // @namespace    klavogonki
-// @version      0.09
+// @version      0.10
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
@@ -12,7 +12,7 @@
 
 //settings initialization
 
-	const version = '0.09';
+	const version = '0.10';
 	const defaultSettings = JSON.stringify({
 		color: '#6fff7d',
 		TFColor: '#222222',
@@ -409,8 +409,14 @@
 			left = (-(740 - widthTextInput.value) / 2);
 		}
 		var css =
-			' .highlight { ' +
+			' div#typetext.full span span#typefocus { ' +
 			' color: ' + TFColorInput.value + ' !important; } ' +
+
+			' div#typetext.full span span#typefocus.highlight { ' +
+			' color: ' + TFColorInput.value + ' !important; } ' +
+
+			' div#typetext.full span span#typefocus.highlight_error { ' +
+			' color: red !important; } ' +
 
 			' #typeblock, #main-block { ' +
 			' width: ' + widthTextInput.value + 'px; } ' +
