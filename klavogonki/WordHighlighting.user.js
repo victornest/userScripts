@@ -12,7 +12,7 @@
 
 //settings initialization
 
-	const version = '0.11';
+	const version = '0.10';
 	const defaultSettings = JSON.stringify({
 		color: '#6fff7d',
 		TFColor: '#222222',
