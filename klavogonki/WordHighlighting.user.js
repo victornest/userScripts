@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WordHighlighting
 // @namespace    klavogonki
-// @version      0.10
+// @version      0.11
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
@@ -12,7 +12,7 @@
 
 //settings initialization
 
-	const version = '0.10';
+	const version = '0.11';
 	const defaultSettings = JSON.stringify({
 		color: '#6fff7d',
 		TFColor: '#222222',
@@ -75,6 +75,7 @@
 					highlightCss(document.getElementById('typefocus').getWidth(),
 								 document.getElementById('typefocus').getHeight()
 								);
+					removeBrInText();
 					observer.observe(targetNode, config);
 				}
 			}
@@ -355,6 +356,13 @@
 	function changeHL(mode) {
 		while (highlightBtn.innerText !== mode) {
 			highlightBtn.click();
+		}
+	}
+
+	function removeBrInText() {
+		var br = document.getElementById('typetext').getElementsByTagName('br').length;
+		for (let i = 0; i < br; i++) {
+			document.getElementsByTagName('br')[0].remove()
 		}
 	}
 
