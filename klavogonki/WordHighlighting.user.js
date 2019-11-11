@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WordHighlighting
 // @namespace    klavogonki
-// @version      0.08
+// @version      0.09
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
@@ -12,12 +12,15 @@
 
 //settings initialization
 
-	const version = '0.08';
+	const version = '0.09';
 	const defaultSettings = JSON.stringify({
 		color: '#6fff7d',
+		TFColor: '#222222',
 		transparency: 128,
 		highlightMode: 'слово + слово',
 		transparencyBF: 0.4,
+		widthText: 0,
+		widthInput: 0,
 		version: version
 	});
 	if (localStorage.wordHighlighting === undefined) {
@@ -29,14 +32,26 @@
 		if ((data.color.slice(0, 1) !== '#') && (data.color.length !== 7)) {
 			data.color = '#6fff7d';
 		}
+		if ((data.TFColor.slice(0, 1) !== '#') && (data.TFColor.length !== 7)) {
+			data.TFColor = '#6fff7d';
+		}
 		if ((data.transparency < 0) || (data.transparency > 255)) {
 			data.transparency = 128;
 		}
-		if (!['слово + слово', 'слово + символ', 'символ + символ', 'нет'].includes(data.highlightMode)) {
+		if (!['слово + слово',
+			  'слово + символ',
+			  'символ + символ',
+			  'нет'].includes(data.highlightMode)) {
 			data.highlightMode = 'слово + слово';
 		}
 		if ((data.transparencyBF > 1) || (data.transparencyBF < 0)) {
 			data.transparencyBF = 0.4;
+		}
+		if ((typeof(data.widthText) !== 'number') || (isNaN(data.widthText))) {
+			data.widthText = 0;
+		}
+		if ((typeof(data.widthInput) !== 'number') || (isNaN(data.widthText))) {
+			data.widthInput = 0;
 		}
 		localStorage.wordHighlighting = JSON.stringify(data);
 	}
@@ -48,16 +63,20 @@
 	const callback = function(mutationsList, observer) {
 		for(let mutation of mutationsList) {
 			if (mutation.type === 'childList') {
-				observer.disconnect();
-				if (document.getElementById('WH-span') !== null) {
-					document.getElementById('WH-span').remove();
+				if (mutation.target.getOpacity() === 1) {
+					observer.disconnect();
+					if (document.getElementById('WH-span') !== null) {
+						document.getElementById('WH-span').remove();
+					}
+					var el = document.createElement('span');
+					el.setAttribute('id', 'WH-span');
+					document.getElementById('typefocus').insert(el);
+					document.getElementById('typefocus').setAttribute('class', 'highlight');
+					highlightCss(document.getElementById('typefocus').getWidth(),
+								 document.getElementById('typefocus').getHeight()
+								);
+					observer.observe(targetNode, config);
 				}
-				var el = document.createElement('span');
-				el.setAttribute('id', 'WH-span');
-				document.getElementById('typefocus').insert(el);
-				document.getElementById('typefocus').setAttribute('class', 'highlight');
-				highlightCss(document.getElementById('typefocus').getWidth(), document.getElementById('typefocus').getHeight());
-				observer.observe(targetNode, config);
 			}
 		}
 	};
@@ -104,6 +123,7 @@
 	var highlightBtn = document.getElementById('param_highlight');
 	highlightBtn.style.setProperty('display', 'none');
 
+
 //color button and transparency range
 
 	var injPlace = document.getElementById('param_highlight').parentNode;
@@ -114,10 +134,12 @@
 
 	settingsContainer.setAttribute('id', 'WH-settingsContainer');
 
-	color.setAttribute('id', 'WH-color');
+	color.setAttribute('class', 'WH-colorInput');
 	color.type = 'color';
 	color.addEventListener('input', function() {
-		highlightCss(document.getElementById('typefocus').getWidth(), document.getElementById('typefocus').getHeight());
+		highlightCss(document.getElementById('typefocus').getWidth(),
+					 document.getElementById('typefocus').getHeight()
+		);
 		let data = JSON.parse(localStorage.wordHighlighting);
 		data.color = color.value;
 		localStorage.wordHighlighting = JSON.stringify(data);
@@ -131,7 +153,9 @@
 	transparency.step = 1;
 	transparency.valueAsNumber = 0;
 	transparency.addEventListener('input', function() {
-		highlightCss(document.getElementById('typefocus').getWidth(), document.getElementById('typefocus').getHeight());
+		highlightCss(document.getElementById('typefocus').getWidth(),
+					 document.getElementById('typefocus').getHeight()
+		);
 		let data = JSON.parse(localStorage.wordHighlighting);
 		data.transparency = transparency.valueAsNumber;
 		localStorage.wordHighlighting = JSON.stringify(data);
@@ -194,13 +218,13 @@
 	transparencyBFRange.type = 'range';
 	transparencyBFRange.value = JSON.parse(localStorage.wordHighlighting).transparencyBF * 100;
 	transparencyBFRange.addEventListener('input', function () {
-		document.getElementById('beforefocus').style.setProperty('opacity', this.value / 100)
+		settingsCss();
 		let data = JSON.parse(localStorage.wordHighlighting);
 		data.transparencyBF = this.value / 100;
 		localStorage.wordHighlighting = JSON.stringify(data);
 	});
 
-	transparencyBFLabel.setAttribute('id', 'WH-transparencyBFLabel');
+	transparencyBFLabel.setAttribute('class', 'WH-label');
 	transparencyBFLabel.innerText = 'Прозрачность набранного текста';
 
 	transparencyBFContainer.setAttribute('id', 'WH-transparencyBFContainer');
@@ -209,7 +233,83 @@
 	transparencyBFContainer.insert(transparencyBFRange);
     injPlace.insert(transparencyBFContainer);
 
-//
+//#typefocus color
+
+	var TFColorContainer = document.createElement('div');
+	var TFColorLabel = document.createElement('div');
+	var TFColorInput = document.createElement('input');
+
+	TFColorLabel.setAttribute('class', 'WH-label');
+	TFColorLabel.innerText = 'Цвет текста — ';
+
+	TFColorInput.setAttribute('class', 'WH-colorInput');
+	TFColorInput.type = 'color';
+	TFColorInput.value = JSON.parse(localStorage.wordHighlighting).TFColor;
+	TFColorInput.addEventListener('input', function () {
+		settingsCss();
+		let data = JSON.parse(localStorage.wordHighlighting);
+		data.TFColor = this.value;
+		localStorage.wordHighlighting = JSON.stringify(data);
+	});
+
+	TFColorContainer.setAttribute('id', 'WH-TFColorContainer');
+
+	TFColorContainer.insert(TFColorLabel);
+	TFColorContainer.insert(TFColorInput);
+	injPlace.insert(TFColorContainer);
+
+//#typeblock #inputtext width
+
+	var widthContainer = document.createElement('div');
+	var widthTextLabel = document.createElement('div');
+	var widthTextInput = document.createElement('input');
+	var widthInputLabel = document.createElement('div');
+	var widthInputInput = document.createElement('input');
+
+	widthTextLabel.setAttribute('class', 'WH-label');
+	widthTextLabel.innerText = 'Ширина текста — ';
+
+	widthInputLabel.setAttribute('class', 'WH-label');
+	widthInputLabel.innerText = 'Ширина ввода — ';
+
+	widthTextInput.setAttribute('class', 'WH-widthInput');
+	if (JSON.parse(localStorage.wordHighlighting).widthText !== 0)
+		widthTextInput.value = JSON.parse(localStorage.wordHighlighting).widthText;
+	widthTextInput.placeholder = 740;
+	widthTextInput.addEventListener('keypress', function (e) {
+		if (e.key.match(/\D/g) !== null)
+			e.preventDefault();
+	});
+	widthTextInput.addEventListener('input', function () {
+		settingsCss();
+		let data = JSON.parse(localStorage.wordHighlighting);
+		data.widthText = +this.value;
+		localStorage.wordHighlighting = JSON.stringify(data);
+	});
+
+	widthInputInput.setAttribute('class', 'WH-widthInput');
+	if (JSON.parse(localStorage.wordHighlighting).widthInput !== 0)
+		widthInputInput.value = JSON.parse(localStorage.wordHighlighting).widthInput;
+	widthInputInput.placeholder = 710;
+	widthInputInput.addEventListener('keypress', function (e) {
+		if (e.key.match(/\D/g) !== null)
+			e.preventDefault();
+	});
+	widthInputInput.addEventListener('input', function () {
+		settingsCss();
+		let data = JSON.parse(localStorage.wordHighlighting);
+		data.widthInput = +this.value;
+		localStorage.wordHighlighting = JSON.stringify(data);
+	});
+
+	widthContainer.insert(widthTextLabel);
+	widthContainer.insert(widthTextInput);
+	widthContainer.insert(document.createElement('br'));
+	widthContainer.insert(widthInputLabel);
+	widthContainer.insert(widthInputInput);
+	injPlace.insert(widthContainer);
+
+//START
 	init();
 	injPlace.getElementsByTagName('br')[0].remove();
 	waitingForStart();
@@ -232,7 +332,8 @@
 				changeHL('выкл');
 			}
 
-			if (['слово + слово', 'слово + символ', 'символ + символ'].includes(eHighlightBtn.innerText)) {
+			if (['слово + слово', 'слово + символ',
+				 'символ + символ'].includes(eHighlightBtn.innerText)) {
 				observerIfError.observe(targetNode, config);
 			}
 		} catch (error) {
@@ -245,7 +346,8 @@
 		if (!document.getElementById('typefocus')) {
 			await sleep(100);
 			waitingForStart();
-		} else if (['слово + слово', 'слово + символ', 'символ + символ'].includes(eHighlightBtn.innerText)){
+		} else if (['слово + слово', 'слово + символ',
+					'символ + символ'].includes(eHighlightBtn.innerText)) {
 			observer.observe(targetNode, config);
 		}
 	}
@@ -267,8 +369,7 @@
 
 			' .highlight { ' +
 			' position: relative; ' +
-			' text-decoration: none !important; ' +
-			' color: #222222 !important; }' +
+			' text-decoration: none !important; }' +
 
 			' #WH-span::before { ' +
 			' content: ""; ' +
@@ -296,18 +397,51 @@
 	}
 
 	function settingsCss() {
+		if (document.getElementById('WH-settings') !== null) {
+			document.getElementById('WH-settings').remove();
+		}
+		var playersScale = 1;
+		var left = 0;
+		if ((+widthTextInput.value < 740) && (widthTextInput.value !== '')) {
+			let inj = document.getElementById('paused');
+			inj.insertBefore(document.createElement('br'), inj.childNodes[1]);
+			playersScale = (1 / (740 / widthTextInput.value));
+			left = (-(740 - widthTextInput.value) / 2);
+		}
 		var css =
-			' #WH-color { ' +
+			' #typefocus { ' +
+			' color: ' + TFColorInput.value + ' !important; } ' +
+
+			' #typeblock, #main-block { ' +
+			' width: ' + widthTextInput.value + 'px; } ' +
+
+			' #inputtextblock { ' +
+			' display: flex; } ' +
+
+			' #inputtext { ' +
+			' margin-left: auto; ' +
+			' margin-right: auto; ' +
+			' width: ' + widthInputInput.value + 'px; } ' +
+
+			' #status-block, #sortable { ' +
+			' width: ' + widthTextInput.value + 'px; } ' +
+
+			' #players-block { ' +
+			' left: ' + left + 'px; ' +
+			' transform: scaleX(' + playersScale + '); } ' +
+
+			' .WH-colorInput { ' +
 			' border: none; ' +
 			' padding: 0 0; ' +
 			' margin: 0 5px; ' +
 			' width: 15px; ' +
-			' top: 3px !important; ' +
+			' top: 4px !important; ' +
 			' height: 15px; } ' +
 
 			' #WH-transparency { ' +
 			' padding: 0 0; ' +
-			' width: 74px; } ' +
+			' top: 8px !important; ' +
+			' width: 73px; } ' +
 
 			' #param_highlight { ' +
 			' position: absolute; ' +
@@ -317,8 +451,11 @@
 			' #WH-eHLLabel { ' +
 			' display: ; } ' +
 
+			' .WH-label { ' +
+			' display: inline; } ' +
+
 			' #WH-settingsContainer { ' +
-			' display: inline-flex; } ' +
+			' display: inline; } ' +
 
 			' #typetext { ' +
 			' word-break: keep-all; ' +
@@ -328,14 +465,26 @@
 			' opacity: ' + transparencyBFRange.value / 100 + '; } ' +
 
 			' #WH-transparencyBFRange { ' +
-			' width: 74px; ' +
-			' padding: 0 0; ' +
-			' left: 10px; } ' +
+			' width: 73px; ' +
+			' padding: 0 0; } ' +
 
 			' #WH-transparencyBFContainer { ' +
-			' display: inline-flex; } ';
+			' display: inline-flex; } ' +
+
+			' #WH-transparencyBFContainer > div:nth-child(1) { ' +
+			' min-width: 200px; } ' +
+
+			' #WH-TFColorContainer { ' +
+			' display: inline-flex; } ' +
+
+			' .WH-widthInput { ' +
+			' border: solid 1px #d5d5d5; ' +
+			' text-align: center; ' +
+			' max-width: 40px; } ';
+
 
 		var style = document.createElement('style');
+		style.setAttribute('id', 'WH-settings');
 		if (style.styleSheet) {
 			style.stylesheet.cssText = css;
 		} else {
