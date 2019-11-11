@@ -71,7 +71,7 @@
 					var el = document.createElement('span');
 					el.setAttribute('id', 'WH-span');
 					document.getElementById('typefocus').insert(el);
-					document.getElementById('typefocus').setAttribute('class', 'highlight');
+					//document.getElementById('typefocus').setAttribute('class', 'highlight');
 					highlightCss(document.getElementById('typefocus').getWidth(),
 								 document.getElementById('typefocus').getHeight()
 								);
@@ -409,7 +409,7 @@
 			left = (-(740 - widthTextInput.value) / 2);
 		}
 		var css =
-			' #typefocus { ' +
+			' .highlight { ' +
 			' color: ' + TFColorInput.value + ' !important; } ' +
 
 			' #typeblock, #main-block { ' +
