@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         WordHighlighting
 // @namespace    klavogonki
-// @version      0.11
+// @version      0.12
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
@@ -21,8 +21,10 @@
 		transparencyBF: 0.4,
 		widthText: 0,
 		widthInput: 0,
+		removeBr: 0,
 		version: version
 	});
+
 	if (localStorage.wordHighlighting === undefined) {
 		localStorage.wordHighlighting = defaultSettings;
 	} else if (JSON.parse(localStorage.wordHighlighting).version !== version) {
@@ -53,6 +55,9 @@
 		if ((typeof(data.widthInput) !== 'number') || (isNaN(data.widthText))) {
 			data.widthInput = 0;
 		}
+		if (![0, 1, 2, '0', '1', '2'].includes(data.removeBr)) {
+			data.removeBr = 0;
+		}
 		localStorage.wordHighlighting = JSON.stringify(data);
 	}
 
@@ -82,6 +87,19 @@
 		}
 	};
 	var observer = new MutationObserver(callback);
+
+	const paragraph = function(mutationsList, observer) {
+		for(let mutation of mutationsList) {
+			if (mutation.type === 'childList') {
+				if (mutation.target.getOpacity() === 1) {
+					observerParagraph.disconnect();
+					removeBrInText();
+					observerParagraph.observe(targetNode, config);
+				}
+			}
+		}
+	};
+	var observerParagraph = new MutationObserver(paragraph);
 
 //making error observation
 
@@ -310,6 +328,35 @@
 	widthContainer.insert(widthInputInput);
 	injPlace.insert(widthContainer);
 
+//removeBrInText()
+
+	var removeBrContainer = document.createElement('div');
+	var removeBrSelect = document.createElement('select');
+	var removeBrLabel = document.createElement('span');
+
+	removeBrSelect.setAttribute('id', 'WH-removeBrSelect');
+	function opt (value, text) {
+		let el = document.createElement('option');
+		el.value = value;
+		el.text = text;
+		return el;
+	};
+	removeBrSelect.insert(opt(0, 'Нет'));
+	removeBrSelect.insert(opt(1, 'Кроме последнего'));
+	removeBrSelect.insert(opt(2, 'Все'));
+	removeBrSelect.value = JSON.parse(localStorage.wordHighlighting).removeBr;
+	removeBrSelect.addEventListener('change', function() {
+		let data = JSON.parse(localStorage.wordHighlighting);
+		data.removeBr = this.value;
+		localStorage.wordHighlighting = JSON.stringify(data);
+	});
+
+	removeBrLabel.innerText = 'Удалять абзацы ';
+
+	removeBrContainer.insert(removeBrLabel);
+	removeBrContainer.insert(removeBrSelect);
+	injPlace.insert(removeBrContainer);
+
 //START
 	init();
 	injPlace.getElementsByTagName('br')[0].remove();
@@ -350,6 +397,8 @@
 		} else if (['слово + слово', 'слово + символ',
 					'символ + символ'].includes(eHighlightBtn.innerText)) {
 			observer.observe(targetNode, config);
+		} else {
+			observerParagraph.observe(targetNode, config);
 		}
 	}
 
@@ -361,8 +410,14 @@
 
 	function removeBrInText() {
 		var br = document.getElementById('typetext').getElementsByTagName('br').length;
-		for (let i = 0; i < br; i++) {
-			document.getElementsByTagName('br')[0].remove()
+		if (removeBrSelect.value === '1') {
+			for (let i = 0; i < br - 2; i++) {
+				document.getElementsByTagName('br')[0].remove()
+			}
+		} else if (removeBrSelect.value === '2') {
+			for (let i = 0; i < br; i++) {
+				document.getElementsByTagName('br')[0].remove()
+			}
 		}
 	}
 
