@@ -411,8 +411,14 @@
 	function removeBrInText() {
 		var br = document.getElementById('typetext').getElementsByTagName('br').length;
 		if (removeBrSelect.value === '1') {
-			for (let i = 0; i < br - 2; i++) {
-				document.getElementsByTagName('br')[0].remove()
+			if (game.getGametype() === 'marathon') {
+				for (let i = 0; i < br - 2; i++) {
+					document.getElementsByTagName('br')[0].remove()
+				}
+			} else {
+				for (let i = 0; i < br - 1; i++) {
+					document.getElementsByTagName('br')[0].remove()
+				}
 			}
 		} else if (removeBrSelect.value === '2') {
 			for (let i = 0; i < br; i++) {
