@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.44
+// @version        3.45
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -32,6 +32,12 @@ function abc() {
 setInterval(abc, 1000);
 
 function main() {
+
+
+	// Список игроков, расчитывающихся по формуле
+	const specialList = [490344, 111001, 528143, 541453];
+
+
 	var gmid = document.location.href.slice(-6).replace(/[^\d]/g, '');
 	var url = "http://klavogonki.ru/g/" + gmid + ".info";
 	var gameInfo;
@@ -44,8 +50,8 @@ function main() {
 	}
 	//console.log(gameInfo);
 
+	//waiting for start
 	async function a() {
-		//waiting for start
 		if (document.getElementById('typetext').style.display === 'none') {
 			await Sleep(1000);
 			a();
@@ -270,7 +276,7 @@ function main() {
                                 //host lose by errors
                                 } else {
 									main.removeAttribute('disabled');
-									if ((id == 490344) || (id == 111001) || (id == 528143)) {
+									if (specialList.includes(+id)) {
 										WonCSS();
 										main.onclick = function() {
 											Send(450, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -293,7 +299,7 @@ function main() {
                                 //host got 0
                                 if (myErrCount == 0) {
 									main.removeAttribute('disabled');
-									if ((id == 490344) || (id == 111001) || (id == 528143)) {
+									if (specialList.includes(+id)) {
 										LostCSS();
 										main.onclick = function() {
 											Get(450, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -314,7 +320,7 @@ function main() {
                                     //host got less
                                     if (myErrCount < errCount) {
 										main.removeAttribute('disabled');
-										if ((id == 490344) || (id == 111001) || (id == 528143)) {
+										if (specialList.includes(+id)) {
 											LostCSS();
 											main.onclick = function() {
 												Get(150, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -335,7 +341,7 @@ function main() {
                                     } else {
 										if (myErrCount > errCount) {
 											main.removeAttribute('disabled');
-											if ((id == 490344) || (id == 111001) || (id == 528143)) {
+											if (specialList.includes(+id)) {
 												WonCSS();
 												main.onclick = function() {
 													Send(150, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -370,7 +376,7 @@ function main() {
 							//host got 0
 							if (myErrCount == 0) {
 								main.removeAttribute('disabled');
-								if ((id == 490344) || (id == 111001) || (id == 528143)) {
+								if (specialList.includes(+id)) {
 									LostCSS();
 									main.onclick = function() {
 										Get(450, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -389,7 +395,7 @@ function main() {
 								//host got 1+
 							} else {
 								main.removeAttribute('disabled');
-								if ((id == 490344) || (id == 111001) || (id == 528143)) {
+								if (specialList.includes(+id)) {
 									LostCSS();
 									if (errCount <= myErrCount) {
 										main.onclick = function() {
@@ -423,7 +429,7 @@ function main() {
 							//player got 0
 							if (errCount == 0) {
 								main.removeAttribute('disabled');
-								if ((id == 490344) || (id == 111001) || (id == 528143)) {
+								if (specialList.includes(+id)) {
 									WonCSS();
 									main.onclick = function() {
 										Send(450, id, extraGameInfo[i].name, myErrCount, errCount);
@@ -443,7 +449,7 @@ function main() {
 								//player got 1+
 							} else {
 								main.removeAttribute('disabled');
-								if ((id == 490344) || (id == 111001) || (id == 528143)) {
+								if (specialList.includes(+id)) {
 									WonCSS();
 									if (myErrCount <= errCount) {
 										main.onclick = function() {
@@ -611,7 +617,18 @@ function main() {
 				try {
 					amount = this.parentElement.children[0].value;
 					id = document.querySelectorAll( '[id^="car"]' )[i].getElementsByTagName('a')[0].href.replace(/[^\d]/g, '');
-					var img = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAASAAAAEgARslrPgAAAAl2cEFnAAAAEAAAABAAXMatwwAAAKRJREFUOMudk0ESwyAMA5dO/mV+hviZ/TL3RNJ2EmiiK7CyNKYAIJInEmVDZLZn7wslX7MLvfcl5BIQEQgREUTEPcBwFsLMcHdKL/8BhrOZfXSl/exX2yp/RODVAb6glwAzAz9c8WOKM8BpB9lydx2gUegS0HvfCxOitcZsT6Z7cBpv1UFrDTq4O0LUqFSvkylEXklSzoTIWxFuT7ASIkfdj7/zG88ZuXfMZDyDAAAAJXRFWHRkYXRlOmNyZWF0ZQAyMDE3LTA3LTE1VDIzOjExOjM1KzAwOjAwBj7ISAAAACV0RVh0ZGF0ZTptb2RpZnkAMjAxNy0wNy0xNVQyMzoxMTozNSswMDowMHdjcPQAAAAASUVORK5CYII=';
+					var img = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA' +
+						'ABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O' +
+						'HOkAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdw' +
+						'nLpRPAAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAASAAAAEgARslr' +
+						'PgAAAAl2cEFnAAAAEAAAABAAXMatwwAAAKRJREFUOMudk0ESwyAMA5dO' +
+						'/mV+hviZ/TL3RNJ2EmiiK7CyNKYAIJInEmVDZLZn7wslX7MLvfcl5BIQ' +
+						'EQgREUTEPcBwFsLMcHdKL/8BhrOZfXSl/exX2yp/RODVAb6glwAzAz9c' +
+						'8WOKM8BpB9lydx2gUegS0HvfCxOitcZsT6Z7cBpv1UFrDTq4O0LUqFSv' +
+						'kylEXklSzoTIWxFuT7ASIkfdj7/zG88ZuXfMZDyDAAAAJXRFWHRkYXRl' +
+						'OmNyZWF0ZQAyMDE3LTA3LTE1VDIzOjExOjM1KzAwOjAwBj7ISAAAACV0' +
+						'RVh0ZGF0ZTptb2RpZnkAMjAxNy0wNy0xNVQyMzoxMTozNSswMDowMHdj' +
+						'cPQAAAAASUVORK5CYII=';
 					params = '{"respondentId":' + id + ',"message":"![](' + img + ') Выигрыш в БО-казино!","amount":' + amount + '}';
 					url = "http://klavogonki.ru/api/profile/send-scores";
 					this.parentElement.children[0].value = '';
