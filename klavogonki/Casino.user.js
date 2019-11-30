@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.45
+// @version        3.46
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -35,7 +35,12 @@ function main() {
 
 
 	// Список игроков, расчитывающихся по формуле
-	const specialList = [490344, 111001, 528143, 541453];
+	const specialList = [490344, 111001, 528143, 541453, 483144];
+
+	// Нижний лимит скорости
+	const lowLimit = 0.95;
+	const lowLimitVitalka = 0.74;
+	const lowLimitDeamon = 0.7925;
 
 
 	var gmid = document.location.href.slice(-6).replace(/[^\d]/g, '');
@@ -197,7 +202,7 @@ function main() {
 				try {
 					for (let j = 0; j < playerList.length; j++) {
 						if (myId === gameInfo.players[j].user.id) {
-							myAvgSpeed = Math.round(gameInfo.players[j].user.avg_speed * 0.9);
+							myAvgSpeed = Math.round(gameInfo.players[j].user.avg_speed * lowLimit);
 							break;
 						}
 					}
@@ -237,12 +242,12 @@ function main() {
 				}
 				//limit computing
 				try {
-					avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.9);
+					avgSpeed = Math.round(extraGameInfo[i].avgSpeed * lowLimit);
 					if (extraGameInfo[i].id === 270277) {
-						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.74); //Виталька
+						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * lowLimitVitalka); //Виталька
 					}
 					if (extraGameInfo[i].id === 488630) {
-						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.7925); //_Daemon_
+						avgSpeed = Math.round(extraGameInfo[i].avgSpeed * lowLimitDeamon); //_Daemon_
 					}
 				} catch (error) {
 					alert('limit computing error');
@@ -595,7 +600,7 @@ function main() {
 				if (extraGameInfo[i].id === 488630) {
 					avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.7925); //_Daemon_
 				} else {
-					avgSpeed = Math.round(extraGameInfo[i].avgSpeed * 0.9);
+					avgSpeed = Math.round(extraGameInfo[i].avgSpeed * lowLimit);
 				}
 			} catch (error) {
 				console.log('avgSpeed computing error');
@@ -752,7 +757,7 @@ function PrintAnnouncement(text) {
 	document.addEventListener('keydown', function(e) {
 		if (e.keyCode == localStorage.casinoAnnouncementButton) {
 			e.preventDefault();
-			PrintAnnouncement(':excl: `Сыграешь против меня?` У кого из нас двоих меньше ошибок, тому __200__, но если __0__ ошибок, тогда __500__. Минимальная скорость: __-10%__ от средней до заезда. `Пишите, кто участвует`');
+			PrintAnnouncement(':excl: `Сыграешь против меня?` У кого из нас двоих меньше ошибок, тому __200__, но если __0__ ошибок, тогда __500__. Минимальная скорость: __-5%__ от средней до заезда. `Пишите, кто участвует`');
 		}
 	}, false);
 	return false;
