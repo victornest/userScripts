@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Casino
-// @version        3.46
+// @version        3.47
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
 // @include        http://klavogonki.ru/g/*
@@ -754,12 +754,48 @@ function PrintAnnouncement(text) {
 }
 
 (function(){
+	/*
 	document.addEventListener('keydown', function(e) {
-		if (e.keyCode == localStorage.casinoAnnouncementButton) {
+		if (e.key == localStorage.casinoAnnouncementButton) {
 			e.preventDefault();
 			PrintAnnouncement(':excl: `Сыграешь против меня?` У кого из нас двоих меньше ошибок, тому __200__, но если __0__ ошибок, тогда __500__. Минимальная скорость: __-5%__ от средней до заезда. `Пишите, кто участвует`');
 		}
 	}, false);
+	*/
+	document.getElementsByClassName('game active r')[0].remove();
+	var injPlace = document.getElementsByClassName('dummy')[0];
+	var btn = document.createElement('input');
+	btn.type = 'button';
+	btn.value = 'Казино';
+	btn.id = 'casinoAnnouncement';
+	btn.addEventListener('mousedown', function() {
+		btn.style.setProperty('border', 'red 1px solid');
+	});
+	btn.addEventListener('mouseup', function(){
+		btn.style.setProperty('border', 'none');
+		PrintAnnouncement(':excl: `Сыграешь против меня?` У кого из нас двоих меньше ошибок, тому __200__, но если __0__ ошибок, тогда __500__. Минимальная скорость: __-5%__ от средней до заезда. `Пишите, кто участвует`');
+	})
+	injPlace.insert(btn);
+
+	var css =
+		' #casinoAnnouncement { ' +
+		' position: absolute; ' +
+		' width: 60px; ' +
+		' height: 14px; ' +
+		' top: 1px; ' +
+		' border: none; ' +
+		' border-top-right-radius: 12px; ' +
+		' background: linear-gradient(to right, #e7e3d8, #dfd5b9 20%); ' +
+		' font-size: 11px; ' +
+		' color: #746652; ';
+
+	var style = document.createElement('style');
+	if (style.styleSheet) {
+		style.styleSheet.cssText = css;
+	} else {
+		style.appendChild(document.createTextNode(css));
+	}
+	document.getElementsByTagName('head')[0].appendChild(style);
 	return false;
 })();
 
