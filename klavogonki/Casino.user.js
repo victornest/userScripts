@@ -35,7 +35,7 @@ function main() {
 
 
 	// Список игроков, расчитывающихся по формуле
-	const specialList = [490344, 111001, 528143, 541453, 483144];
+	const specialList = [490344, 111001, 528143, 541453];
 
 	// Нижний лимит скорости
 	const lowLimit = 0.95;
@@ -762,7 +762,7 @@ function PrintAnnouncement(text) {
 		}
 	}, false);
 	*/
-	document.getElementsByClassName('game active r')[0].remove();
+	//document.getElementsByClassName('game active r')[0].remove();
 	var injPlace = document.getElementsByClassName('dummy')[0];
 	var btn = document.createElement('input');
 	btn.type = 'button';
@@ -784,10 +784,11 @@ function PrintAnnouncement(text) {
 		' height: 14px; ' +
 		' top: 1px; ' +
 		' border: none; ' +
+		' border-top-left-radius: 12px; ' +
 		' border-top-right-radius: 12px; ' +
-		' background: linear-gradient(to right, #e7e3d8, #dfd5b9 20%); ' +
+		' background: #d8b0ff; ' +
 		' font-size: 11px; ' +
-		' color: #746652; ';
+		' color: #535353; ';
 
 	var style = document.createElement('style');
 	if (style.styleSheet) {
