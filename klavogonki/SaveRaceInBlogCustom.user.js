@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       1.1.5
+// @version       1.1.6
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
+// @include       https://klavogonki.ru/g/*
 // @author        Lexin13, agile, 490344
 // ==/UserScript==
 
@@ -64,17 +65,24 @@ function saveRaceInBlog () {
 						} else {
 							text += '*' + gameTypes[res.gameType] + '* | **' + comp + '** | **';
 						}
+						if (game.getGametype() == 'marathon') {
+							text += res.stats.speed + '&nbsp;зн/мин** | *' +
+							res.stats.errors.replace(')', '&#41;*\n\n') +
+							'*![сложнограмма](' + reader.result + ')*\n\n' +
+							res.author + '\n**' + res.title + '**\n![обложка](' + res.pic + ')\n\n';
+						} else {
 						text += res.stats.speed + '&nbsp;зн/мин** | *' +
 							res.stats.errors.replace(')', '&#41;* | *') +
 							res.stats.time + '*\n\n' +
 							'*![сложнограмма](' + reader.result + ')*\n\n';
 
-						var typedMarked = res.typedHtml
-						.replace(/<span class="error">|<\/span>/g, '**')
-						.replace(/<s class="error">/g, '~~**')
-						.replace(/<\/s>/g, '**~~');
+							var typedMarked = res.typedHtml
+							.replace(/<span class="error">|<\/span>/g, '**')
+							.replace(/<s class="error">/g, '~~**')
+							.replace(/<\/s>/g, '**~~');
 
-						text += '> ' + typedMarked;
+							text += '> ' + typedMarked;
+						}
 
 						//if (confirm('Добавить запись в бортжурнал?')) {
 						var xhr = new XMLHttpRequest();
@@ -113,16 +121,23 @@ function saveRaceInBlog () {
 		} else {
 			text += '*' + gameTypes[res.gameType] + '* | **';
 		}
+
+		if (game.getGametype() == 'marathon') {
+			text += res.stats.speed + '&nbsp;зн/мин** | *' +
+				res.stats.errors.replace(')', '&#41;*\n\n') +
+				res.author + '\n**' + res.title + '**\n![обложка](' + res.pic + ')\n\n';
+		} else {
 		text += res.stats.speed + '&nbsp;зн/мин** | *' +
 			res.stats.errors.replace(')', '&#41;* | *') +
 			res.stats.time + '*\n\n'
 
-		var typedMarked = res.typedHtml
-		.replace(/<span class="error">|<\/span>/g, '**')
-		.replace(/<s class="error">/g, '~~**')
-		.replace(/<\/s>/g, '**~~');
+			var typedMarked = res.typedHtml
+			.replace(/<span class="error">|<\/span>/g, '**')
+			.replace(/<s class="error">/g, '~~**')
+			.replace(/<\/s>/g, '**~~');
 
-		text += '> ' + typedMarked;
+			text += '> ' + typedMarked;
+		}
 
 		//if (confirm('Добавить запись в бортжурнал?')) {
 		var xhr = new XMLHttpRequest();
@@ -149,9 +164,19 @@ function init (resultId) {
 	link.style.color = '#ff3855';
 	link.textContent = 'Сохранить в бортжурнале';
 
-	var typed = document.querySelector('#errors_text p');
-	if (!typed) {
-		throw new Error('#errors_text p element not found.');
+	if (game.getGametype() == 'marathon')
+	{
+		var raceTime = document.querySelector('.player.you.ng-scope').querySelector('.bitmore');
+		raceTime.textContent = 0 + raceTime.textContent;
+		var typed = { innerHTML: 'Упс! Текст потерялся...' };
+		var pic = document.querySelector('.imobilco-book').querySelector('img').src;
+		var author = document.querySelector('.author').innerText;
+		var title = document.querySelector('#book .name').innerText;
+	} else {
+		var typed = document.querySelector('#errors_text p');
+		if (!typed) {
+			throw new Error('#errors_text p element not found.');
+		}
 	}
 
 	var statsContainer = document.querySelector('.player.you .stats');
@@ -186,6 +211,9 @@ function init (resultId) {
 		gameType: gameType,
 		vocName: vocName,
 		vocId: vocId,
+		pic: pic,
+		author: author,
+		title: title
 	};
 
 	link.addEventListener('click', saveResult.bind(null, resultData));
