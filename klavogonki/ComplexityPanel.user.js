@@ -394,7 +394,8 @@ function embed() {
         return canvas;
     }
 }
-document.getElementById("playads").remove();
+if (document.getElementById("playads"))
+    document.getElementById("playads").remove();
 var inject = document.createElement("script");
 inject.setAttribute("type", "text/javascript");
 inject.appendChild(document.createTextNode("(" + embed + ")()"));
