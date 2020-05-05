@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       1.1.6
+// @version       1.1.7
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
 // @include       https://klavogonki.ru/g/*
@@ -221,7 +221,9 @@ function init (resultId) {
 
 	var again = document.getElementById('again');
 	if (!again) {
-		throw new Error('#again element not found.');
+        	again = document.getElementById('bookinfo');
+        	if (!again)
+            		throw new Error('#again element not found.');
 	}
 
 	var cell = again.querySelector('td');
