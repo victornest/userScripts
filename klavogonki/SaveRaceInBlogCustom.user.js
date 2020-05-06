@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       1.1.7
+// @version       1.1.8
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
 // @include       https://klavogonki.ru/g/*
@@ -160,6 +160,7 @@ function saveRaceInBlog () {
 function init (resultId) {
 	var container = document.createElement('div');
 	container.style.fontSize = '10pt';
+	container.style.display = 'flex';
 	var link = document.createElement('a');
 	link.style.color = '#ff3855';
 	link.textContent = 'Сохранить в бортжурнале';
