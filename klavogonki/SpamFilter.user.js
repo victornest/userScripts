@@ -3,7 +3,7 @@
 // @namespace      klavogonki
 // @include        http*://klavogonki.ru/g*
 // @author         Великий и медицинский
-// @version        1.1
+// @version        1.2
 // @description    Спам-фильтр
 
 // ==/UserScript==
@@ -14,7 +14,9 @@
 	var config = { attributes: true, childList: true, subtree: true };
 	var callback = function(mutationsList, observer) {
 		for(let mutation of mutationsList) {
-			checkId();
+			try {
+				checkId();
+			} catch(e) {}
 		}
 	};
 	var observer = new MutationObserver(callback);
