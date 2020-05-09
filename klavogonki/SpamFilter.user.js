@@ -3,7 +3,7 @@
 // @namespace      klavogonki
 // @include        http*://klavogonki.ru/g*
 // @author         Великий и медицинский
-// @version        1.0
+// @version        1.1
 // @description    Спам-фильтр
 
 // ==/UserScript==
@@ -24,7 +24,7 @@
 		var list = document.querySelector('.messages-content').querySelectorAll('.username');
 		for (var i = 0; i <= list.length; i++) {
 			if (list[i].firstElementChild.attributes[0].nodeValue.length > 8)
-				document.querySelector('.messages-content').querySelectorAll('.username')[i].parentNode.style.display = 'none';
+				document.querySelector('.messages-content').querySelectorAll('.username')[i].parentNode.remove();
 		}
 	}
 
