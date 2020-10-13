@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         chatSwitcher
-// @version      0.23
+// @version      0.24
 // @description  Переключение вкладок чата
 // @match        http://klavogonki.ru/g/*
 // @match        https://klavogonki.ru/g/*
@@ -49,7 +49,7 @@ function click() {
 
 function generalChatActivate() {
     window.addEventListener('load', function a() {
-        if (document.querySelectorAll('.messages-content')[0].querySelector('div').firstElementChild) {
+        if (document.querySelectorAll('.messages-content')[0].querySelector('div').childNodes[1]) {
             genTab.click();
             chatContent[0].scrollTop = 100000;
         } else {
