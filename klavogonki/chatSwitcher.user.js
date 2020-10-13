@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         generalChatSwitcher
+// @name         chatSwitcher
 // @version      0.2
 // @description  Переключение вкладок чата
 // @match        http://klavogonki.ru/g/*
