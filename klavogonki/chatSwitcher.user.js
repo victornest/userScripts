@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         chatSwitcher
-// @version      0.2
+// @version      0.21
 // @description  Переключение вкладок чата
 // @match        http://klavogonki.ru/g/*
 // @match        https://klavogonki.ru/g/*
@@ -14,6 +14,9 @@ tabSwitcher();
 
 //скроление чата alt + J / alt + K
 chatScroll();
+
+//минимизация чата ctrl + space
+chatMinimize();
 
 //время двойного нажатия (ms)
 let dbltime = 300;
@@ -90,4 +93,12 @@ function chatScroll() {
         }
         keys[e.code] = false;
     })
+}
+
+function chatMinimize() {
+    window.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.code == 'Space') {
+            document.querySelector('.hide-bar').click();
+        }
+    });
 }
