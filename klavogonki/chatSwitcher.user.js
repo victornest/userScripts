@@ -1,13 +1,20 @@
 // ==UserScript==
 // @name         chatSwitcher
-// @version      0.24
+// @version      0.25
 // @description  Переключение вкладок чата
-// @match        http://klavogonki.ru/g/*
-// @match        https://klavogonki.ru/g/*
+// @match        http*://klavogonki.ru/g/*
+// @match        http*://klavogonki.ru/gamelist/
 // ==/UserScript==
 
+let mode;
+((document.URL == 'http://klavogonki.ru/gamelist/') || (document.URL == 'https://klavogonki.ru/gamelist/')) ? mode = false : mode = true;
+
+
+
+
+if (mode)
 //активация общего чата при заходе в заезд
-generalChatActivate();
+    generalChatActivate();
 
 //переключение вкладок нажатием таба, двойным нажатием - установление курсора в строку ввода чата
 tabSwitcher();
@@ -22,12 +29,24 @@ chatMinimize();
 let dbltime = 300;
 //расстояние скролла чата (px)
 let scrollLength = 50;
+//если не переключается на общий чат при открытии заезда - увеличить время (ms): 500, 1000, 2000...
+let extraTime = 0;
 
+
+
+
+let genTab;
+let gameTab;
+let gameInput;
+if (mode) {
+    genTab = document.querySelector('#chat-title .general.c');
+    gameTab = document.querySelector('#chat-title .game.c');
+    gameInput = document.querySelectorAll('.chat')[1].querySelector('.text');
+} else
+    genTab = document.querySelector('#chat-title .active.c');
 let chatContent = document.querySelectorAll('.messages-content');
-let genTab = document.querySelector('#chat-title .general.c');
-let gameTab = document.querySelector('#chat-title .game.c');
 let genInput = document.querySelectorAll('.chat')[0].querySelector('.text');
-let gameInput = document.querySelectorAll('.chat')[1].querySelector('.text');
+
 let timesTabClicked = 0;
 
 function focus() {
@@ -49,9 +68,15 @@ function click() {
 
 function generalChatActivate() {
     window.addEventListener('load', function a() {
-        if (document.querySelectorAll('.messages-content')[0].querySelector('div').childNodes[1]) {
+        if ((chatContent[0].querySelector('div').childNodes[1]) && (!genTab.hasClassName('active'))) {
             genTab.click();
             chatContent[0].scrollTop = 100000;
+            setTimeout(() => {
+                if ((chatContent[0].querySelector('div').childNodes[1]) && (!genTab.hasClassName('active'))) {
+                    genTab.click();
+                    chatContent[0].scrollTop = 100000;
+                }
+            }, extraTime);
         } else {
             setTimeout(a, 500);
         }
@@ -66,7 +91,8 @@ function tabSwitcher() {
             if (timesTabClicked < 2) {
                 let t = setTimeout(function() {
                     if (timesTabClicked < 2) {
-                        click();
+                        if (mode)
+                            click();
                         timesTabClicked = 0;
                     } else {
                         timesTabClicked = 0;
@@ -91,10 +117,12 @@ function chatScroll() {
     window.addEventListener('keyup', (e) => {
         if ((keys['AltLeft'] || keys['AltRight']) && keys['KeyJ']) {
             chatContent[0].scrollBy({top: scrollLength, left: 0, behavior: 'smooth'});
-            chatContent[1].scrollBy({top: scrollLength, left: 0, behavior: 'smooth'});
+            if (mode)
+                chatContent[1].scrollBy({top: scrollLength, left: 0, behavior: 'smooth'});
         } else if ((keys['AltLeft'] || keys['AltRight']) && keys['KeyK']) {
             chatContent[0].scrollBy({top: -scrollLength, left: 0, behavior: 'smooth'});
-            chatContent[1].scrollBy({top: -scrollLength, left: 0, behavior: 'smooth'});
+            if (mode)
+                chatContent[1].scrollBy({top: -scrollLength, left: 0, behavior: 'smooth'});
         }
         keys[e.code] = false;
     })
