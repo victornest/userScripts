@@ -21,25 +21,7 @@ chatMinimize();
 //время двойного нажатия (ms)
 let dbltime = 300;
 //расстояние скролла чата (px)
-let scrollLength = 50;
 
-let chatContent = document.querySelector('.messages-content');
-let genTab = document.querySelector('#chat-title .general.c');
-let gameTab = document.querySelector('#chat-title .game.c');
-let genInput = document.querySelectorAll('.chat')[0].querySelector('.text');
-let gameInput = document.querySelectorAll('.chat')[1].querySelector('.text');
-let timesTabClicked = 0;
-
-function focus() {
-    if (genTab.hasClassName('active'))
-        genInput.focus();
-    else
-        gameInput.focus();
-}
-
-function click() {
-    if (!genTab.hasClassName('active'))
-        genTab.click();
     else
         gameTab.click();
     chatContent.scrollTop = 100000;
