@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         chatSwitcher
-// @version      0.21
+// @version      0.22
 // @description  Переключение вкладок чата
 // @match        http://klavogonki.ru/g/*
 // @match        https://klavogonki.ru/g/*
@@ -23,7 +23,7 @@ let dbltime = 300;
 //расстояние скролла чата (px)
 let scrollLength = 50;
 
-let chatContent = document.querySelector('.messages-content');
+let chatContent = document.querySelectorAll('.messages-content');
 let genTab = document.querySelector('#chat-title .general.c');
 let gameTab = document.querySelector('#chat-title .game.c');
 let genInput = document.querySelectorAll('.chat')[0].querySelector('.text');
@@ -38,18 +38,20 @@ function focus() {
 }
 
 function click() {
-    if (!genTab.hasClassName('active'))
+    if (!genTab.hasClassName('active')) {
         genTab.click();
-    else
+        chatContent[0].scrollTop = 100000;
+    } else {
         gameTab.click();
-    chatContent.scrollTop = 100000;
+        chatContent[1].scrollTop = 100000;
+    }
 }
 
 function generalChatActivate() {
     window.addEventListener('load', function a() {
         if (!genTab.hasClassName('active')) {
             genTab.click();
-            chatContent.scrollTop = 100000;
+            chatContent[0].scrollTop = 100000;
             setTimeout(a, 500);
         }
     });
@@ -87,9 +89,11 @@ function chatScroll() {
     })
     window.addEventListener('keyup', (e) => {
         if ((keys['AltLeft'] || keys['AltRight']) && keys['KeyJ']) {
-            chatContent.scrollBy({top: scrollLength, left: 0, behavior: 'smooth'});
+            chatContent[0].scrollBy({top: scrollLength, left: 0, behavior: 'smooth'});
+            chatContent[1].scrollBy({top: scrollLength, left: 0, behavior: 'smooth'});
         } else if ((keys['AltLeft'] || keys['AltRight']) && keys['KeyK']) {
-            chatContent.scrollBy({top: -scrollLength, left: 0, behavior: 'smooth'});
+            chatContent[0].scrollBy({top: -scrollLength, left: 0, behavior: 'smooth'});
+            chatContent[1].scrollBy({top: -scrollLength, left: 0, behavior: 'smooth'});
         }
         keys[e.code] = false;
     })
