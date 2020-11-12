@@ -45,6 +45,7 @@
     RCLButton.setAttribute('id', 'RCLButton');
     RCLButton.setAttribute('type', 'button');
     RCLButton.textContent = 'В чат!';
+    RCLButton.setAttribute('title', 'Создать заезд и отправить ссылку в чат');
     RCLButton.onclick = create;
 
     RCLGametype.setAttribute('id', 'RCLGametype');
@@ -61,6 +62,7 @@
                             );
 
     RCLTimeout.setAttribute('id', 'RCLTimeout');
+    RCLTimeout.setAttribute('title', 'Таймаут');
     RCLTimeout.insert(option('5', '5 секунд'));
     RCLTimeout.insert(option('10', '10 секунд'));
     RCLTimeout.insert(option('20', '20 секунд'));
