@@ -32,12 +32,14 @@
 
     var gmid = document.URL.match(/(\d+)/)[0];
     var info = httpGet('http://klavogonki.ru/g/' + gmid + '.info');
-    info = JSON.parse(info.response);
-    var currentMin = info.params.level_from;
-    var currentMax = info.params.level_to;
-    var currentTimeout = info.params.timeout;
-    var currentGametype = info.params.gametype;
-    var currentMode = info.params.type;
+    info = JSON.parse(info.response).params;
+    var currentMin = info.level_from;
+    var currentMax = info.level_to;
+    var currentTimeout = info.timeout;
+    if (currentTimeout > 120)
+        currentTimeout = '10';
+    var currentGametype = info.gametype.match(/(\d+)/) ? info.gametype.match(/(\d+)/)[0] : info.gametype;
+    var currentMode = info.type;
 
     RCLDiv.setAttribute('id', 'RCLDiv');
     RCLDiv.insert(RCLButton);
@@ -56,7 +58,7 @@
     RCLGametype.setAttribute('id', 'RCLGametype');
     RCLGametype.value = currentGametype;
     RCLGametype.setAttribute('title', 'Обычный - normal\n' +
-                                      'По словарю - voc-#\n' +
+                                      'По словарю - id словаря\n' +
                                       'Безошибочный - noerror\n' +
                                       'Буквы - chars\n' +
                                       'Марафон - marathon\n' +
@@ -91,7 +93,7 @@
     RCLMin.value = currentMin;
 
     RCLMax.setAttribute('id', 'RCLMin');
-    RCLMax.setAttribute('title', 'Минимальный ранг');
+    RCLMax.setAttribute('title', 'Максимальный ранг');
     RCLMax.insert(option('1', 'Новичок'));
     RCLMax.insert(option('2', 'Любитель'));
     RCLMax.insert(option('3', 'Таксист'));
@@ -149,8 +151,8 @@
 
     function create() {
         var gametype = '';
-        if (RCLGametype.value.match('voc'))
-            gametype = 'voc&voc=' + RCLGametype.value.match(/(\d+)/)[0];
+        if (RCLGametype.value.match(/(\d+)/))
+            gametype = 'voc&voc=' + RCLGametype.value;
         else
             gametype = RCLGametype.value;
 
