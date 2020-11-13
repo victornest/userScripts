@@ -107,7 +107,6 @@
 
     RCLMode.setAttribute('id', 'RCLMode');
     RCLMode.setAttribute('type', 'checkbox');
-    console.log(currentMode);
     if (currentMode == 'normal')
         RCLMode.checked = true;
     else
