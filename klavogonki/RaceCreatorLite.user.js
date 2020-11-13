@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RaceCreatorLite
 // @namespace    klavogonki
-// @version      0.1
+// @version      0.2
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
@@ -20,6 +20,8 @@
     var RCLButton = document.createElement('button');
     var RCLGametype = document.createElement('input');
     var RCLTimeout = document.createElement('select');
+    var RCLMin = document.createElement('select');
+    var RCLMax = document.createElement('select');
     var RCLMode = document.createElement('input');
     var option = (value, text) => {
         var x = document.createElement('option');
@@ -27,19 +29,22 @@
         x.textContent = text;
         return x;
     }
-    var currentTimeout = '10';
-    if (document.querySelector('#gamedesc').textContent.match('таймаут') != null) {
-        currentTimeout = document.querySelector('#gamedesc').textContent.match(/(\d+)/)[0];
-        if (currentTimeout == '1')
-            currentTimeout = '60';
-        if (currentTimeout == '2')
-            currentTimeout = '120';
-    }
+
+    var gmid = document.URL.match(/(\d+)/)[0];
+    var info = httpGet('http://klavogonki.ru/g/' + gmid + '.info');
+    info = JSON.parse(info.response);
+    var currentMin = info.params.level_from;
+    var currentMax = info.params.level_to;
+    var currentTimeout = info.params.timeout;
+    var currentGametype = info.params.gametype;
+    var currentMode = info.params.type;
 
     RCLDiv.setAttribute('id', 'RCLDiv');
     RCLDiv.insert(RCLButton);
     RCLDiv.insert(RCLGametype);
     RCLDiv.insert(RCLTimeout);
+    RCLDiv.insert(RCLMin);
+    RCLDiv.insert(RCLMax);
     RCLDiv.insert(RCLMode);
 
     RCLButton.setAttribute('id', 'RCLButton');
@@ -49,7 +54,7 @@
     RCLButton.onclick = create;
 
     RCLGametype.setAttribute('id', 'RCLGametype');
-    RCLGametype.value = game.getGametype();
+    RCLGametype.value = currentGametype;
     RCLGametype.setAttribute('title', 'Обычный - normal\n' +
                                       'По словарю - voc-#\n' +
                                       'Безошибочный - noerror\n' +
@@ -72,9 +77,39 @@
     RCLTimeout.insert(option('120', '2 минуты'));
     RCLTimeout.value = currentTimeout;
 
+    RCLMin.setAttribute('id', 'RCLMin');
+    RCLMin.setAttribute('title', 'Минимальный ранг');
+    RCLMin.insert(option('1', 'Новичок'));
+    RCLMin.insert(option('2', 'Любитель'));
+    RCLMin.insert(option('3', 'Таксист'));
+    RCLMin.insert(option('4', 'Профи'));
+    RCLMin.insert(option('5', 'Гонщик'));
+    RCLMin.insert(option('6', 'Маньяк'));
+    RCLMin.insert(option('7', 'Супермен'));
+    RCLMin.insert(option('8', 'Кибергонщик'));
+    RCLMin.insert(option('9', 'Экстракибер'));
+    RCLMin.value = currentMin;
+
+    RCLMax.setAttribute('id', 'RCLMin');
+    RCLMax.setAttribute('title', 'Минимальный ранг');
+    RCLMax.insert(option('1', 'Новичок'));
+    RCLMax.insert(option('2', 'Любитель'));
+    RCLMax.insert(option('3', 'Таксист'));
+    RCLMax.insert(option('4', 'Профи'));
+    RCLMax.insert(option('5', 'Гонщик'));
+    RCLMax.insert(option('6', 'Маньяк'));
+    RCLMax.insert(option('7', 'Супермен'));
+    RCLMax.insert(option('8', 'Кибергонщик'));
+    RCLMax.insert(option('9', 'Экстракибер'));
+    RCLMax.value = currentMax;
+
     RCLMode.setAttribute('id', 'RCLMode');
     RCLMode.setAttribute('type', 'checkbox');
-    RCLMode.checked = true;
+    console.log(currentMode);
+    if (currentMode == 'normal')
+        RCLMode.checked = true;
+    else
+        RCLMode.checked = false;
     RCLMode.setAttribute('title', 'Галочка - открытый, иначе - дружеский');
 
     inviteDiv.childElements()[2].insertBefore(RCLDiv, inviteDiv.childElements()[2].childElements()[1]);
@@ -84,32 +119,35 @@
                              'text-align: center; ' +
                              'outline: none; ' +
                              'border: gray solid 1px; ' +
-                             'margin: 5px 10px 0px 0px; '
+                             'margin: 5px -1px 0px 0px; '
                             );
     RCLButton.setAttribute('style',
                            'outline: none; ' +
                            'border: gray solid 1px; ' +
-                           'margin: 5px 10px 0px 0px; '
+                           'margin: 5px -1px 0px 0px; '
                           );
     RCLTimeout.setAttribute('style',
                             'outline: none; ' +
                             'border: gray solid 1px; ' +
-                            'margin: 5px 10px 0px 0px; '
+                            'margin: 5px -1px 0px 0px; '
                            );
+    RCLMin.setAttribute('style',
+                        'outline: none; ' +
+                        'border: gray solid 1px; ' +
+                        'margin: 5px -1px 0px 0px; ' +
+                        'width: 45px'
+                       );
+    RCLMax.setAttribute('style',
+                        'outline: none; ' +
+                        'border: gray solid 1px; ' +
+                        'margin: 5px 5px 0px 0px; ' +
+                        'width: 45px'
+                       );
     RCLMode.setAttribute('style',
                          ''
                         );
 
     function create() {
-
-        function httpGet(theUrl)
-        {
-            var xmlHttp = new XMLHttpRequest();
-            xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
-            xmlHttp.send( null );
-            return xmlHttp.responseURL;
-        }
-
         var gametype = '';
         if (RCLGametype.value.match('voc'))
             gametype = 'voc&voc=' + RCLGametype.value.match(/(\d+)/)[0];
@@ -125,11 +163,29 @@
         var newRaceUrl = httpGet('http://klavogonki.ru/create/?' +
                                  'gametype=' + gametype +
                                  '&type=' + mode +
-                                 '&level_from=1&level_to=9' +
+                                 '&level_from=' + RCLMin.value +
+                                 '&level_to=' + RCLMax.value +
                                  '&timeout=' + RCLTimeout.value +
                                  '&submit=1'
                                 );
-        gamechatInput(newRaceUrl + ' начнется через ' + RCLTimeout.value + ' секунд');
+        if ((RCLMin.value == '1') && (RCLMax.value == '9'))
+            gamechatInput(newRaceUrl.responseURL +
+                          ' **' + RCLTimeout.value + ' секунд**'
+                         );
+        else
+            gamechatInput(newRaceUrl.responseURL + ' ' +
+                          RCLMin.options[RCLMin.selectedIndex].text + ' — ' +
+                          RCLMax.options[RCLMax.selectedIndex].text +
+                          ' **' + RCLTimeout.value + ' секунд**'
+                         );
         gamechatSend();
     }
+
+    function httpGet(theUrl) {
+        var xhr = new XMLHttpRequest();
+        xhr.open( "GET", theUrl, false ); // false for synchronous request
+        xhr.send( null );
+        return xhr;
+    }
+
 })();
