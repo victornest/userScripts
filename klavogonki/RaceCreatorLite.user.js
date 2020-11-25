@@ -17,7 +17,7 @@
         // и текст "пригласить"
         inviteDiv.childElements()[2].childElements()[0].style.display = 'none';
         // поднимаем кнопку приглашения наверх
-        // inviteDiv.childElements()[2].insertBefore(inviteDiv.childElements()[2].childElements()[2], inviteDiv.childElements()[2].childElements()[1])
+        inviteDiv.childElements()[2].insertBefore(inviteDiv.childElements()[2].childElements()[2], inviteDiv.childElements()[2].childElements()[1])
     } catch(e) {}
 
     var RCLDiv = document.createElement('div');
@@ -146,7 +146,7 @@
     // против этого таймаут двести мс
     // в течение которого срабатывает клик по словарю и триггерит его выбор
     // а затем фокусаут
-    RCLGametype.addEventListener('focusout', (e) => {
+    RCLGametype.addEventListener('1focusout', (e) => {
         setTimeout(() => {
             if (!RCLGametypeVocs.style.display == false) {
                 hideOptions();
@@ -279,7 +279,7 @@
         ' z-index: 999; ' +
         ' max-height: 300px; ' +
         ' min-width: 190px; ' +
-        ' overflow: auto; ' +
+        ' overflow-x: hidden; ' +
         ' border-bottom-left-radius: 4px; ' +
         ' border-bottom-right-radius: 4px; ' +
         ' } ' +
@@ -287,11 +287,26 @@
         ' .RCLGametypeOption { ' +
         ' padding: 3px; ' +
         ' cursor: default; ' +
+
+        ' } ' +
+
+        ' .RCLGametypeOption:before { ' +
+        ' content: ""; ' +
+        ' position: absolute; ' +
+        ' margin-top: -4px; ' +
+        ' left: 0; ' +
+        ' width: 190px; ' +
+        ' height: 1px; ' +
+        ' background-color: #c0c0c080; ' +
+        ' } ' +
+
+        ' .RCLGametypeOption:hover:before { ' +
+        //' background-color: #ffeed6; ' +
         ' } ' +
 
         ' .RCLGametypeOption:hover { ' +
-        ' box-shadow: inset 0px 0px 0px 2px #d4ba98; ' +
-        ' background-color: #ffeace80; ' +
+        //' box-shadow: inset 0px 0px 0px 2px #d4ba98; ' +
+        ' background-color: #ffeed6; ' +
         ' } ' +
 
         ' #RCLGametypeDiv { ' +
