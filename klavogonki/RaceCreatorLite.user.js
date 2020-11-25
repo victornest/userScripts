@@ -146,7 +146,7 @@
     // против этого таймаут двести мс
     // в течение которого срабатывает клик по словарю и триггерит его выбор
     // а затем фокусаут
-    RCLGametype.addEventListener('1focusout', (e) => {
+    RCLGametype.addEventListener('focusout', (e) => {
         setTimeout(() => {
             if (!RCLGametypeVocs.style.display == false) {
                 hideOptions();
