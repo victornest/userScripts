@@ -134,6 +134,8 @@
 
     inviteDiv.childElements()[2].insertBefore(RCLDiv, inviteDiv.childElements()[2].childElements()[1]);
 
+
+
     // ввод в геймтайп
     RCLGametype.addEventListener('input', () => { updateRCLGametypeVocs(RCLGametype.value) });
     RCLGametype.addEventListener('mousedown', () => { updateRCLGametypeVocs(RCLGametype.value) });
@@ -210,20 +212,20 @@
     function create() {
 
         // определяем по айди из датасета: словарь/стандартный режим
-        // если по какой-то причине нет айди в датасете (вроде этого не может быть)
-        // то создаем по айди словаря из инпута
         try {
             let gt = RCLGametype.dataset.id.match(/(\d+)/);
             if (gt)
                 var gametype = 'voc&voc=' + RCLGametype.dataset.id;
             else
                 var gametype = RCLGametype.dataset.id;
-        } catch(e) {
-            if (RCLGametype.value.match(/(\d+)/))
-                var gametype = 'voc&voc=' + RCLGametype.value;
+        } catch(e) {}
+        // проверка на ручной ввод id словаря
+        try {
+            if (RCLGametype.value.match(/\B\$/))
+                var gametype = 'voc&voc=' + RCLGametype.value.slice(1);
             else
                 var gametype = RCLGametype.dataset.id;
-        }
+        } catch(e) {}
 
         // открытый/дружеский
         var mode = 'normal';
@@ -295,7 +297,7 @@
         ' #RCLGametypeDiv { ' +
         ' display: inline; ' +
         ' position: absolute; ' +
-        ' width: 450px; ' +
+        ' width: 190px; ' +
         ' height: 0%; ' +
         ' max-height: 331px; ' +
         ' } ' +
