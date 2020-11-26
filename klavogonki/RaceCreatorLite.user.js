@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         RaceCreatorLite
 // @namespace    klavogonki
-// @version      0.31
+// @version      0.32
 // @author       490344
 // @include      http://klavogonki.ru/g/*
 // @include      https://klavogonki.ru/g/*
