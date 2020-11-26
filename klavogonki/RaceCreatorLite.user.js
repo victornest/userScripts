@@ -214,14 +214,16 @@
         // проверяем ручной ввод айди словаря с $
         // иначе смотрим цифровой айди в датасете
         // иначе берем буквенный айди из датасета
-        if (RCLGametype.value.match(/\B\$/))
-            var gametype = 'voc&voc=' + RCLGametype.value.slice(1);
-        else {
-            if (RCLGametype.dataset.id.match(/(\d+)/))
-                var gametype = 'voc&voc=' + RCLGametype.dataset.id;
-            else
-                var gametype = RCLGametype.dataset.id;
-        }
+        try {
+            if (RCLGametype.value.match(/\B\$/))
+                var gametype = 'voc&voc=' + RCLGametype.value.slice(1);
+            else {
+                if (RCLGametype.dataset.id.match(/(\d+)/))
+                    var gametype = 'voc&voc=' + RCLGametype.dataset.id;
+                else
+                    var gametype = RCLGametype.dataset.id;
+            }
+        } catch(e) { console.log('gametype init error') }
 
         // открытый/дружеский
         var mode = 'normal';
@@ -341,7 +343,7 @@
         ' outline: none; ' +
         ' border: gray solid 1px; ' +
         ' margin: 5px 5px 0px 0px; ' +
-        ' width: 70px;' +
+        ' width: 65px;' +
         ' border-radius: 4px; ' +
         ' } ' +
 
@@ -349,7 +351,7 @@
         ' outline: none; ' +
         ' border: gray solid 1px; ' +
         ' margin: 5px 5px 0px 0px; ' +
-        ' width: 70px;' +
+        ' width: 65px;' +
         ' border-radius: 4px; ' +
         ' } ';
 
@@ -5299,7 +5301,7 @@
 			{id: '172284', text: 'Марина'},
 			{id: '172277', text: 'мпрми сч'},
 			{id: '172275', text: 'сптмрисапсм1111111111111111111'},
-			{id: '172274', text: '111111\'},
+			{id: '172274', text: '111111\\'},
 			{id: '172266', text: 'Discourse on the Method'},
 			{id: '172251', text: 'Элиезер Юдковский - Рациональность 26 - часть'},
 			{id: '172246', text: 'Указательныйтелефон'},
@@ -18388,7 +18390,7 @@
 			{id: '67949', text: 'Sweepy'},
 			{id: '67944', text: 'ВОВА'},
 			{id: '67915', text: 'сочетания НТ, ТН'},
-			{id: '67913', text: 'left hand numbers 1-6 tranin\\''},
+			{id: '67913', text: 'left hand numbers 1-6 tranin\\\''},
 			{id: '67905', text: 'Просто 21312231'},
 			{id: '67903', text: 'starcraft 2 (zerg left hand)'},
 			{id: '67890', text: 'мои куски кода'},
@@ -19466,7 +19468,7 @@
 			{id: '57897', text: 'Хочешь!'},
 			{id: '57888', text: 'словарик на разминку'},
 			{id: '57885', text: 'просто словарь ))'},
-			{id: '57856', text: 'самый лучший словарь!!!!!!!!!!\'},
+			{id: '57856', text: 'самый лучший словарь!!!!!!!!!!\\'},
 			{id: '57852', text: 'тест укр 2'},
 			{id: '57843', text: 'Денискины рассказы'},
 			{id: '57816', text: 'В.Р.Дольник  НЕПОСЛУШНОЕ ДИТЯ БИОСФЕРЫ'},
@@ -19503,7 +19505,7 @@
 			{id: '57633', text: 'Английские буквы для правой руки'},
 			{id: '57586', text: 'Дживс и Вустер'},
 			{id: '57565', text: 'Руфимский'},
-			{id: '57561', text: 'english words with (asdfghjkl;\\\\')'},
+			{id: '57561', text: 'english words with (asdfghjkl;\\\\\')'},
 			{id: '57559', text: 'буквы и лёгкие слова'},
 			{id: '57529', text: 'Средний левый'},
 			{id: '57520', text: 'englishtreaner'},
@@ -20522,7 +20524,7 @@
 			{id: '45188', text: 'Метро'},
 			{id: '45177', text: 'Вас невозможно научить'},
 			{id: '45148', text: 'Девушка, взрывавшая замки'},
-			{id: '45117', text: 'new word\\\\\\\\'s'},
+			{id: '45117', text: 'new word\\\\\\\\\'s'},
 			{id: '45103', text: 'Текущий'},
 			{id: '45090', text: 'три 2'},
 			{id: '45084', text: 'Кибертекст: просто так!'},
@@ -21735,7 +21737,7 @@
 			{id: '32507', text: 'Без буквы А'},
 			{id: '32465', text: 'Н. Макиавелли «Государь»'},
 			{id: '32429', text: '1-200 TOP 5000 words'},
-			{id: '32428', text: 'Jay Walker on the world\\'s'},
+			{id: '32428', text: 'Jay Walker on the world\\\'s'},
 			{id: '32313', text: 'тест2000'},
 			{id: '32269', text: 'Эмоции'},
 			{id: '32248', text: 'Словaрик'},
@@ -23458,7 +23460,7 @@
 			{id: '14897', text: 'ый'},
 			{id: '14876', text: 'Смешной текст.'},
 			{id: '14869', text: 'кибертест Grand Phrase'},
-			{id: '14854', text: 'Wissen\\\\\\\\\\\\\\\\'s vocabu'},
+			{id: '14854', text: 'Wissen\\\\\\\\\\\\\\\\\'s vocabu'},
 			{id: '14853', text: 'Тень победы'},
 			{id: '14849', text: 'The Langoliers'},
 			{id: '14847', text: 'The Green Mile'},
