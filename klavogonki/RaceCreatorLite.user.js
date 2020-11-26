@@ -7,7 +7,7 @@
 // @include      https://klavogonki.ru/g/*
 // @grant        none
 // ==/UserScript==
-
+//aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 (function() {
 
     var inviteDiv = document.querySelector('#invite .rc');
