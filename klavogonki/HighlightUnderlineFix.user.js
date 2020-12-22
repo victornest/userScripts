@@ -9,6 +9,10 @@
 // ==/UserScript==
 
 
+const color = '#33a';
+const thickness = '3px';
+
+
 let typetext = document.querySelector('#typetext');
 observe((mutationsList, observer) => {
     for (let mutation of mutationsList) {
@@ -16,7 +20,8 @@ observe((mutationsList, observer) => {
             if (mutation.target.getOpacity() == 1) {
                 let typefocus = document.querySelector('#typefocus');
                 typefocus.style.textDecoration = 0;
-                typefocus.style.borderBottom = '#33a solid 2px';
+                typefocus.style.borderBottom = color + ' solid ' + thickness;
+                typefocus.style.color = color;
             }
         }
     }
