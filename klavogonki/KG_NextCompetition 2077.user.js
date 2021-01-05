@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           KG_NextCompetition 2077
-// @version        0.1
+// @version        0.11
 // @description    Добавляет в блок ввода текста таймер со ссылкой на следующий икс
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
@@ -11,17 +11,25 @@
 
 (function() {
 
-    function httpGet(theUrl) {
-        let xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("GET", theUrl, false);
-        xmlHttp.send(null);
-        return xmlHttp.responseText;
+    function httpGet(url) {
+        return new Promise((resolve, reject) => {
+            let xhr = new XMLHttpRequest();
+            xhr.open("Get", url);
+            xhr.onload = () => resolve(JSON.parse(xhr.responseText));
+            xhr.onerror = () => reject(console.log(xhr.statusText));
+            xhr.send();
+        });
     }
 
 
-    function getBegintime() {
-        let url = 'http://klavogonki.ru/gamelist.data/'
-        let resp = JSON.parse(httpGet(url))
+    function getGamelist() {
+        let url = 'http://klavogonki.ru/gamelist.data/';
+        return httpGet(url)
+    }
+
+
+    async function main() {
+        let resp = await getGamelist();
         resp.gamelist.forEach(x => {
             if (x.params.competition && x.type == 'open') {
                 begintime = x.begintime;
@@ -35,7 +43,7 @@
             return updateTimer();
         } else {
             timer.innerText = 'иксы отдыхают';
-            return setTimeout(getBegintime, 10000)
+            return setTimeout(main, 10000);
         }
     }
 
@@ -94,11 +102,11 @@
                 shareBtn.removeEventListener('click', share);
                 timer.style.color = 'darkgrey';
                 begintime = multiplier = gmid = min = sec = null;
-                getBegintime();
+                main();
             }
         } else {
             console.log('updateTimer: begintime error', begintime);
-            setTimeout(getBegintime, 10000);
+            setTimeout(main, 10000);
         }
     }
 
@@ -119,7 +127,7 @@
     let gmid;
     let min;
     let sec;
-    getBegintime();
+    main();
 
 
     (() => {
