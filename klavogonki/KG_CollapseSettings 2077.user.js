@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           KG_CollapseSettings 2077
-// @version        0.1
+// @version        0.2
 // @description    Сворачиватель блока настроек
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
@@ -11,19 +11,8 @@
 
 (function() {
 
-    let btn = document.createElement('div');
-    btn.id = 'collapse-settings-2077';
-    btn.addEventListener('click', expand);
-    let arrow = document.createElement('div');
-    arrow.id = 'collapse-settings-2077-arrow';
-    btn.insert(arrow);
-    let params = document.querySelector('#params');
-    params.insert(btn);
-
-    let arrowImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAfQAAAH0Bx0gPAAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACeSURBVDiN1ZPBDcIwDEWfMwt7sAQLMEWvnaRRC0dG4tY9+FyMZKgTIZULkSwl9n9PudgkseeUXfQvBAYcgQNQJT2+gswKcAbuACsgYAKKJHrlv56cWQEGfwioPYnDNeSH12AMzTmTODyH3CiJGIiSJUocXj7hN0EiuThY/L6BN4JEcvVK4VSQSJpwU5BIUlgS1tsFMzsBSLo1M/+/TE92ZfjD1tAH3gAAAABJRU5ErkJggg==';
-
     function expand() {
-        params.style['max-height'] = '1000px';
+        params.style['max-height'] = paramsHeight + 'px';
         arrow.style.transform = 'scaleY(-1)';
         btn.removeEventListener('click', expand);
         btn.addEventListener('click', collapse);
@@ -38,29 +27,51 @@
     }
 
 
+    let btn = document.createElement('div');
+    btn.id = 'collapse-settings-2077';
+    btn.addEventListener('click', expand);
+    let arrow = document.createElement('div');
+    arrow.id = 'collapse-settings-2077-arrow';
+    btn.insert(arrow);
+    let params = document.querySelector('#params');
+    params.insert(btn);
+
+    let paramsHeight;
+    new MutationObserver(function(muts, observer) {
+        paramsHeight = muts[0].target.querySelector('#params').scrollHeight;
+        console.log('asd');
+    }).observe(document.querySelector('#play-right'), {attributes: true, childList: true});
+
+    collapse();
+
+
+    let arrowImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAfQAAAH0Bx0gPAAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACeSURBVDiN1ZPBDcIwDEWfMwt7sAQLMEWvnaRRC0dG4tY9+FyMZKgTIZULkSwl9n9PudgkseeUXfQvBAYcgQNQJT2+gswKcAbuACsgYAKKJHrlv56cWQEGfwioPYnDNeSH12AMzTmTODyH3CiJGIiSJUocXj7hN0EiuThY/L6BN4JEcvVK4VSQSJpwU5BIUlgS1tsFMzsBSLo1M/+/TE92ZfjD1tAH3gAAAABJRU5ErkJggg==';
+
     (() => {
         let css = document.createElement('style');
         css.innerHTML =
             " #collapse-settings-2077 { " +
-            " position: relative; " +
-            " width: 0; " +
-            " height: 0; " +
-            " top: -340px; " +
+            " position: absolute; " +
+            " width: 100%; " +
+            " height: 34px; " +
+            " top: 0; " +
             " } " +
 
             " #collapse-settings-2077-arrow { " +
             " position: relative; " +
-            " width: 270px; " +
+            " width: 32px; " +
             " height: 32px; " +
-            " top: 1px; " +
+            " top: 2px; " +
+            " right: 5px; " +
+            " float: right; " +
             " filter: invert(40%); " +
-            " background: 240px center no-repeat url(" + arrowImage + "); " +
-            " transition: all 0.2s linear;" +
+            " background: center no-repeat url(" + arrowImage + "); " +
+            " transition: all 0.1s linear;" +
             " } " +
 
             " #params { " +
+            " position: relative; " +
             " overflow: hidden; " +
-            " max-height: 34px; " +
             " border-radius: 16px; " +
             " transition: max-height 0.2s linear; " +
             " } " +
