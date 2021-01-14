@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           KG_NextCompetition 2077
-// @version        0.11
+// @version        0.12
 // @description    Добавляет в блок ввода текста таймер со ссылкой на следующий икс
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
@@ -23,7 +23,7 @@
 
 
     function getGamelist() {
-        let url = 'http://klavogonki.ru/gamelist.data/';
+        let url = '//klavogonki.ru/gamelist.data/';
         return httpGet(url)
     }
 
@@ -50,7 +50,7 @@
 
     function share() {
         if (gmid != null) {
-            gamechatInput('http://klavogonki.ru/g/?gmid=' + gmid + ' ' + min + ':' + sec);
+            gamechatInput('//klavogonki.ru/g/?gmid=' + gmid + ' ' + min + ':' + sec);
             gamechatSend();
         } else {
             console.log('чето беда какая-то картинка есть, а гмида нет');
@@ -138,6 +138,7 @@
             " right: 30px; " +
             " bottom: 10px; " +
             " color: darkgrey; " +
+            " font-family: monospace; " +
             " } " +
 
             " #next-competition-2077-link { " +
@@ -152,7 +153,7 @@
             " position: absolute; " +
             " right: 12px; " +
             " width: 12px; " +
-            " bottom: 12px; " +
+            " bottom: 11px; " +
             " opacity: .5; " +
             " } " +
             " #next-competition-2077-share:hover { " +
