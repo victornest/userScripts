@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           KG_NextCompetition 2077
-// @version        0.13
+// @version        0.14
 // @description    Добавляет в блок ввода текста таймер со ссылкой на следующий икс
 // @namespace      klavogonki
 // @author         http://klavogonki.ru/u/#/490344/
@@ -168,7 +168,7 @@
     }
 
 
-    const version = '0.13';
+    const version = '0.14';
     const localStorageName = 'NextCompetition2077';
     const defaultSettings = JSON.stringify({
         //previousGame: {link: location.protocol +
