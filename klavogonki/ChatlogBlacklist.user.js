@@ -10,7 +10,7 @@
 
 (function() {
 
-    let bl = new RegExp('Advisor|ПАНЧЕР|jemcik|2021г|BorisQuiz');
+    let bl = new RegExp('Advisor|KlavoMedia|ПАНЧЕР|jemcik|2021г|BorisQuiz');
     let div = document.createElement('div');
     let newChatlog = document.createElement('div');
     for (let node of document.body.childNodes) {
