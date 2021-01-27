@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         ZenMode
-// @version      0.01
+// @version      0.02
 // @namespace    klavogonki
 // @description  Максимальная концентрация, максимальный дзен
 // @author       http://klavogonki.ru/u/#/490344/
@@ -12,11 +12,28 @@
 (() => {
 
 
-    const globalOpacity = '100%';
+    const theme = 'classic';
 
+    let globalOpacity = '100%';
+    let bgColor = 'none';
+    let fontColor = '#222';
+    let errorBgColor = 'rgb(170,0,0)';
+    let errorFontColor = 'white';
 
-    const bgColor = 'white';
-    const fontColor = '#222';
+    switch(theme) {
+        case 'classic':
+            bgColor = 'none';
+            fontColor = '#222';
+            errorBgColor = 'rgb(170,0,0)';
+            errorFontColor = 'white';
+            break;
+        case 'night':
+            bgColor = '#222';
+            fontColor = '#aaa';
+            errorBgColor = '#660000';
+            errorFontColor = '#aaa';
+            break;
+    }
 
 
     function hideAllElements() {
@@ -36,21 +53,22 @@
 
     function applyStyle() {
         let style = '<style>'+
-            'body {opacity:'+globalOpacity+';}'+
-            '* {margin:0 !important;padding:0 !important;}'+
+            '#game-minifier, #main-block{position:absolute !important;top:50%;left:50%;transform:translate(-50%,-50%);}'+
+            'body {opacity:'+globalOpacity+';background:'+bgColor+';}'+
             '.tl, .tr, .bl, .br {background:none !important;}'+
             '#typeblock {background:none !important;}'+
             '#keyboard_cont, #report, #errorwork, #errors_tab, #book, #again, #next-competition-2077,'+
                 '.note, .handle, .bar, .hotkey{display:none;}'+
-            '#game-minifier span {margin:20px !important;font-size:14pt;font-family:calibri,sans-serif;}'+
-            '#game-minifier {margin-top:10px !important;text-align:center;}'+
-            '#main-block {margin:10px auto !important;}'+
+            '#game-minifier span {color:'+fontColor+';margin:20px !important;font-size:14pt;font-family:calibri,sans-serif;}'+
+            '#game-minifier {margin:auto !important;text-align:center;}'+
+            '#main-block {margin:auto !important;}'+
             '#typeblock #bookinfo #again td {padding:10px 20px !important;}'+
             '#typeblock #bookinfo a {text-decoration:none;}'+
             '#typetext {color:'+fontColor+';}'+
-            '#hiddentext {text-shadow:none !important;background-color:'+bgColor+' !important;color:#888 !important;font-weight:normal !important;border:1px solid lightgray;}'+
+            '#hiddentext {background-color:#00000000 !important;text-shadow:none !important;color:#888 !important;font-weight:normal !important;border:2px solid #555;}'+
             '#waiting_timeout {margin:auto !important;display:table;font-size:3em;}'+
-            '#inputtext {color:'+fontColor+';background:'+bgColor+';margin:10px auto !important;display:table;width:400px;text-align:center;font-family:monospace !important;}'+
+            '#inputtext {color:'+fontColor+';outline:none;border:2px solid #555;box-shadow:none !important;background:none !important;margin:10px auto !important;display:table;width:400px;text-align:center;font-family:monospace !important;}'+
+            '#inputtext.error {color:'+errorFontColor+' !important;background:'+errorBgColor+' !important;}'+
             '</style>';
         document.body.insert(style);
     }
@@ -116,7 +134,9 @@
                             result.append((()=>{let e=document.createElement('span');e.innerText=mut.target.querySelector('.stats').childElements()[0].innerText;return e;})()); // time
                             result.append((()=>{let e=document.createElement('span');e.innerText=mut.target.querySelector('.stats').childElements()[1].innerText;return e;})()); // speed
                             result.append((()=>{let e=document.createElement('span');e.innerText=mut.target.querySelector('.stats').childElements()[2].innerText;return e;})()); // error
-                            document.body.insertBefore(result, document.querySelector('#main-block'));
+                            let mb = document.querySelector('#main-block');
+                            document.body.insertBefore(result, mb);
+                            mb.style.display = 'none';
 
                         }
                     }
