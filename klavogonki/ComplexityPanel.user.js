@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           KG_ComplexityPanel
-// @version        1.5.0
+// @version        2.0.0
 // @namespace      klavogonki
 // @author         Silly_Sergio
 // @description    Добавляет панель прогноза сложности текста в заездах
@@ -32,7 +32,7 @@ function embed() {
 
     // 2 letters combinations for the Russian language, ordered by their frequency. Only the first 791 most common combinations are included.
     // The rest will get the worst coefficient.
-    var SYLLABLES = "тостнанопонеконираеналроовголипркаосерреотволаолтатьонваореллоеттеомодзавеилриатдеанлеогесдальитактиемасмеойсяныдообскмо" +
+    var SYLLABLES_RU = "тостнанопонеконираеналроовголипркаосерреотволаолтатьонваореллоеттеомодзавеилриатдеанлеогесдальитактиемасмеойсяныдообскмо" +
         "инчежесеамазтрмикиависвиедбысоманнимарсьчтслегнурутвбовыдииевсизейивикпеокэтхооеадожчабемушеспаяихияудкрочсидневчиляылкузнсапаты" +
         "дуульншиутнящежитсеесвыйрыопозекмнидаетуусичглужлуятлсвнийыеымезгабребтныхиражмыжадруюьсснлюпиечгднтбугрииахрярнабжнаюссучачьквл" +
         "ньумчноиугапывцеплщизвбиепгиешсмашблсуцишазджддвошбактврукицагайртежпуялупклдлвуурытоязолытккенсубещысянушвшдыувцаютишиггуйсшьох" +
@@ -46,9 +46,14 @@ function embed() {
         "пэчмзшмзбчууфнцзкдлщчжхгфэыумщгюфгкюгшжюшюбгнъщоцлццфммхюикъкбцнпбнмцмйикьнплъюепфъюдфлрьхцсмшкчххюфьркфжтмдвжзэцрхкфчгхсщюэшсцд" +
         "ччхчгпфбеэхдшээямжжэяугзшхвюйщфяжцээйюгфпвхпэожвчэтжцп";
 
+    // 2 letters combinations for English, ordered by their frequency. Usual English and mini-marathons English dictionaries were used.
+    // Only the first 274 most common combinations are included.
+    // The rest will get the worst coefficient.
+    var SYLLABLES_EN = "hethineranreedndnghaenonatastohiouitstorarwaofleteesiseasevealnentrometiadlldelibeelcoshrieeutnohoomowlychraloceunlaotwefoacmaooldwiwhghimetpeulurilicsitauskesoirmoaidicarstrgessemioidwoigoleynsckhtecrtdobuniiencpaosmievayblfetsambofifrsuttrdugporysaplpragavfactabgrbaovgaapeiodspifuptuopvitlivmprncrnadakiclwngobrokefpippepciewdrdsrryeslawrutybyexftucffscakgirmflhrqultauumianyknrluicuochutwlsgllulfnlikmyfuyomurkoaipoimsnkuepubimbptegnnrcsmafuduaysvatcguddobgsdypsskrgjududlswmmibzeognuubkseolkvoyirvccizdnphxpjoehgngglmsnoylvnfwsrpdgrfwlwrxtnvsy";
+
     // Complexity weight for each character. Russian letters and special characters use different formulas, so even if you
     // see the same weights for some Russian letter and some special character, they will contribute different final weights.
-    var CHAR_WEIGHTS = {
+    var CHAR_WEIGHTS_RU = {
         "а": 105,   "б": 142,   "в": 119,   "г": 140,   "д": 125,   "е": 105,   "ж": 153,   "з": 142,   "и": 107,   "й": 150,
         "к": 122,   "л": 117,   "м": 122,   "н": 108,   "о": 100,   "п": 126,   "р": 118,   "с": 115,   "т": 110,   "у": 127,
         "ф": 155,   "х": 157,   "ц": 175,   "ч": 145,   "ш": 160,   "щ": 180,   "ъ": 200,   "ы": 140,   "ь": 137,   "э": 183,
@@ -57,6 +62,22 @@ function embed() {
         ")": 5.0,   "*": 7.0,   "=": 7.0,   "+": 7.0,   "№": 5.0,   "#": 9.0,   "$": 9.0,   "&": 9.0,   "/": 9.0,   "\\": 10.0,
         "|": 10.0,  "<": 11.0,  ">": 11.0,  "@": 11.0,  "[": 11.0,  "]": 11.0,  "^": 11.0,  "~": 11.0,  "`": 11.0,  "{": 11.0,
         "}": 11.0,  "0": 5.0,   "1": 5.0,   "2": 5.0,   "3": 5.0,   "4": 5.0,   "5": 5.0,   "6": 5.0,   "7": 5.0,   "8": 5.0,
+        "9": 5.0
+    };
+
+    // Complexity weight for each character in English QWERTY layout.
+    // TODO: consider separate processing for apostrophe in words vs single quota
+    var CHAR_WEIGHTS_EN_QWERTY = {
+        "f": 105,   /*",": 142,*/   "d": 119,   "u": 140,   "l": 125,   "t": 105,   /*";": 153,*/   "p": 142,   "b": 107,   "q": 150,
+        "r": 122,   "k": 117,   "v": 122,   "y": 108,   "j": 100,   "g": 126,   "h": 118,   "c": 115,   "n": 110,   "e": 127,
+        "a": 155,   /*"[": 157,*/   "w": 175,   "x": 145,   "i": 160,   "o": 180,   /*"]": 200,*/   "s": 140,   "m": 137,   /*"'": 183,*/
+        /*".": 167,*/   "z": 135,   "\n": 0.3,  " ": 0.3,
+        
+        ".": 1.5,   ",": 1.0,   "!": 4.0,   "?": 2.5,   ":": 2.0,   ";": 1.5,
+        "\"": 2.5,  "«": 2.5,   "»": 2.5,   "'": 2.0,   "_": 8.0,   "%": 8.0,   "—": 5.0,   "–": 5.0,   "-": 5.0,   "(": 5.0,
+        ")": 5.0,   "*": 7.0,   "=": 7.0,   "+": 7.0,   "№": 9.0,   "#": 5.0,   "$": 4.5,   "&": 3.0,   "/": 2.0,   "\\": 10.0,
+        "|": 10.0,  "<": 1.5,  ">": 2.0,  "@": 11.0,  "[": 2.5,  "]": 3.0,  "^": 4.0,  "~": 8.0,  "`": 5.0,  "{": 3.0,
+        "}": 3.5,  "0": 5.0,   "1": 5.0,   "2": 5.0,   "3": 5.0,   "4": 5.0,   "5": 5.0,   "6": 5.0,   "7": 5.0,   "8": 5.0,
         "9": 5.0
     };
 
@@ -79,7 +100,10 @@ function embed() {
     var DEFAULT_LETTER_WEIGHT = 100;
 
     // Characters for Russian language.
-    var ALPHABETICAL_CHARACTERS = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+    var ALPHABETICAL_CHARACTERS_RU = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+
+    // Characters for English.
+    var ALPHABETICAL_CHARACTERS_EN = "abcdefghijklmnopqrstuvwxyz";
 
     // If letter is a capital, we add such a number to its weight
     var CAPITAL_WEIGHT = 200.0;
@@ -123,7 +147,6 @@ function embed() {
         }
 
         initialized = true;
-        prepareDictionary();
 
         var complexityObject = getComplexity(text);
         var complexity = complexityObject.complexity.toFixed(2);
@@ -172,7 +195,7 @@ function embed() {
         }
     }
 
-    function prepareDictionary() {
+    function prepareDictionary(SYLLABLES) {
         for (var i = 0; i < SYLLABLES.length; i += 2) {
             dictionary[SYLLABLES.substr(i, 2)] = i / 2;
         }
@@ -199,8 +222,34 @@ function embed() {
         var pos = 0;
         var wordComplexityPerCharacter, j;
 
-        // Replace all "ё" occurrences to "е".
-        str = str.split("ё").join("е");
+        var isRussian = false;
+        var isEnglish = false;
+
+        let charIndex = 0;
+        while(!isRussian && !isEnglish) {
+            let currentChar = str[charIndex].toLowerCase();
+            isRussian = ALPHABETICAL_CHARACTERS_RU.indexOf(currentChar) != -1;
+            if(isRussian) {
+                break;
+            }
+
+            isEnglish = ALPHABETICAL_CHARACTERS_EN.indexOf(currentChar) != -1;
+            if(isEnglish) {
+                break;
+            }
+
+            charIndex++;
+        }
+
+        prepareDictionary(isRussian ? SYLLABLES_RU : SYLLABLES_EN);
+
+        let ALPHABETICAL_CHARACTERS = isRussian ? ALPHABETICAL_CHARACTERS_RU : ALPHABETICAL_CHARACTERS_EN;
+        let CHAR_WEIGHTS = isRussian ? CHAR_WEIGHTS_RU : CHAR_WEIGHTS_EN_QWERTY;
+
+        if(isRussian) {
+            // Replace all "ё" occurrences to "е".
+            str = str.split("ё").join("е");
+        }
 
         for (var i = 0; i < str.length; i++) {
             var char = str.charAt(i);
@@ -216,14 +265,14 @@ function embed() {
                     weight = CHAR_WEIGHTS[charLowerCase];
                 } else {
                     // All the following letters in the word will get default weight. Their final weight will depend on the letters combination frequency.
-                    weight = DEFAULT_LETTER_WEIGHT;
+                    weight = isRussian ? DEFAULT_LETTER_WEIGHT : CHAR_WEIGHTS[charLowerCase];
                 }
 
                 // All letters in the word, starting from the second, will apply coefficient depending on the 2 letters frequency
                 if (wordLength > 1) {
                     var n = dictionary[prevChar + charLowerCase];
                     if (n == null) {
-                        n = -3.75; // This is minimum value, which can be achieved by the following formula
+                        n = isRussian ? -3.75 : 548; // This is minimum value, which can be achieved by the following formula
                     }
 
                     // Such formula returns 2 letters frequency in the decimal logarithmic scale, e.g. "0" - most common, "-1",
