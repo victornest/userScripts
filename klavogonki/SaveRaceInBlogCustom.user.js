@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       1.1.8
+// @version       1.1.10
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
 // @include       https://klavogonki.ru/g/*
@@ -25,7 +25,7 @@ function saveRaceInBlog () {
 
 			for (var i = 0; i < json.players.length; i++) {
 				if ('record' in json.players[i] && json.players[i].record.user === userId) {
-					return json.players[i].record.id;
+					return json.players[i].user.best_speed;
 				}
 			}
 
@@ -35,46 +35,12 @@ function saveRaceInBlog () {
 		}
 	}
 
-    function httpPostForm(url, formData) {
-        return new Promise((resolve, reject) => {
-            let xhr = new XMLHttpRequest();
-            xhr.open("POST", url);
-            xhr.onload = () => resolve(xhr.responseText);
-            xhr.onerror = () => reject(logError(xhr.statusText));
-            xhr.send(formData);
-        });
-    }
-
-    async function getUserGameTypeBestSpeedAsync(userId, gameType) {
-
-        var formData = new FormData();
-
-        formData.append("user_id", userId);
-        formData.append("gametype", gameType);
-
-        let url = location.protocol + '//klavogonki.ru/ajax/profile-popup';
-
-        let htmlResult = await httpPostForm(url, formData);
-
-        let speetTitle = '<th>Лучшая скорость:</th>';
-        let indexSpeedTitle = htmlResult.indexOf(speetTitle);
-        let indexSpeedUnit = htmlResult.indexOf(' зн/мин', indexSpeedTitle);
-        let speed = htmlResult.substring(indexSpeedTitle + speetTitle.length + 6, indexSpeedUnit);
-
-        console.debug('received best speed for player with closed statistics', speed);
-
-        return speed;
-
-    }
-
-	async function getRecordPercent(userId, gameType, res) {
-		let bestSpeed = await getUserGameTypeBestSpeedAsync(userId, gameType);
-
-		let achievedPercentage = Math.floor((res / bestSpeed) * 100);
-		return achievedPercentage + '%';
-	}
-
 	function saveResult (res) {
+        var percent = parseFloat(((res.stats.speed + '00') / res.best).toFixed(1)); //округление процента до указанного количества знаков после запятой
+        if(percent >= 95)
+            percent = '**'+percent+'%**';
+        else
+            percent += '%';
 		if (document.getElementById('spectrumCanvas') !== null) {
 			if (document.getElementById('spectrumCanvas').firstElementChild !== null) {
 				new Promise(function(resolve, reject) {
@@ -85,127 +51,129 @@ function saveRaceInBlog () {
 					var reader = new FileReader();
 					reader.readAsDataURL(result);
 					reader.onloadend = function() {
-						getRecordPercent(userId, res.gameType === 'voc' ? 'voc-' + res.vocId : res.gameType, res.stats.speed).then(r => {
-							var gameTypes = {
-								normal: 'Oбычный',
-								abra: 'Абракадабра',
-								referats: 'Яндекс.Рефераты',
-								noerror: 'Безошибочный',
-								marathon: 'Марафон',
-								chars: 'Буквы',
-								digits: 'Цифры',
-								sprint: 'Спринт',
-							};
-	
-							var text = '';//'Результат #' + res.id + ' в режиме ';
-							var comp = document.getElementById("complexity-panel")
-							comp = comp.innerText.slice(18, 23).trim();
-							if (res.gameType === 'voc') {
-								text += '*[' + res.vocName + '](/vocs/' + res.vocId + '/ "Перейти на страницу словаря")* | **' + comp + '** | **';
-							} else {
-								text += '*' + gameTypes[res.gameType] + '* | **' + comp + '** | **';
+						var gameTypes = {
+							normal: 'Oбычный',
+							abra: 'Абракадабра',
+							referats: 'Яндекс.Рефераты',
+							noerror: 'Безошибочный',
+							marathon: 'Марафон',
+							chars: 'Буквы',
+							digits: 'Цифры',
+							sprint: 'Спринт',
+						};
+
+						var text = '';//'Результат #' + res.id + ' в режиме ';
+						var comp = document.getElementById("complexity-panel")
+						comp = comp.innerText.slice(18, 23).trim();
+						if (res.gameType === 'voc') {
+							text += '*[' + res.vocName + '](/vocs/' + res.vocId + '/ "Перейти на страницу словаря")* | **' + comp + '** | **';
+						} else {
+							text += '*' + gameTypes[res.gameType] + '* | **' + comp + '** | **';
+						}
+
+						if (game.getGametype() == 'marathon') {
+							text += res.stats.speed + '&nbsp;зн/мин** | ' +
+                            percent + ' | *' +
+							res.stats.errors.replace(')', '&#41;*\n\n') +
+							'*![сложнограмма](' + reader.result + ')*\n\n' +
+							res.author + '\n**' + res.title + '**\n![обложка](' + res.pic + ')\n\n';
+						} else {
+                            text += res.stats.speed + '&nbsp;зн/мин** | ' +
+                            percent + ' | *' +
+							res.stats.errors.replace(')', '&#41;* | *') +
+							res.stats.time + '*\n\n' +
+                            '*![сложнограмма](' + reader.result + ')*\n\n';
+                            if(game.getGametype() == 'normal') {
+                                text += res.author + '\n**' + res.title + '**\n![обложка](' + res.pic + ')\n\n';
+                            }
+
+                            res.author + '\n**' + res.title + '**\n![обложка](' + res.pic + ')\n\n';
+
+							var typedMarked = res.typedHtml
+							.replace(/<span class="error">|<\/span>/g, '**')
+							.replace(/<s class="error">/g, '~~**')
+							.replace(/<\/s>/g, '**~~');
+
+							text += '> ' + typedMarked;
+						}
+
+						//if (confirm('Добавить запись в бортжурнал?')) {
+						var xhr = new XMLHttpRequest();
+						xhr.open('POST', '/api/profile/add-journal-post');
+						xhr.onload = function () {
+							if (this.status !== 200) {
+								throw new Error('Something went wrong.');
 							}
-							if (game.getGametype() == 'marathon') {
-								text += res.stats.speed + '&nbsp;зн/мин** | **' +
-								r + '** | *' +
-								res.stats.errors.replace(')', '&#41;*\n\n') +
-								'*![сложнограмма](' + reader.result + ')*\n\n' +
-								res.author + '\n**' + res.title + '**\n![обложка](' + res.pic + ')\n\n';
-							} else {
-							text += res.stats.speed + '&nbsp;зн/мин** | **' +
-								r + '** | *' +
-								res.stats.errors.replace(')', '&#41;* | *') +
-								res.stats.time + '*\n\n' +
-								'*![сложнограмма](' + reader.result + ')*\n\n';
-	
-								var typedMarked = res.typedHtml
-								.replace(/<span class="error">|<\/span>/g, '**')
-								.replace(/<s class="error">/g, '~~**')
-								.replace(/<\/s>/g, '**~~');
-	
-								text += '> ' + typedMarked;
-							}
-	
-							//if (confirm('Добавить запись в бортжурнал?')) {
-							var xhr = new XMLHttpRequest();
-							xhr.open('POST', '/api/profile/add-journal-post');
-							xhr.onload = function () {
-								if (this.status !== 200) {
-									throw new Error('Something went wrong.');
-								}
-	
-								alert('Запись успешно добавлена.');
-							};
-							xhr.send(JSON.stringify({
-								userId: userId,
-								text: text,
-								hidden: false,
-							}));
-						});
+
+							alert('Запись успешно добавлена.');
+						};
+						xhr.send(JSON.stringify({
+							userId: userId,
+							text: text,
+							hidden: false,
+						}));
 					}
 				});
 				return;
 			}
 		}
+		var gameTypes = {
+			normal: 'Oбычный',
+			abra: 'Абракадабра',
+			referats: 'Яндекс.Рефераты',
+			noerror: 'Безошибочный',
+			marathon: 'Марафон',
+			chars: 'Буквы',
+			digits: 'Цифры',
+			sprint: 'Спринт',
+		};
 
-		getRecordPercent(userId, res.gameType === 'voc' ? 'voc-' + res.vocId : res.gameType, res.stats.speed).then(r => {
-			var gameTypes = {
-				normal: 'Oбычный',
-				abra: 'Абракадабра',
-				referats: 'Яндекс.Рефераты',
-				noerror: 'Безошибочный',
-				marathon: 'Марафон',
-				chars: 'Буквы',
-				digits: 'Цифры',
-				sprint: 'Спринт',
-			};
-	
-			var text = '';//'Результат #' + res.id + ' в режиме ';
-			if (res.gameType === 'voc') {
-				text += '*[' + res.vocName + '](/vocs/' + res.vocId + '/ "Перейти на страницу словаря")* | **';
-			} else {
-				text += '*' + gameTypes[res.gameType] + '* | **';
+		var text = '';//'Результат #' + res.id + ' в режиме ';
+		if (res.gameType === 'voc') {
+			text += '*[' + res.vocName + '](/vocs/' + res.vocId + '/ "Перейти на страницу словаря")* | **';
+		} else {
+			text += '*' + gameTypes[res.gameType] + '* | **';
+		}
+
+		if (game.getGametype() == 'marathon') {
+			text += res.stats.speed + '&nbsp;зн/мин** | *' +
+				res.stats.errors.replace(')', '&#41;*\n\n') +
+				res.author + '\n**' + res.title + '**\n![обложка](' + res.pic + ')\n\n';
+		} else {
+            console.log('test res', res);
+		text += res.stats.speed + '&nbsp;зн/мин** | ' +
+            percent + ' | *' +
+			res.stats.errors.replace(')', '&#41;* | *') +
+			res.stats.time + '*\n\n';
+
+			var typedMarked = res.typedHtml
+			.replace(/<span class="error">|<\/span>/g, '**')
+			.replace(/<s class="error">/g, '~~**')
+			.replace(/<\/s>/g, '**~~');
+
+			text += '> ' + typedMarked;
+		}
+
+		//if (confirm('Добавить запись в бортжурнал?')) {
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', '/api/profile/add-journal-post');
+		xhr.onload = function () {
+			if (this.status !== 200) {
+				throw new Error('Something went wrong.');
+                alert('Произошла ошибка. Повторите снова.');
 			}
-	
-			if (game.getGametype() == 'marathon') {
-				text += res.stats.speed + '&nbsp;зн/мин** | **' +
-				    r + '** | *' +
-					res.stats.errors.replace(')', '&#41;*\n\n') +
-					res.author + '\n**' + res.title + '**\n![обложка](' + res.pic + ')\n\n';
-			} else {
-			text += res.stats.speed + '&nbsp;зн/мин** | **' +
-				r + '** | *' +
-				res.stats.errors.replace(')', '&#41;* | *') +
-				res.stats.time + '*\n\n'
-	
-				var typedMarked = res.typedHtml
-				.replace(/<span class="error">|<\/span>/g, '**')
-				.replace(/<s class="error">/g, '~~**')
-				.replace(/<\/s>/g, '**~~');
-	
-				text += '> ' + typedMarked;
-			}
-	
-			//if (confirm('Добавить запись в бортжурнал?')) {
-			var xhr = new XMLHttpRequest();
-			xhr.open('POST', '/api/profile/add-journal-post');
-			xhr.onload = function () {
-				if (this.status !== 200) {
-					throw new Error('Something went wrong.');
-				}
-	
-				alert('Запись успешно добавлена.');
-			};
-			xhr.send(JSON.stringify({
-				userId: userId,
-				text: text,
-				hidden: false,
-			}));
-		});
+
+			alert('Запись успешно добавлена.');
+		};
+		xhr.send(JSON.stringify({
+			userId: userId,
+			text: text,
+			hidden: false,
+		}));
 	}
 //}
 
-function init (resultId) {
+function init (bestSpeed) {
 	var container = document.createElement('div');
 	container.style.fontSize = '10pt';
 	container.style.display = 'flex';
@@ -222,6 +190,11 @@ function init (resultId) {
 		var author = document.querySelector('.author').innerText;
 		var title = document.querySelector('#book .name').innerText;
 	} else {
+        if(game.getGametype() == 'normal') {
+            pic = document.querySelector('.imobilco-book').querySelector('img').src;
+            author = document.querySelector('.author').innerText;
+            title = document.querySelector('#book .name').innerText;
+        }
 		var typed = document.querySelector('#errors_text p');
 		if (!typed) {
 			throw new Error('#errors_text p element not found.');
@@ -254,8 +227,8 @@ function init (resultId) {
 	};
 
 	var resultData = {
-		id: resultId,
 		stats: stats,
+        best: bestSpeed,
 		typedHtml: typed.innerHTML,
 		gameType: gameType,
 		vocName: vocName,
@@ -289,9 +262,9 @@ var proxied = window.XMLHttpRequest.prototype.send;
 
 window.XMLHttpRequest.prototype.send = function () {
 	this.addEventListener('load', function () {
-		var resultId = checkJSON(this.responseText);
-		if (resultId) {
-			init(resultId);
+		var bestSpeed = checkJSON(this.responseText);
+		if (bestSpeed) {
+			init(bestSpeed);
 		}
 	}.bind(this));
 	return proxied.apply(this, [].slice.call(arguments));
