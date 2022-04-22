@@ -62,6 +62,8 @@ function embed() {
 
     var SYLLABLES_UA = "налистпонероаловголавікотатиніаверволоогнонитовавизакаодкидораоромоланоспрсярисьтьмиатенивисідреамиммаинілмотіардиаслеобівийитондабуякрівсувькінщолічиилулихнукулятррувеадотоктемульпіакпемідіочісітбаозпабосеоюмесоикнядесаійдучегаутсвхокрчакіоїтуднжеелбіцізнбиахлюспсиембесіннйоусньесазшиожсксуезайхаслцеудчоачпиедізьоагаєікопидеврнснетвнлуглвуирчуьсуребятплапбршетяаюжиблабірішзвичімчіумепряклекдвічявукжагрдречщеянажзоібртохгункчкейжншозузд'яцявлицтнїїйнїхупютцьдкзенцмнежюдвжючямужишухшачнашоясмушибялтвугдлйшзіркипзиьнхиучгишлпувчвшткунубгніжвдшнкеягядигєтіхнсігячвкоєегдящаойрбзлрвхншкрхмліяттшішугізмджвтзгхіиззбжуіпнтіїжіищдьхтрсієхлвгжкршяхкнуюлтеюзпуєхуймвпзррмацешрлншоштюхвдсзкйснюжоїййдзьвзузв'ецїмм'ясштеїгеязцююбємощювзясхлкбнтлктьшждндіюквдчщиксврижєїмкрдцидзптлльмаїсцдпддхмщієювбрцвмоцїнсюехргзсфійтрюп'іщрчєлввіцхрмбияаярждтяжччяряєюргкдцйкфежчиїдбєшфаюсїввцрпіаащжлпнбкяюз'офщунчбсяцпкуйьццафоєдмрйвєвюкеомпдмзтюєнгйбвхр'вяєнїтафссчяїзущююшвуц'їфрззшпещпчпцбтбмїлйлгтїдмсдхкщуяіояшюнцвхеоетх'юиєнп'єеаеянєцнкбьбьтшмяйпшмчющоотсб'йжрщрзаудюцуябрьсрдшшсчцфупсцтюгбжєрдгзчтцюхйяюшбшюжлєїсіфгшйцьгмцхкьчбдкшзшжжяїлгефчючлбхнщжцуїжббвкчсфїжйпфлжяуанвзжкцгсюпбцвщтєзцфиюлтчлдаотмяяфтйгмхґрґаєсиюящуезюнфьйтжзхюцюзцоьєчвєчбпжмйрчммтьдмяиґбгбзьянзрфбюаеґеґіаґмфуфифяпйчоуьвгдйзд'жвкдгвьпмвюмкзеєґуеуйїлцгяєпбчьзхснблчиоїшїчлніушчґооґоімдцкпхйюмжрртдкмгмфсмшаійхнжтбцдрйеґйугюбблмхгьщфкжюшшьїьхфмюйьлтшєфєкрґсшйєвйдйоакйяунлґльфтгтфлснрйфккеіууфзиіфнгцчьіґїцзґуофчтпбфпяшцдїдєєґтзґдйщффьюсгґгшрфпааїксбнхшялвчтсєюївюжркюьієгппммхпєцґвцмдщлпкякпєііьмзгб";
 
+    var SYLLABLES_PL = "ienibychtoponałaciwiiaobżeegymzedzczśchcamyłiłożgnandyraazzipeewwnnobiedkizyendohooćwłaśiwałsiięimkoochaaćłomiłekaażżddlladnnegosmmóółłkcęprrzezowećgdybrowceśśnejtaakspossóóbłbbaarrdzosymppaattyycznnyallemaośtepierrwwsszjeesstbrryid";
+
     // 2 letters combinations for English, ordered by their frequency. Usual English and mini-marathons English dictionaries were used.
     // Only the first 274 most common combinations are included.
     // The rest will get the worst coefficient.
@@ -121,6 +123,21 @@ function embed() {
         "9": 5.0
     };
 
+    var CHAR_WEIGHTS_PL = {
+        "f": 105,   /*",": 142,*/   "d": 119,   "u": 140,   "l": 125,   "t": 105,   /*";": 153,*/   "p": 142,   "b": 107,   "q": 150,
+        "r": 122,   "k": 117,   "v": 122,   "y": 108,   "j": 100,   "g": 126,   "h": 118,   "c": 115,   "n": 110,   "e": 127,
+        "a": 155,   /*"[": 157,*/   "w": 175,   "x": 145,   "i": 160,   "o": 180,   /*"]": 200,*/   "s": 140,   "m": 137,   /*"'": 183,*/
+        /*".": 167,*/   "z": 135,   
+        "ą": 205, "ć": 165, "ę": 177, "ł": 175, "ń": 160, "ó": 230, "ś": 190, "ż": 285, "ź": 295,
+        "\n": 0.3,  " ": 0.3,
+        ".": 1.5,   ",": 1.0,   "!": 4.0,   "?": 2.5,   ":": 2.0,   ";": 1.5,
+        "\"": 2.5,  "«": 2.5,   "»": 2.5,   "'": 2.0,   "_": 8.0,   "%": 8.0,   "—": 5.0,   "–": 5.0,   "-": 5.0,   "(": 5.0,
+        ")": 5.0,   "*": 7.0,   "=": 7.0,   "+": 7.0,   "№": 9.0,   "#": 5.0,   "$": 4.5,   "&": 3.0,   "/": 2.0,   "\\": 10.0,
+        "|": 10.0,  "<": 1.5,  ">": 2.0,  "@": 11.0,  "[": 2.5,  "]": 3.0,  "^": 4.0,  "~": 8.0,  "`": 5.0,  "{": 3.0,
+        "}": 3.5,  "0": 5.0,   "1": 5.0,   "2": 5.0,   "3": 5.0,   "4": 5.0,   "5": 5.0,   "6": 5.0,   "7": 5.0,   "8": 5.0,
+        "9": 5.0
+    };
+
     // Spectrum canvas settings
     var CANVAS_HEIGHT = 12;
     var CANVAS_OPACITY  = 0.65;
@@ -150,6 +167,9 @@ function embed() {
 
     // Characters for English.
     var ALPHABETICAL_CHARACTERS_EN = "abcdefghijklmnopqrstuvwxyz";
+
+    // Characters for Polish.
+    var ALPHABETICAL_CHARACTERS_PL = "aąbcćdeęfghijklłmnńoópqrsśtuvwxyzżź";
 
     // If letter is a capital, we add such a number to its weight
     var CAPITAL_WEIGHT = 200.0;
@@ -194,8 +214,6 @@ function embed() {
 
         let languages = ['Auto', 'RU', 'EN', 'BY', 'UA', 'PL'];
 
-        console.log('111');
-
         initialized = true;
 
         var params = document.getElementById("params");
@@ -237,8 +255,6 @@ function embed() {
 
             console.log('inputLanguageElement', inputLanguageElement);
 
-            preCalcElement.appendChild(inputLanguageElement);
-            
             for (let lg of languages) {
                 let lgRadio = document.createElement('input');
                 lgRadio.setAttribute('type', 'radio');
@@ -257,9 +273,16 @@ function embed() {
 
                 var lgLabel = document.createElement('label');
                 lgLabel.setAttribute('for', 'language-' + lg);
+                lgLabel.style.fontWeight = 'normal';
+                lgLabel.style.marginLeft = '3px';
+                lgLabel.style.marginRight = '10px';
+                lgLabel.style.verticalAlign = 'middle';
                 lgLabel.innerHTML = lg;
                 inputLanguageElement.appendChild(lgLabel);
             }
+
+            let calcElement = complexityInnerElement.childNodes[1];
+            calcElement.appendChild(inputLanguageElement);
 
             processComplexity(text, complexityInnerElement, localStorage['complexity-language']);
         }
@@ -269,15 +292,29 @@ function embed() {
         var complexityObject = getComplexity(text, language);
         var complexity = complexityObject.complexity.toFixed(2);
 
+        let complexityCalcInner = document.createElement('div');
+        complexityCalcInner.id = 'complexity-calc-inner';
+
         let complexityPart = '<div><span style="font-size:17px;font-weight:bold;color:#333">' + (complexity >= 0 ? complexity.slice(0, -3) : '') + '</span>' +
         '<span style="font-size:14px;font-weight:bold;color:#666">' + (complexity >= 0 ? '.' + complexity.slice(-2) : 'N/A')+ '</span>' +
         '&nbsp;−&nbsp;' + (complexity >= 0 ? getComplexityText(complexity) : 'неприменимо к данному заезду') +
 
         '</div><div style="margin:10px 0 4px;background-color:white"id="spectrumCanvas"/>';
 
+        complexityCalcInner.innerHTML = complexityPart;
+
         let calcElement = complexityInnerElement.childNodes[1];
 
-        calcElement.innerHTML = complexityPart;
+        for (let child of calcElement.childNodes) {
+            if(child.id == 'complexity-calc-inner') {
+                calcElement.removeChild(child);
+            }
+        }
+
+        let inputLanguageElement = calcElement.childNodes[0];
+
+        calcElement.insertBefore(complexityCalcInner, inputLanguageElement);
+        // calcElement.innerHTML = complexityPart;
 
         // Add spectrum canvas to the panel
         if (complexity >= 0) {
@@ -346,6 +383,7 @@ function embed() {
         let ALPHABETICAL_CHARACTERS;
         let CHAR_WEIGHTS;
         let isCyryllic = false;
+        let isUmlautish = false;
         switch(language) {
             case 'RU':
                 isCyryllic = true;
@@ -371,7 +409,10 @@ function embed() {
                 CHAR_WEIGHTS = CHAR_WEIGHTS_UA;
                 break;
             case 'PL':
-                console.log("TODO language", language);
+                isUmlautish = true;
+                SYLLABLES = SYLLABLES_PL;
+                ALPHABETICAL_CHARACTERS = ALPHABETICAL_CHARACTERS_PL;
+                CHAR_WEIGHTS = CHAR_WEIGHTS_PL;
                 break;
             default:
                 console.log("invalid language", language);
@@ -406,7 +447,7 @@ function embed() {
                 if (wordLength > 1) {
                     var n = dictionary[prevChar + charLowerCase];
                     if (n == null) {
-                        n = isCyryllic ? -3.75 : 548; // This is minimum value, which can be achieved by the following formula
+                        n = isCyryllic || isUmlautish ? -3.75 : 548; // This is minimum value, which can be achieved by the following formula
                     }
 
                     // Such formula returns 2 letters frequency in the decimal logarithmic scale, e.g. "0" - most common, "-1",
