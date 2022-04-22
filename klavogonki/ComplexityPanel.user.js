@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           KG_ComplexityPanel
-// @version        2.0.0
+// @version        3.0.0
 // @namespace      klavogonki
 // @author         Silly_Sergio
 // @description    Добавляет панель прогноза сложности текста в заездах
