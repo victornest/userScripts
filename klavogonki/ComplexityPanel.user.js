@@ -146,10 +146,11 @@ function embed() {
             return false;
         }
 
-        initialized = true;
+        let languages = ['Auto', 'RU', 'EN', 'BY', 'UA', 'PL'];
 
-        var complexityObject = getComplexity(text);
-        var complexity = complexityObject.complexity.toFixed(2);
+        console.log('111');
+
+        initialized = true;
 
         var params = document.getElementById("params");
         if (params) {
@@ -171,26 +172,80 @@ function embed() {
             params.parentNode.insertBefore(wrapper, params);
 
             elem.innerHTML = '<div class="r tl" title="v1.4"><div class="tr"><div class="bl"><div class="br"><div class="rc">' +
-                '<h4>Прогноз сложности</h4>' +
+                
 
-                '<div><span style="font-size:17px;font-weight:bold;color:#333">' + (complexity >= 0 ? complexity.slice(0, -3) : '') + '</span>' +
-                '<span style="font-size:14px;font-weight:bold;color:#666">' + (complexity >= 0 ? '.' + complexity.slice(-2) : 'N/A')+ '</span>' +
-                '&nbsp;−&nbsp;' + (complexity >= 0 ? getComplexityText(complexity) : 'неприменимо к данному заезду') +
-
-                '</div><div style="margin:10px 0 4px;background-color:white"id="spectrumCanvas"/>' +
+                
                 '</div></div></div></div></div>';
 
-            // Add spectrum canvas to the panel
-            if (complexity >= 0) {
-                var spectrum = complexityObject.spectrum;
-                smoothArray(spectrum, 10);
+            let complexityInnerElement = elem.getElementsByClassName('rc')[0];
+            console.log('complexityInnerElement', complexityInnerElement);
+            // complexityInnerElement.innerHTML = '<div id="complexity-pre-calc"><h4>Прогноз сложности</h4>' + inputLanguageHtml + '</div>';
+            complexityInnerElement.innerHTML = '<div id="complexity-pre-calc"><h4>Прогноз сложности</h4>' + '</div><div id="complexity-calc"></div>';
 
-                var canvasDiv = document.getElementById("spectrumCanvas");
+            let preCalcElement = complexityInnerElement.childNodes[0];
 
-                var canvasElem = getSpectrumCanvas(spectrum, canvasDiv.clientWidth, CANVAS_HEIGHT);
-                if (canvasElem != null) {
-                    canvasDiv.appendChild(canvasElem);
+            console.log('preCalcElement', preCalcElement);
+
+            var inputLanguageElement = document.createElement("div");
+            inputLanguageElement.id = "input-language";
+
+            console.log('inputLanguageElement', inputLanguageElement);
+
+            preCalcElement.appendChild(inputLanguageElement);
+            
+            for (let lg of languages) {
+                let lgRadio = document.createElement('input');
+                lgRadio.setAttribute('type', 'radio');
+                lgRadio.setAttribute('name', 'complexity-language');
+                lgRadio.setAttribute('class', 'complexity-language');
+                lgRadio.id = 'language-' + lg;
+                lgRadio.setAttribute('value', lg);
+                lgRadio.checked = localStorage['complexity-language'] == lgRadio.value;
+                lgRadio.addEventListener('change', function () {
+                    console.log('lg change', lgRadio.value);
+                    localStorage['complexity-language'] = lgRadio.value;
+                    processComplexity(text, complexityInnerElement, localStorage['complexity-language']);
+                });
+
+                inputLanguageElement.appendChild(lgRadio);
+
+                var lgLabel = document.createElement('label');
+                lgLabel.setAttribute('for', 'language-' + lg);
+                lgLabel.innerHTML = lg;
+                inputLanguageElement.appendChild(lgLabel);
+            }
+
+            processComplexity(text, complexityInnerElement, localStorage['complexity-language']);
+        }
+    }
+
+    function processComplexity(text, complexityInnerElement, language) {
+        var complexityObject = getComplexity(text, language);
+        var complexity = complexityObject.complexity.toFixed(2);
+
+        let complexityPart = '<div><span style="font-size:17px;font-weight:bold;color:#333">' + (complexity >= 0 ? complexity.slice(0, -3) : '') + '</span>' +
+        '<span style="font-size:14px;font-weight:bold;color:#666">' + (complexity >= 0 ? '.' + complexity.slice(-2) : 'N/A')+ '</span>' +
+        '&nbsp;−&nbsp;' + (complexity >= 0 ? getComplexityText(complexity) : 'неприменимо к данному заезду') +
+
+        '</div><div style="margin:10px 0 4px;background-color:white"id="spectrumCanvas"/>';
+
+        let calcElement = complexityInnerElement.childNodes[1];
+
+        calcElement.innerHTML = complexityPart;
+
+        // Add spectrum canvas to the panel
+        if (complexity >= 0) {
+            var spectrum = complexityObject.spectrum;
+            smoothArray(spectrum, 10);
+
+            var canvasDiv = document.getElementById("spectrumCanvas");
+
+            var canvasElem = getSpectrumCanvas(spectrum, canvasDiv.clientWidth, CANVAS_HEIGHT);
+            if (canvasElem != null) {
+                for (let child of canvasDiv.childNodes) {
+                    canvasDiv.removeChild(child);
                 }
+                canvasDiv.appendChild(canvasElem);
             }
         }
     }
@@ -211,7 +266,7 @@ function embed() {
     }
 
     // Return string complexity and its spectrum. Return -1 for the complexity, if it can't be applied to the string.
-    function getComplexity(str) {
+    function getComplexity(str, language) {
         var complexity = 0.0;
         var wordLength = 0;
         var wordComplexity = 0;
@@ -222,31 +277,54 @@ function embed() {
         var pos = 0;
         var wordComplexityPerCharacter, j;
 
-        var isRussian = false;
-        var isEnglish = false;
-
         let charIndex = 0;
-        while(!isRussian && !isEnglish) {
-            let currentChar = str[charIndex].toLowerCase();
-            isRussian = ALPHABETICAL_CHARACTERS_RU.indexOf(currentChar) != -1;
-            if(isRussian) {
-                break;
-            }
+        if(!language || language == 'Auto') {
+            while(!language || language == 'Auto') {
+                let currentChar = str[charIndex].toLowerCase();
 
-            isEnglish = ALPHABETICAL_CHARACTERS_EN.indexOf(currentChar) != -1;
-            if(isEnglish) {
-                break;
-            }
+                if(ALPHABETICAL_CHARACTERS_RU.indexOf(currentChar) != -1) {
+                    language = 'RU';
+                    break;
+                }
 
-            charIndex++;
+                if(ALPHABETICAL_CHARACTERS_EN.indexOf(currentChar) != -1) {
+                    language = 'EN';
+                    break;
+                }
+
+                charIndex++;
+            }
         }
 
-        prepareDictionary(isRussian ? SYLLABLES_RU : SYLLABLES_EN);
+        var SYLLABLES;
+        let ALPHABETICAL_CHARACTERS;
+        let CHAR_WEIGHTS;
+        let isRussian = false;
+        switch(language) {
+            case 'RU':
+                isRussian = true;
+                SYLLABLES = SYLLABLES_RU;
+                ALPHABETICAL_CHARACTERS = ALPHABETICAL_CHARACTERS_RU;
+                CHAR_WEIGHTS = CHAR_WEIGHTS_RU;
+                break;
+            case 'EN':
+                SYLLABLES = SYLLABLES_EN;
+                ALPHABETICAL_CHARACTERS = ALPHABETICAL_CHARACTERS_EN;
+                CHAR_WEIGHTS = CHAR_WEIGHTS_EN_QWERTY;
+                break;
+            case 'BY':
+            case 'UA':
+            case 'PL':
+                console.log("TODO language", language);
+                break;
+            default:
+                console.log("invalid language", language);
+                break;
+        }
 
-        let ALPHABETICAL_CHARACTERS = isRussian ? ALPHABETICAL_CHARACTERS_RU : ALPHABETICAL_CHARACTERS_EN;
-        let CHAR_WEIGHTS = isRussian ? CHAR_WEIGHTS_RU : CHAR_WEIGHTS_EN_QWERTY;
+        prepareDictionary(SYLLABLES);
 
-        if(isRussian) {
+        if(language == 'RU') {
             // Replace all "ё" occurrences to "е".
             str = str.split("ё").join("е");
         }
