@@ -46,6 +46,20 @@ function embed() {
         "пэчмзшмзбчууфнцзкдлщчжхгфэыумщгюфгкюгшжюшюбгнъщоцлццфммхюикъкбцнпбнмцмйикьнплъюепфъюдфлрьхцсмшкчххюфьркфжтмдвжзэцрхкфчгхсщюэшсцд" +
         "ччхчгпфбеэхдшээямжжэяугзшхвюйщфяжцээйюгфпвхпэожвчэтжцп";
 
+    var SYLLABLES_BY = "нараалкапаватаадліланеасдаамаўсяараврыкіанныгадзцьстмапрзатоакчынічаагаблельайымбыгоацвеякеразвыміўсролясатыатінкуштылці" +
+        "косццатрнуоўбалоачапенолянзеённязіягскруыямевоілаярэісаепеімэтханнццусдывіспахжаноыўвягэдншыікмуынтуелыхіхіціўбознсвдоодмоойкрор" + 
+        "бецяоносцеогыцулўндуедыськжыессіялслаюуюшчямярумзвейглутпобішаудлыіясуівовядыкмядрмномцыяўзяклздожуўлюпіткокплбрхоецсёьнснвугубл" + 
+        "ажывеўсернукбугімыашяечэчузуяцотекуржосьетюччнлутвірйшічемужньобяшдвуптночітжнўшгрыруцучытнкясгндклёхуідухэныгішоеэрезсоушычятнт" + 
+        "зртэпуэлркйннцеччошкаіізбяўвяззмпяозугшлсмьмявўлэйхвгеубдлзьунртёйшосыузябпыўзаёхіджыпдчяжувўдьшыбцёкнюдоцзлўжевршьцўкешмлячюцяп" + 
+        "чкрцзбнсшутлшнышхтепмкегшэошжкрснчлкйсзгйкўгндншопбнцэцуыйэўёмрвёсэбебцюрміжнюхлзыеждсптяхехксібрдктоювёэдсхўтзкэшжудэыдхнўчёр'я" + 
+        "фаэчэсжэзоохўпйгкепэёксэюбквьвргддгчоішцрхігызрлдпцнеянёрбнгўрсюдбмрфіўбшмьбыеафёўэмыіцвз'ёдяйёгэзіппндтўцьсэвйммп'еоягкфреамёёт" + 
+        "ёлцкссмсфеэкяюдмзёііаамэр'уаыжчвэцйдыюхмззтчэпцоуеьгпшёюйчбсжчллгврпрчўмпкфожвждсчэафуяяеешпмгёзпсьдхрюсеюўяюшцтйцпчютжлйлбкпцб'" + 
+        "йвмбччржмчюнкмд'дцэгбмбэрзюльёфлнвшвэжэхзюбвмцьлнэ'ёіюеіп'юкэялблдуфьіьчпёюмлтсрзпжжуяюхдгдшвэм'зэёвюржбкціфійхеёпчцююбхьпыёья'ю" + 
+        "кшьеюпаэтцйбчмбцккнззцдхуйбдсфйтшстмчлшхвюмфйзсшўхаолэгёжмбчуіжц'ігсэікчйпбшьтіёлсмшпврфмвнфофнжэфзсэебёёффгўіфычтыанлхціоўемдтх" + 
+        "хсефэюсбыфлпауіеуэтсэомхцмбтбгьюіэлмлхтжшшкзгцхэіазжзчяіхкёхлцьзюзгдпхсгпьфёжснхьфыуеофэўюкпбююйфсхгюеёегяюжмтзшкэьрээпюяёжгбпьх" + 
+        "гшўёйаяфтгфтлчюёкёёбнмюгтфтефяёчлгчблжгмуохдйфцфлвкюёцбжювмюкдкяёжйобзўотзпбтшйхмзўайічхшьыоюійрўулфнрггфныыррхпк'жзцлгылзйяжрхч" + 
+        "кбдфттгбшргьгхн'оачььэряпфюфтіёакхчжўэсдёуйэнблрцпфміу";
+
     // 2 letters combinations for English, ordered by their frequency. Usual English and mini-marathons English dictionaries were used.
     // Only the first 274 most common combinations are included.
     // The rest will get the worst coefficient.
@@ -63,6 +77,18 @@ function embed() {
         "|": 10.0,  "<": 11.0,  ">": 11.0,  "@": 11.0,  "[": 11.0,  "]": 11.0,  "^": 11.0,  "~": 11.0,  "`": 11.0,  "{": 11.0,
         "}": 11.0,  "0": 5.0,   "1": 5.0,   "2": 5.0,   "3": 5.0,   "4": 5.0,   "5": 5.0,   "6": 5.0,   "7": 5.0,   "8": 5.0,
         "9": 5.0
+    };
+
+    var CHAR_WEIGHTS_BY = {
+        "а": 105,   "б": 142,   "в": 119,   "г": 140,   "д": 125,   "е": 105,   "ж": 153,   "з": 142,   "і": 107,   "й": 150,
+        "к": 122,   "л": 117,   "м": 122,   "н": 108,   "о": 100,   "п": 126,   "р": 118,   "с": 115,   "т": 110,   "у": 127,
+        "ф": 155,   "х": 157,   "ц": 175,   "ч": 145,   "ш": 160,   "ў": 180,   "'": 200,   "ы": 140,   "ь": 137,   "э": 183,
+        "ю": 167,   "я": 135,   "\n": 0.3,  " ": 0.3,   ".": 2.0,   ",": 2.5,   "!": 4.0,   "?": 3.0,   ":": 4.0,   ";": 4.5,
+        "\"": 7.0,  "«": 5.0,   "»": 5.0,   /*"'": 9.0,*/   "_": 8.0,   "%": 8.0,   "—": 5.0,   "–": 5.0,   "-": 5.0,   "(": 5.0,
+        ")": 5.0,   "*": 7.0,   "=": 7.0,   "+": 7.0,   "№": 5.0,   "#": 9.0,   "$": 9.0,   "&": 9.0,   "/": 9.0,   "\\": 10.0,
+        "|": 10.0,  "<": 11.0,  ">": 11.0,  "@": 11.0,  "[": 11.0,  "]": 11.0,  "^": 11.0,  "~": 11.0,  "`": 11.0,  "{": 11.0,
+        "}": 11.0,  "0": 5.0,   "1": 5.0,   "2": 5.0,   "3": 5.0,   "4": 5.0,   "5": 5.0,   "6": 5.0,   "7": 5.0,   "8": 5.0,
+        "9": 5.0, "ё": 217
     };
 
     // Complexity weight for each character in English QWERTY layout.
@@ -101,6 +127,9 @@ function embed() {
 
     // Characters for Russian language.
     var ALPHABETICAL_CHARACTERS_RU = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+
+    // Characters for Belorusian language.
+    var ALPHABETICAL_CHARACTERS_BY = "абвгдеёжзійклмнопрстуфхцчшў'ыьэюя";
 
     // Characters for English.
     var ALPHABETICAL_CHARACTERS_EN = "abcdefghijklmnopqrstuvwxyz";
@@ -299,10 +328,10 @@ function embed() {
         var SYLLABLES;
         let ALPHABETICAL_CHARACTERS;
         let CHAR_WEIGHTS;
-        let isRussian = false;
+        let isCyryllic = false;
         switch(language) {
             case 'RU':
-                isRussian = true;
+                isCyryllic = true;
                 SYLLABLES = SYLLABLES_RU;
                 ALPHABETICAL_CHARACTERS = ALPHABETICAL_CHARACTERS_RU;
                 CHAR_WEIGHTS = CHAR_WEIGHTS_RU;
@@ -313,6 +342,11 @@ function embed() {
                 CHAR_WEIGHTS = CHAR_WEIGHTS_EN_QWERTY;
                 break;
             case 'BY':
+                // isCyryllic = true;
+                SYLLABLES = SYLLABLES_BY;
+                ALPHABETICAL_CHARACTERS = ALPHABETICAL_CHARACTERS_BY;
+                CHAR_WEIGHTS = CHAR_WEIGHTS_BY;
+                break;
             case 'UA':
             case 'PL':
                 console.log("TODO language", language);
@@ -343,14 +377,14 @@ function embed() {
                     weight = CHAR_WEIGHTS[charLowerCase];
                 } else {
                     // All the following letters in the word will get default weight. Their final weight will depend on the letters combination frequency.
-                    weight = isRussian ? DEFAULT_LETTER_WEIGHT : CHAR_WEIGHTS[charLowerCase];
+                    weight = isCyryllic ? DEFAULT_LETTER_WEIGHT : CHAR_WEIGHTS[charLowerCase];
                 }
 
                 // All letters in the word, starting from the second, will apply coefficient depending on the 2 letters frequency
                 if (wordLength > 1) {
                     var n = dictionary[prevChar + charLowerCase];
                     if (n == null) {
-                        n = isRussian ? -3.75 : 548; // This is minimum value, which can be achieved by the following formula
+                        n = isCyryllic ? -3.75 : 548; // This is minimum value, which can be achieved by the following formula
                     }
 
                     // Such formula returns 2 letters frequency in the decimal logarithmic scale, e.g. "0" - most common, "-1",
