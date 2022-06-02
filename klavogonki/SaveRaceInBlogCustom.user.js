@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       1.1.11
+// @version       1.2.0
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
 // @include       https://klavogonki.ru/g/*
@@ -35,7 +35,7 @@ function saveRaceInBlog () {
 		}
 	}
 
-	function saveResult (res) {
+	function saveResult (res, savePic) {
         var percent = parseFloat(((res.stats.speed + '00') / res.best).toFixed(1)); //округление процента до указанного количества знаков после запятой
         if(percent >= 95)
             percent = '**'+percent+'%**';
@@ -71,19 +71,22 @@ function saveRaceInBlog () {
 							text += '*' + gameTypes[res.gameType] + '* | **' + comp + '** | **';
 						}
 
+						console.log('aaa', res.stats.speed);
+
 						if (game.getGametype() == 'marathon') {
-							text += res.stats.speed + '&nbsp;зн/мин** | ' +
+							text += res.stats.speed + ' зн/мин** | ' +
                             percent + ' | *' +
-							res.stats.errors.replace(')', '&#41;*\n\n') +
+							res.stats.errors.replace('(', '[').replace(')', ']*\n\n') +
 							'*![сложнограмма](' + reader.result + ')*\n\n' +
 							res.author + '\n**' + res.title + '**\n![обложка](' + res.pic + ')\n\n';
 						} else {
-                            text += res.stats.speed + '&nbsp;зн/мин** | ' +
+							var gameType = game.getGametype();
+                            text += res.stats.speed + ' зн/мин** | ' +
                             percent + ' | *' +
-							res.stats.errors.replace(')', '&#41;* | *') +
+							res.stats.errors.replace('(', '[').replace(')', ']* | *') +
 							res.stats.time + '*\n\n' +
                             '*![сложнограмма](' + reader.result + ')*\n\n';
-                            if(game.getGametype() == 'normal') {
+                            if(savePic && (gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint')) {
                                 text += '\n![обложка](' + res.pic + ') ' + res.author + ' - **' + res.title + '**\n\n';
                             }
 
@@ -134,15 +137,19 @@ function saveRaceInBlog () {
 		}
 
 		if (game.getGametype() == 'marathon') {
-			text += res.stats.speed + '&nbsp;зн/мин** | *' +
-				res.stats.errors.replace(')', '&#41;*\n\n') +
+			text += res.stats.speed + ' зн/мин** | *' +
+				res.stats.errors.replace('(', '[').replace(')', ']*\n\n') +
 				res.author + '\n**' + res.title + '**\n![обложка](' + res.pic + ')\n\n';
 		} else {
-            console.log('test res', res);
-		text += res.stats.speed + '&nbsp;зн/мин** | ' +
+			var gameType = game.getGametype();
+			text += res.stats.speed + ' зн/мин** | ' +
             percent + ' | *' +
-			res.stats.errors.replace(')', '&#41;* | *') +
+			res.stats.errors.replace('(', '[').replace(')', ']* | *') +
 			res.stats.time + '*\n\n';
+
+			if(savePic && (gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint')) {
+				text += '\n![обложка](' + res.pic + ') ' + res.author + ' - **' + res.title + '**\n\n';
+			}
 
 			var typedMarked = res.typedHtml
 			.replace(/<span class="error">|<\/span>/g, '**')
@@ -178,6 +185,10 @@ function init (bestSpeed) {
 	var link = document.createElement('a');
 	link.style.color = '#ff3855';
 	link.textContent = 'Сохранить в бортжурнале';
+
+	var linkWithPicture = document.createElement('a');
+	linkWithPicture.style.color = '#5247A7';
+	linkWithPicture.textContent = 'Сохранить с обложкой (для обычного)';
 
 	if (game.getGametype() == 'marathon')
 	{
@@ -236,8 +247,10 @@ function init (bestSpeed) {
 		title: title
 	};
 
-	link.addEventListener('click', saveResult.bind(null, resultData));
+	link.addEventListener('click', saveResult.bind(null, resultData, false));
+	linkWithPicture.addEventListener('click', saveResult.bind(null, resultData, true));
 	container.appendChild(link);
+	container.appendChild(linkWithPicture);
 
 	var again = document.getElementById('again');
 	if (!again) {
