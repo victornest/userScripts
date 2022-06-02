@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       1.2.0
+// @version       1.2.1
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
 // @include       https://klavogonki.ru/g/*
-// @author        Lexin13, agile, 490344
+// @author        Lexin13, agile, 490344, vnest
 // ==/UserScript==
 
 function saveRaceInBlog () {
@@ -179,6 +179,9 @@ function saveRaceInBlog () {
 //}
 
 function init (bestSpeed) {
+
+	var gameType = game.getGametype();
+
 	var container = document.createElement('div');
 	container.style.fontSize = '10pt';
 	container.style.display = 'flex';
@@ -186,11 +189,13 @@ function init (bestSpeed) {
 	link.style.color = '#ff3855';
 	link.textContent = 'Сохранить в бортжурнале';
 
-	var linkWithPicture = document.createElement('a');
-	linkWithPicture.style.color = '#5247A7';
-	linkWithPicture.textContent = 'Сохранить с обложкой (для обычного)';
+	if(gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint') {
+		var linkWithPicture = document.createElement('a');
+		linkWithPicture.style.color = '#5247A7';
+		linkWithPicture.textContent = 'Сохранить в бортжурнале с обложкой';
+	}
 
-	if (game.getGametype() == 'marathon')
+	if (gameType == 'marathon')
 	{
 		var raceTime = document.querySelector('.player.you.ng-scope').querySelector('.bitmore');
 		raceTime.textContent = 0 + raceTime.textContent;
@@ -199,7 +204,7 @@ function init (bestSpeed) {
 		var author = document.querySelector('.author').innerText;
 		var title = document.querySelector('#book .name').innerText;
 	} else {
-        if(game.getGametype() == 'normal') {
+        if(gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint') {
             pic = document.querySelector('.imobilco-book').querySelector('img').src;
             author = document.querySelector('.author').innerText;
             title = document.querySelector('#book .name').innerText;
@@ -248,9 +253,12 @@ function init (bestSpeed) {
 	};
 
 	link.addEventListener('click', saveResult.bind(null, resultData, false));
-	linkWithPicture.addEventListener('click', saveResult.bind(null, resultData, true));
 	container.appendChild(link);
-	container.appendChild(linkWithPicture);
+	if(gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint') {
+		linkWithPicture.addEventListener('click', saveResult.bind(null, resultData, true));
+		container.appendChild(linkWithPicture);
+	}
+	
 
 	var again = document.getElementById('again');
 	if (!again) {
