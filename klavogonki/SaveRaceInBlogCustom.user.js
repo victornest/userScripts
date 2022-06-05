@@ -86,7 +86,7 @@ function saveRaceInBlog () {
 							'*![сложнограмма](' + reader.result + ')*\n\n' +
 							res.author + '\n**' + res.title + '**\n![обложка](' + res.pic + ')\n\n';
 						} else {
-							var gameType = game.getGametype();
+							var gameType = game.getGametype();	
                             text += res.stats.speed + ' зн/мин** | ' +
                             percent + ' | *' +
 							res.stats.errors.replace('(', '[').replace(')', ']* | *') +
@@ -95,6 +95,12 @@ function saveRaceInBlog () {
                             if(savePic && (gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint')) {
                                 text += '\n![обложка](' + res.pic + ') ' + res.author + ' - **' + res.title + '**\n\n';
                             }
+
+							res.typedHtml = res.typedHtml
+							.replaceAll('<span class="error"> ', '<span class="error">˽')
+							.replaceAll(' </span>', '˽</span>')
+							.replaceAll('<s class="error"> ', '<s class="error">˽')
+							.replaceAll(' </s>', '˽</s>');
 
 							var typedMarked = res.typedHtml
 							.replace(/<span class="error">|<\/span>/g, '**')
