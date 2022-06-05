@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       2.0.1
+// @version       3.0.0
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
 // @include       https://klavogonki.ru/g/*
@@ -9,6 +9,7 @@
 // ==/UserScript==
 
 function saveRaceInBlog () {
+	var fullText;
 	var link = document.querySelector('.dropmenu a');
 	if (!link) {
 		throw new Error('.dropmenu a element not found.');
@@ -27,6 +28,10 @@ function saveRaceInBlog () {
 			var json = JSON.parse(response);
 			if (!('players' in json)) {
 				return false;
+			}
+
+			if ('text' in json) {
+				fullText = json.text.text;
 			}
 
 			for (var i = 0; i < json.players.length; i++) {
@@ -86,13 +91,12 @@ function saveRaceInBlog () {
 							'*![сложнограмма](' + reader.result + ')*\n\n' +
 							res.author + '\n**' + res.title + '**\n![обложка](' + res.pic + ')\n\n';
 						} else {
-							var gameType = game.getGametype();	
                             text += res.stats.speed + ' зн/мин** | ' +
                             percent + ' | *' +
 							res.stats.errors.replace('(', '[').replace(')', ']* | *') +
 							res.stats.time + '*\n\n' +
                             '*![сложнограмма](' + reader.result + ')*\n\n';
-                            if(savePic && (gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint')) {
+                            if(savePic) {
                                 text += '\n![обложка](' + res.pic + ') ' + res.author + ' - **' + res.title + '**\n\n';
                             }
 
@@ -160,9 +164,15 @@ function saveRaceInBlog () {
 			res.stats.errors.replace('(', '[').replace(')', ']* | *') +
 			res.stats.time + '*\n\n';
 
-			if(savePic && (gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint')) {
+			if(savePic) {
 				text += '\n![обложка](' + res.pic + ') ' + res.author + ' - **' + res.title + '**\n\n';
 			}
+
+			res.typedHtml = res.typedHtml
+			.replaceAll('<span class="error"> ', '<span class="error">˽')
+			.replaceAll(' </span>', '˽</span>')
+			.replaceAll('<s class="error"> ', '<s class="error">˽')
+			.replaceAll(' </s>', '˽</s>');
 
 			var typedMarked = res.typedHtml
 			.replace(/<span class="error">|<\/span>/g, '**')
@@ -203,7 +213,98 @@ function init (bestSpeed) {
 	link.style.color = '#ff3855';
 	link.textContent = 'Сохранить в бортжурнале';
 
-	if(gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint') {
+	// const gameTypeMiniBY = 'voc-25856'; // test
+	const gameTypeMiniBY = 'voc-218696';
+	const gameTypeMiniRU = 'voc-6018';
+	const gameTypeMiniEN = 'voc-8835';
+	const gameTypeNormalBY = 'voc-29616';
+	const gameTypeNormalEN = 'voc-5539';
+	const gameTypeSuffixBY = '.BY';
+	const gameTypeSuffixRU = '.RU';
+	const gameTypeSuffixEN = '.EN';
+	const gameTypeMini = 'MiniMarathon';
+	const gameTypeNormal = 'Normal';
+
+
+	const vocCoversLocalStorageNamePrefix = 'KG_Covers.';
+	var vocCoversLocalStorageName;
+
+	switch (gameType) {
+		case gameTypeMiniBY:
+			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeMini + gameTypeSuffixBY;
+			break;
+		case gameTypeMiniRU:
+			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeMini + gameTypeSuffixRU;
+			break;
+		case gameTypeMiniEN:
+			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeMini + gameTypeSuffixEN;
+			break;
+		case gameTypeNormalBY:
+			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal + gameTypeSuffixBY;
+			break;
+		case gameTypeNormalEN:
+			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal + gameTypeSuffixEN;
+			break;
+		default:
+			break;
+	}
+
+	var coversMapJson = localStorage[vocCoversLocalStorageName];
+	var vocCoversMap = coversMapJson ? JSON.parse(coversMapJson) : undefined;
+
+	// var textKey = 'Behind every man now alive stand thirty ghosts, for that is the ratio by which the dead outnumber the living. Since the dawn of time, roughly a hundred billion human beings have walked the planet Eart';
+
+	var textKey = fullText.substring(0, 200);
+
+	var storeVocCover = (gameType == gameTypeMiniBY 
+		|| gameType == gameTypeMiniRU 
+		|| gameType == gameTypeMiniEN
+		|| gameType == gameTypeNormalBY
+		|| gameType == gameTypeNormalEN) && vocCoversMap 
+		&& vocCoversMap[textKey] && vocCoversMap[textKey].title;
+	
+	if(storeVocCover) {
+		const defaultCover = 'https://i.imgur.com/cUkkjem.jpg?1';
+		
+		var coverInfo = vocCoversMap[textKey];
+		//if no cover - insert default
+		var cover = coverInfo.cover ? coverInfo.cover : defaultCover;
+		var coverTable = document.createElement('table');
+		coverTable.id = 'book';
+		coverTable.className = 'imobilco';
+		coverTable.innerHTML = 
+			`<tbody>
+				<tr>
+					<th>
+						<div class="imobilco-container">
+							<div class="imobilco-book">
+								<span class="imobilco-cover"><span class="co itl"></span>
+								<span class="co itr"></span><span class="co ibl"></span>
+								<span class="co ibr"></span></span>
+								<img src="${cover}" style="height: 168px;">
+							</div>
+						</div>
+					</th>
+					<td>
+						<div>Вы набирали цитату из книги:</div>
+						<div class="author">${coverInfo.author}</div>
+						<div class="name">${coverInfo.title}</div>
+					</td>
+				</tr>
+			</tbody>`;
+		var bookInfo = document.getElementById('bookinfo');
+		var bookInfoFirstDiv = bookInfo.firstElementChild;
+		bookInfoFirstDiv.appendChild(coverTable);
+	}
+	
+	var storeCover = false;
+
+	if(gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint'
+	|| storeVocCover) {
+		storeCover = true;
+	}
+
+	if(storeCover) {
 		var linkWithPicture = document.createElement('a');
 		linkWithPicture.style.color = '#5247A7';
 		linkWithPicture.textContent = 'Сохранить в бортжурнале с обложкой';
@@ -218,7 +319,7 @@ function init (bestSpeed) {
 		var author = document.querySelector('.author').innerText;
 		var title = document.querySelector('#book .name').innerText;
 	} else {
-        if(gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint') {
+        if(storeCover) {
             pic = document.querySelector('.imobilco-book').querySelector('img').src;
             author = document.querySelector('.author').innerText;
             title = document.querySelector('#book .name').innerText;
@@ -268,7 +369,7 @@ function init (bestSpeed) {
 
 	link.addEventListener('click', saveResult.bind(null, resultData, false));
 	container.appendChild(link);
-	if(gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint') {
+	if(storeCover) {
 		linkWithPicture.addEventListener('click', saveResult.bind(null, resultData, true));
 		container.appendChild(linkWithPicture);
 	}
@@ -296,7 +397,7 @@ var proxied = window.XMLHttpRequest.prototype.send;
 window.XMLHttpRequest.prototype.send = function () {
 	this.addEventListener('load', function () {
 		var bestSpeed = checkJSON(this.responseText);
-		if (bestSpeed) {
+		if (bestSpeed && fullText) {
 			init(bestSpeed);
 		}
 	}.bind(this));
