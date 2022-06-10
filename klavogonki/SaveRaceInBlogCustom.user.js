@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       3.0.0
+// @version       3.1.0
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
 // @include       https://klavogonki.ru/g/*
@@ -128,7 +128,7 @@ function saveRaceInBlog () {
 						xhr.send(JSON.stringify({
 							userId: userId,
 							text: text,
-							hidden: false,
+							hidden: localStorage['KG.save_race_in_blog_custom.save-hidden'] == 'true',
 						}));
 					}
 				});
@@ -197,7 +197,7 @@ function saveRaceInBlog () {
 		xhr.send(JSON.stringify({
 			userId: userId,
 			text: text,
-			hidden: false,
+			hidden: localStorage['KG.save_race_in_blog_custom.save-hidden'] == 'true',
 		}));
 	}
 //}
@@ -252,7 +252,7 @@ function init (bestSpeed) {
 	var coversMapJson = localStorage[vocCoversLocalStorageName];
 	var vocCoversMap = coversMapJson ? JSON.parse(coversMapJson) : undefined;
 
-	// var textKey = 'Behind every man now alive stand thirty ghosts, for that is the ratio by which the dead outnumber the living. Since the dawn of time, roughly a hundred billion human beings have walked the planet Eart';
+	// var textKey = "Coming down the steps of \"Snooks\" Club, so nicknamed by George Forsyte in the late eighties, on that momentous mid-October afternoon of 1922, Sir Lawrence Mont, ninth baronet, set his fine nose toward";
 
 	var textKey = fullText.substring(0, 200);
 
@@ -309,6 +309,25 @@ function init (bestSpeed) {
 		linkWithPicture.style.color = '#5247A7';
 		linkWithPicture.textContent = 'Сохранить в бортжурнале с обложкой';
 	}
+
+	var saveHiddenElement = document.createElement("div");
+	saveHiddenElement.id = "input-save-hidden";
+	let saveHiddenCheckbox = document.createElement('input');
+	saveHiddenCheckbox.setAttribute('type', 'checkbox');
+	saveHiddenCheckbox.setAttribute('name', 'save-hidden');
+	saveHiddenCheckbox.id = 'save-hidden-checkbox';
+	saveHiddenCheckbox.checked = localStorage['KG.save_race_in_blog_custom.save-hidden'] == 'true';
+	saveHiddenCheckbox.addEventListener('change', function () {
+		console.debug('saveHiddenLabel change', saveHiddenCheckbox.checked);
+		localStorage['KG.save_race_in_blog_custom.save-hidden'] = saveHiddenCheckbox.checked;
+	});
+	let saveHiddenLabel = document.createElement('label');
+	saveHiddenLabel.setAttribute('for', 'save-hidden-checkbox');
+	saveHiddenLabel.innerText = 'Скрытая запись';
+	saveHiddenLabel.style.verticalAlign = 'middle';
+	
+	saveHiddenElement.appendChild(saveHiddenCheckbox);
+	saveHiddenElement.appendChild(saveHiddenLabel);
 
 	if (gameType == 'marathon')
 	{
@@ -370,10 +389,12 @@ function init (bestSpeed) {
 	link.addEventListener('click', saveResult.bind(null, resultData, false));
 	container.appendChild(link);
 	if(storeCover) {
+		container.insertAdjacentHTML('beforeend', '<span>&nbsp;</span>');
 		linkWithPicture.addEventListener('click', saveResult.bind(null, resultData, true));
 		container.appendChild(linkWithPicture);
 	}
-	
+	container.insertAdjacentHTML('beforeend', '<span>&nbsp;</span>');
+	container.appendChild(saveHiddenElement);
 
 	var again = document.getElementById('again');
 	if (!again) {
