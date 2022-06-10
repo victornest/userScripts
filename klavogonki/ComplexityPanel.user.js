@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           KG_ComplexityPanel
-// @version        3.0.0
+// @version        3.1.0
 // @namespace      klavogonki
 // @author         Silly_Sergio
 // @description    Добавляет панель прогноза сложности текста в заездах
@@ -138,6 +138,10 @@ function embed() {
         "9": 5.0
     };
 
+    let vocsBY = ['voc-29616', 'voc-208615', 'voc-218696', 'voc-208660', 'voc-205246', 'voc-216879', 'voc-218806', 'voc-205247', 'voc-205255', 'voc-205242', 'voc-205250', 'voc-205253', 'voc-205254', 'voc-205252'];
+    let vocsUA = ['voc-123163', 'voc-216909', 'voc-96194', 'voc-216827'];
+    let vocsPL = ['voc-28072', 'voc-29513', 'voc-217656'];
+
     // Spectrum canvas settings
     var CANVAS_HEIGHT = 12;
     var CANVAS_OPACITY  = 0.65;
@@ -214,6 +218,8 @@ function embed() {
 
         let languages = ['Auto', 'RU', 'EN', 'BY', 'UA', 'PL'];
 
+        var gameType = game.getGametype();
+
         initialized = true;
 
         var params = document.getElementById("params");
@@ -266,7 +272,7 @@ function embed() {
                 lgRadio.addEventListener('change', function () {
                     console.log('lg change', lgRadio.value);
                     localStorage['complexity-language'] = lgRadio.value;
-                    processComplexity(text, complexityInnerElement, localStorage['complexity-language']);
+                    processComplexity(text, complexityInnerElement, localStorage['complexity-language'], gameType);
                 });
 
                 inputLanguageElement.appendChild(lgRadio);
@@ -284,12 +290,12 @@ function embed() {
             let calcElement = complexityInnerElement.childNodes[1];
             calcElement.appendChild(inputLanguageElement);
 
-            processComplexity(text, complexityInnerElement, localStorage['complexity-language']);
+            processComplexity(text, complexityInnerElement, localStorage['complexity-language'], gameType);
         }
     }
 
-    function processComplexity(text, complexityInnerElement, language) {
-        var complexityObject = getComplexity(text, language);
+    function processComplexity(text, complexityInnerElement, language, gameType) {
+        var complexityObject = getComplexity(text, language, gameType);
         var complexity = complexityObject.complexity.toFixed(2);
 
         let complexityCalcInner = document.createElement('div');
@@ -349,7 +355,7 @@ function embed() {
     }
 
     // Return string complexity and its spectrum. Return -1 for the complexity, if it can't be applied to the string.
-    function getComplexity(str, language) {
+    function getComplexity(str, language, gameType) {
         var complexity = 0.0;
         var wordLength = 0;
         var wordComplexity = 0;
@@ -360,22 +366,31 @@ function embed() {
         var pos = 0;
         var wordComplexityPerCharacter, j;
 
-        let charIndex = 0;
         if(!language || language == 'Auto') {
-            while(!language || language == 'Auto') {
-                let currentChar = str[charIndex].toLowerCase();
 
-                if(ALPHABETICAL_CHARACTERS_RU.indexOf(currentChar) != -1) {
-                    language = 'RU';
-                    break;
+            if(vocsBY.indexOf(gameType) > 0) {
+                language = 'BY';
+            } else if (vocsUA.indexOf(gameType) > 0) {
+                language = 'UA';
+            } else if (vocsPL.indexOf(gameType) > 0) {
+                language = 'PL';
+            } else {
+                while(!language || language == 'Auto') {
+                    let charIndex = 0;
+                    let currentChar = str[charIndex].toLowerCase();
+    
+                    if(ALPHABETICAL_CHARACTERS_RU.indexOf(currentChar) != -1) {
+                        language = 'RU';
+                        break;
+                    }
+    
+                    if(ALPHABETICAL_CHARACTERS_EN.indexOf(currentChar) != -1) {
+                        language = 'EN';
+                        break;
+                    }
+    
+                    charIndex++;
                 }
-
-                if(ALPHABETICAL_CHARACTERS_EN.indexOf(currentChar) != -1) {
-                    language = 'EN';
-                    break;
-                }
-
-                charIndex++;
             }
         }
 
