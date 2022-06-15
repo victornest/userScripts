@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           KG_ComplexityPanel
-// @version        3.1.0
+// @version        3.1.1
 // @namespace      klavogonki
 // @author         Silly_Sergio
 // @description    Добавляет панель прогноза сложности текста в заездах
@@ -368,11 +368,11 @@ function embed() {
 
         if(!language || language == 'Auto') {
 
-            if(vocsBY.indexOf(gameType) > 0) {
+            if(vocsBY.indexOf(gameType) >= 0) {
                 language = 'BY';
-            } else if (vocsUA.indexOf(gameType) > 0) {
+            } else if (vocsUA.indexOf(gameType) >= 0) {
                 language = 'UA';
-            } else if (vocsPL.indexOf(gameType) > 0) {
+            } else if (vocsPL.indexOf(gameType) >= 0) {
                 language = 'PL';
             } else {
                 while(!language || language == 'Auto') {
