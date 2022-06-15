@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       3.1.0
+// @version       3.2.0
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
 // @include       https://klavogonki.ru/g/*
@@ -219,9 +219,11 @@ function init (bestSpeed) {
 	const gameTypeMiniEN = 'voc-8835';
 	const gameTypeNormalBY = 'voc-29616';
 	const gameTypeNormalEN = 'voc-5539';
+	const gameTypeNormalUA = 'voc-123163';
 	const gameTypeSuffixBY = '.BY';
 	const gameTypeSuffixRU = '.RU';
 	const gameTypeSuffixEN = '.EN';
+	const gameTypeSuffixUA = '.UA';
 	const gameTypeMini = 'MiniMarathon';
 	const gameTypeNormal = 'Normal';
 
@@ -245,7 +247,11 @@ function init (bestSpeed) {
 		case gameTypeNormalEN:
 			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal + gameTypeSuffixEN;
 			break;
+		case gameTypeNormalUA:
+			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal + gameTypeSuffixUA;
+			break;
 		default:
+			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal;
 			break;
 	}
 
@@ -256,11 +262,7 @@ function init (bestSpeed) {
 
 	var textKey = fullText.substring(0, 200);
 
-	var storeVocCover = (gameType == gameTypeMiniBY 
-		|| gameType == gameTypeMiniRU 
-		|| gameType == gameTypeMiniEN
-		|| gameType == gameTypeNormalBY
-		|| gameType == gameTypeNormalEN) && vocCoversMap 
+	var storeVocCover = gameType.startsWith('voc-') && vocCoversMap 
 		&& vocCoversMap[textKey] && vocCoversMap[textKey].title;
 	
 	if(storeVocCover) {
