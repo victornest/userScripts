@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           KG_ComplexityPanel
-// @version        3.1.2
+// @version        3.1.3
 // @namespace      klavogonki
 // @author         Silly_Sergio
 // @description    Добавляет панель прогноза сложности текста в заездах
@@ -139,7 +139,7 @@ function embed() {
     };
 
     let vocsBY = ['voc-29616', 'voc-208615', 'voc-218696', 'voc-208660', 'voc-205246', 'voc-216879', 'voc-218806', 'voc-205247', 'voc-205255', 'voc-205242', 'voc-205250', 'voc-205253', 'voc-205254', 'voc-205252'];
-    let vocsUA = ['voc-123163', 'voc-216909', 'voc-96194', 'voc-216827'];
+    let vocsUA = ['voc-123163', 'voc-216909', 'voc-96194', 'voc-216827', 'voc-220155'];
     let vocsPL = ['voc-28072', 'voc-29513', 'voc-217656'];
 
     // Spectrum canvas settings
