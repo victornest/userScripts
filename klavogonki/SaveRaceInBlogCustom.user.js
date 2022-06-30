@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       3.2.0
+// @version       3.2.1
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
 // @include       https://klavogonki.ru/g/*
@@ -251,7 +251,7 @@ function init (bestSpeed) {
 			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal + gameTypeSuffixUA;
 			break;
 		default:
-			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal;
+			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameType;
 			break;
 	}
 
