@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       3.2.1
+// @version       3.2.2
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
 // @include       https://klavogonki.ru/g/*
@@ -266,7 +266,7 @@ function init (bestSpeed) {
 		&& vocCoversMap[textKey] && vocCoversMap[textKey].title;
 	
 	if(storeVocCover) {
-		const defaultCover = 'https://i.imgur.com/cUkkjem.jpg?1';
+		const defaultCover = 'https://i.imgur.com/j6uPT6r.png';
 		
 		var coverInfo = vocCoversMap[textKey];
 		//if no cover - insert default
