@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       3.2.2
+// @version       3.2.3
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
 // @include       https://klavogonki.ru/g/*
@@ -10,6 +10,8 @@
 
 function saveRaceInBlog () {
 	var fullText;
+	var qualParamFound = false;
+	var qual;
 	var link = document.querySelector('.dropmenu a');
 	if (!link) {
 		throw new Error('.dropmenu a element not found.');
@@ -32,6 +34,11 @@ function saveRaceInBlog () {
 
 			if ('text' in json) {
 				fullText = json.text.text;
+			}
+
+			if('params' in json) {
+				qual = json.params.qual;
+				qualParamFound = true;
 			}
 
 			for (var i = 0; i < json.players.length; i++) {
@@ -260,9 +267,9 @@ function init (bestSpeed) {
 
 	// var textKey = "Coming down the steps of \"Snooks\" Club, so nicknamed by George Forsyte in the late eighties, on that momentous mid-October afternoon of 1922, Sir Lawrence Mont, ninth baronet, set his fine nose toward";
 
-	var textKey = fullText.substring(0, 200);
+	var textKey = fullText ? fullText.substring(0, 200) : undefined;
 
-	var storeVocCover = gameType.startsWith('voc-') && vocCoversMap 
+	var storeVocCover = !qual && gameType.startsWith('voc-') && vocCoversMap 
 		&& vocCoversMap[textKey] && vocCoversMap[textKey].title;
 	
 	if(storeVocCover) {
@@ -301,8 +308,8 @@ function init (bestSpeed) {
 	
 	var storeCover = false;
 
-	if(gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint'
-	|| storeVocCover) {
+	if(!qual && (gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint'
+	|| storeVocCover)) {
 		storeCover = true;
 	}
 
@@ -420,7 +427,7 @@ var proxied = window.XMLHttpRequest.prototype.send;
 window.XMLHttpRequest.prototype.send = function () {
 	this.addEventListener('load', function () {
 		var bestSpeed = checkJSON(this.responseText);
-		if (bestSpeed && fullText) {
+		if (qualParamFound && bestSpeed && (qual || fullText)) {
 			init(bestSpeed);
 		}
 	}.bind(this));
