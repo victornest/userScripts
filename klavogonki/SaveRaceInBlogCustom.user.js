@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       3.2.3
+// @version       3.2.4
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @include       http://klavogonki.ru/g/*
 // @include       https://klavogonki.ru/g/*
@@ -10,8 +10,9 @@
 
 function saveRaceInBlog () {
 	var fullText;
-	var qualParamFound = false;
+	var paramsFound = false;
 	var qual;
+	var practice;
 	var link = document.querySelector('.dropmenu a');
 	if (!link) {
 		throw new Error('.dropmenu a element not found.');
@@ -38,7 +39,8 @@ function saveRaceInBlog () {
 
 			if('params' in json) {
 				qual = json.params.qual;
-				qualParamFound = true;
+				practice = json.params.type == 'practice';
+				paramsFound = true;
 			}
 
 			for (var i = 0; i < json.players.length; i++) {
@@ -269,7 +271,7 @@ function init (bestSpeed) {
 
 	var textKey = fullText ? fullText.substring(0, 200) : undefined;
 
-	var storeVocCover = !qual && gameType.startsWith('voc-') && vocCoversMap 
+	var storeVocCover = !qual && !practice && gameType.startsWith('voc-') && vocCoversMap 
 		&& vocCoversMap[textKey] && vocCoversMap[textKey].title;
 	
 	if(storeVocCover) {
@@ -308,7 +310,7 @@ function init (bestSpeed) {
 	
 	var storeCover = false;
 
-	if(!qual && (gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint'
+	if(!qual && !practice && (gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint'
 	|| storeVocCover)) {
 		storeCover = true;
 	}
@@ -427,7 +429,7 @@ var proxied = window.XMLHttpRequest.prototype.send;
 window.XMLHttpRequest.prototype.send = function () {
 	this.addEventListener('load', function () {
 		var bestSpeed = checkJSON(this.responseText);
-		if (qualParamFound && bestSpeed && (qual || fullText)) {
+		if (paramsFound && bestSpeed && (qual || practice || fullText)) {
 			init(bestSpeed);
 		}
 	}.bind(this));
