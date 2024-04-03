@@ -1,14 +1,20 @@
 // ==UserScript==
 // @name           KG_ComplexityPanel
-// @version        3.1.3
+// @version        3.2.0
 // @namespace      klavogonki
 // @author         Silly_Sergio
 // @description    Добавляет панель прогноза сложности текста в заездах
-// @include        http*://klavogonki.ru/g/*
+// @match          http*://klavogonki.ru/g/*
 // @grant          none
 // ==/UserScript==
 
-function embed() {
+(async function () {
+    'use strict';
+
+    if (document.getElementById("playads")) {
+        document.getElementById("playads").remove();
+    }
+
     var COMPLEXITY_TEXT = [
         "СУПЕР РЕКОРДНЫЙ ТЕКСТ",    // < 1
         "РЕКОРДНЫЙ ТЕКСТ",          // < 2
@@ -199,17 +205,49 @@ function embed() {
     // Saving the original prototype method:
     var proxied = window.XMLHttpRequest.prototype.send;
 
+    var practice;
+    var textRequested;
+
     window.XMLHttpRequest.prototype.send = function () {
         this.addEventListener('load', function () {
             try {
                 var json = JSON.parse(this.responseText);
+                if('params' in json) {
+                    practice = json.params.type == 'practice';
+                }
+
                 if ('text' in json) {
                     createPanel(json.text.text);
+                } else if (practice && !textRequested) {
+                    textRequested = true;
+                    let gameId = document.URL.match(/(\d+)/)[0];
+                    let fullTextRequestUrl = `${location.protocol}//klavogonki.ru/g/${gameId}.info`;
+
+                    let fullTextRequest = new FormData();
+                    fullTextRequest.append("need_text", 1);
+
+                    console.log("KG_ComplexityPanel - force text request");
+                    httpPostForm(fullTextRequestUrl, fullTextRequest).then(textRequestResult => {
+                        var fullText = textRequestResult?.text?.text;
+                        if(fullText) {
+                            createPanel(fullText);
+                        }
+                    });
                 }
             } catch (e) {}
         }.bind(this));
         return proxied.apply(this, [].slice.call(arguments));
     };
+
+    function httpPostForm(url, formData) {
+        return new Promise((resolve, reject) => {
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", url);
+            xhr.onload = () => resolve(xhr.responseText);
+            xhr.onerror = () => reject(logError(xhr.statusText));
+            xhr.send(formData);
+        });
+    }
 
     function createPanel (text) {
         if (initialized) {
@@ -635,10 +673,4 @@ function embed() {
 
         return canvas;
     }
-}
-if (document.getElementById("playads"))
-    document.getElementById("playads").remove();
-var inject = document.createElement("script");
-inject.setAttribute("type", "text/javascript");
-inject.appendChild(document.createTextNode("(" + embed + ")()"));
-document.body.appendChild(inject);
+})();
