@@ -1,18 +1,21 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       3.2.4
+// @version       3.3.0
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
-// @include       http://klavogonki.ru/g/*
-// @include       https://klavogonki.ru/g/*
+// @match         http*://klavogonki.ru/g/*
 // @author        Lexin13, agile, 490344, vnest
 // ==/UserScript==
 
-function saveRaceInBlog () {
+(async function () {
+    'use strict';
+
 	var fullText;
 	var paramsFound = false;
 	var qual;
 	var practice;
+    var inited;
+    var textRequested;
 	var link = document.querySelector('.dropmenu a');
 	if (!link) {
 		throw new Error('.dropmenu a element not found.');
@@ -25,6 +28,17 @@ function saveRaceInBlog () {
 		const parts = value.split(`; ${name}=`);
 		if (parts.length === 2) return parts.pop().split(';').shift();
 	}
+
+   function httpPostForm(url, formData) {
+        return new Promise((resolve, reject) => {
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", url);
+            xhr.onload = () => resolve(xhr.responseText);
+            xhr.onerror = () => reject(logError(xhr.statusText));
+            xhr.send(formData);
+        });
+    }
+
 
 	function checkJSON (response) {
 		try {
@@ -90,8 +104,6 @@ function saveRaceInBlog () {
 						} else {
 							text += '*' + gameTypes[res.gameType] + '* | **' + comp + '** | **';
 						}
-
-						console.log('aaa', res.stats.speed);
 
 						if (game.getGametype() == 'marathon') {
 							text += res.stats.speed + ' зн/мин** | ' +
@@ -209,82 +221,81 @@ function saveRaceInBlog () {
 			hidden: localStorage['KG.save_race_in_blog_custom.save-hidden'] == 'true',
 		}));
 	}
-//}
 
-function init (bestSpeed) {
+    async function init (bestSpeed) {
 
-	var gameType = game.getGametype();
+        var gameType = game.getGametype();
 
-	var container = document.createElement('div');
-	container.style.fontSize = '10pt';
-	container.style.display = 'flex';
-	var link = document.createElement('a');
-	link.style.color = '#ff3855';
-	link.textContent = 'Сохранить в бортжурнале';
+        var container = document.createElement('div');
+        container.style.fontSize = '10pt';
+        container.style.display = 'flex';
+        var link = document.createElement('a');
+        link.style.color = '#ff3855';
+        link.textContent = 'Сохранить в бортжурнале';
 
-	// const gameTypeMiniBY = 'voc-25856'; // test
-	const gameTypeMiniBY = 'voc-218696';
-	const gameTypeMiniRU = 'voc-6018';
-	const gameTypeMiniEN = 'voc-8835';
-	const gameTypeNormalBY = 'voc-29616';
-	const gameTypeNormalEN = 'voc-5539';
-	const gameTypeNormalUA = 'voc-123163';
-	const gameTypeSuffixBY = '.BY';
-	const gameTypeSuffixRU = '.RU';
-	const gameTypeSuffixEN = '.EN';
-	const gameTypeSuffixUA = '.UA';
-	const gameTypeMini = 'MiniMarathon';
-	const gameTypeNormal = 'Normal';
+        // const gameTypeMiniBY = 'voc-25856'; // test
+        const gameTypeMiniBY = 'voc-218696';
+        const gameTypeMiniRU = 'voc-6018';
+        const gameTypeMiniEN = 'voc-8835';
+        const gameTypeNormalBY = 'voc-29616';
+        const gameTypeNormalEN = 'voc-5539';
+        const gameTypeNormalUA = 'voc-123163';
+        const gameTypeSuffixBY = '.BY';
+        const gameTypeSuffixRU = '.RU';
+        const gameTypeSuffixEN = '.EN';
+        const gameTypeSuffixUA = '.UA';
+        const gameTypeMini = 'MiniMarathon';
+        const gameTypeNormal = 'Normal';
 
 
-	const vocCoversLocalStorageNamePrefix = 'KG_Covers.';
-	var vocCoversLocalStorageName;
+        const vocCoversLocalStorageNamePrefix = 'KG_Covers.';
+        var vocCoversLocalStorageName;
 
-	switch (gameType) {
-		case gameTypeMiniBY:
-			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeMini + gameTypeSuffixBY;
-			break;
-		case gameTypeMiniRU:
-			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeMini + gameTypeSuffixRU;
-			break;
-		case gameTypeMiniEN:
-			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeMini + gameTypeSuffixEN;
-			break;
-		case gameTypeNormalBY:
-			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal + gameTypeSuffixBY;
-			break;
-		case gameTypeNormalEN:
-			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal + gameTypeSuffixEN;
-			break;
-		case gameTypeNormalUA:
-			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal + gameTypeSuffixUA;
-			break;
-		default:
-			vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameType;
-			break;
-	}
+        switch (gameType) {
+            case gameTypeMiniBY:
+                vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeMini + gameTypeSuffixBY;
+                break;
+            case gameTypeMiniRU:
+                vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeMini + gameTypeSuffixRU;
+                break;
+            case gameTypeMiniEN:
+                vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeMini + gameTypeSuffixEN;
+                break;
+            case gameTypeNormalBY:
+                vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal + gameTypeSuffixBY;
+                break;
+            case gameTypeNormalEN:
+                vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal + gameTypeSuffixEN;
+                break;
+            case gameTypeNormalUA:
+                vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameTypeNormal + gameTypeSuffixUA;
+                break;
+            default:
+                vocCoversLocalStorageName = vocCoversLocalStorageNamePrefix + gameType;
+                break;
+        }
 
-	var coversMapJson = localStorage[vocCoversLocalStorageName];
-	var vocCoversMap = coversMapJson ? JSON.parse(coversMapJson) : undefined;
+        var coversMapJson = localStorage[vocCoversLocalStorageName];
+        var vocCoversMap = coversMapJson ? JSON.parse(coversMapJson) : undefined;
 
-	// var textKey = "Coming down the steps of \"Snooks\" Club, so nicknamed by George Forsyte in the late eighties, on that momentous mid-October afternoon of 1922, Sir Lawrence Mont, ninth baronet, set his fine nose toward";
+        // var textKey = "Coming down the steps of \"Snooks\" Club, so nicknamed by George Forsyte in the late eighties, on that momentous mid-October afternoon of 1922, Sir Lawrence Mont, ninth baronet, set his fine nose toward";
 
-	var textKey = fullText ? fullText.substring(0, 200) : undefined;
+        var textKey = fullText ? fullText.substring(0, 200) : undefined;
 
-	var storeVocCover = !qual && !practice && gameType.startsWith('voc-') && vocCoversMap 
-		&& vocCoversMap[textKey] && vocCoversMap[textKey].title;
-	
-	if(storeVocCover) {
-		const defaultCover = 'https://i.imgur.com/j6uPT6r.png';
-		
-		var coverInfo = vocCoversMap[textKey];
-		//if no cover - insert default
-		var cover = coverInfo.cover ? coverInfo.cover : defaultCover;
-		var coverTable = document.createElement('table');
-		coverTable.id = 'book';
-		coverTable.className = 'imobilco';
-		coverTable.innerHTML = 
-			`<tbody>
+        var storeVocCover = !qual && fullText && gameType.startsWith('voc-') && vocCoversMap
+        && vocCoversMap[textKey] && vocCoversMap[textKey].title;
+
+        if(storeVocCover) {
+            const defaultCover = 'https://i.imgur.com/j6uPT6r.png';
+
+            var coverInfo = vocCoversMap[textKey];
+            //if no cover - insert default
+            var cover = coverInfo.cover ? coverInfo.cover : defaultCover;
+            var coverTable = document.createElement('table');
+            coverTable.id = 'book';
+            coverTable.className = 'imobilco';
+            coverTable.innerHTML =
+                `<tbody>
 				<tr>
 					<th>
 						<div class="imobilco-container">
@@ -303,140 +314,158 @@ function init (bestSpeed) {
 					</td>
 				</tr>
 			</tbody>`;
-		var bookInfo = document.getElementById('bookinfo');
-		var bookInfoFirstDiv = bookInfo.firstElementChild;
-		bookInfoFirstDiv.appendChild(coverTable);
-	}
-	
-	var storeCover = false;
-
-	if(!qual && !practice && (gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint'
-	|| storeVocCover)) {
-		storeCover = true;
-	}
-
-	if(storeCover) {
-		var linkWithPicture = document.createElement('a');
-		linkWithPicture.style.color = '#5247A7';
-		linkWithPicture.textContent = 'Сохранить в бортжурнале с обложкой';
-	}
-
-	var saveHiddenElement = document.createElement("div");
-	saveHiddenElement.id = "input-save-hidden";
-	let saveHiddenCheckbox = document.createElement('input');
-	saveHiddenCheckbox.setAttribute('type', 'checkbox');
-	saveHiddenCheckbox.setAttribute('name', 'save-hidden');
-	saveHiddenCheckbox.id = 'save-hidden-checkbox';
-	saveHiddenCheckbox.checked = localStorage['KG.save_race_in_blog_custom.save-hidden'] == 'true';
-	saveHiddenCheckbox.addEventListener('change', function () {
-		console.debug('saveHiddenLabel change', saveHiddenCheckbox.checked);
-		localStorage['KG.save_race_in_blog_custom.save-hidden'] = saveHiddenCheckbox.checked;
-	});
-	let saveHiddenLabel = document.createElement('label');
-	saveHiddenLabel.setAttribute('for', 'save-hidden-checkbox');
-	saveHiddenLabel.innerText = 'Скрытая запись';
-	saveHiddenLabel.style.verticalAlign = 'middle';
-	
-	saveHiddenElement.appendChild(saveHiddenCheckbox);
-	saveHiddenElement.appendChild(saveHiddenLabel);
-
-	if (gameType == 'marathon')
-	{
-		var raceTime = document.querySelector('.player.you.ng-scope').querySelector('.bitmore');
-		raceTime.textContent = 0 + raceTime.textContent;
-		var typed = { innerHTML: 'Упс! Текст потерялся...' };
-		var pic = document.querySelector('.imobilco-book').querySelector('img').src;
-		var author = document.querySelector('.author').innerText;
-		var title = document.querySelector('#book .name').innerText;
-	} else {
-        if(storeCover) {
-            pic = document.querySelector('.imobilco-book').querySelector('img').src;
-            author = document.querySelector('.author').innerText;
-            title = document.querySelector('#book .name').innerText;
+            var bookInfo = document.getElementById('bookinfo');
+            var bookInfoFirstDiv = bookInfo.firstElementChild;
+            bookInfoFirstDiv.appendChild(coverTable);
         }
-		var typed = document.querySelector('#errors_text p');
-		if (!typed) {
-			throw new Error('#errors_text p element not found.');
-		}
-	}
 
-	var statsContainer = document.querySelector('.player.you .stats');
-	if (!statsContainer) {
-		throw new Error('.player.you .stats element not found.');
-	}
+        var storeCover = false;
 
-	var matches = statsContainer.textContent.match(/(\d{2}:\d{2}\.\d)(\d+) зн\/мин(\d+ ошиб\S+ \([\d,%]+\))/);
-	if (!matches) {
-		throw new Error('result stats were not parsed.');
-	}
+        if(!qual && fullText && (gameType == 'normal' || gameType == 'noerror' || gameType == 'sprint'
+                                  || storeVocCover)) {
+            storeCover = true;
+        }
 
-	var span = document.querySelector('#gamedesc span');
-	if (!span) {
-		throw new Error('#gamedesc span element not found.');
-	}
+        if(storeCover) {
+            var linkWithPicture = document.createElement('a');
+            linkWithPicture.style.color = '#5247A7';
+            linkWithPicture.textContent = 'Сохранить в бортжурнале с обложкой';
+        }
 
-	var gameType = span.className.split('-').pop();
-	var vocName = gameType === 'voc' ? span.textContent.replace(/[«»]/g, '') : '';
-	var vocId = gameType === 'voc' ? parseInt(span.querySelector('a').href.match(/vocs\/(\d+)/)[1]) : '';
+        var saveHiddenElement = document.createElement("div");
+        saveHiddenElement.id = "input-save-hidden";
+        let saveHiddenCheckbox = document.createElement('input');
+        saveHiddenCheckbox.setAttribute('type', 'checkbox');
+        saveHiddenCheckbox.setAttribute('name', 'save-hidden');
+        saveHiddenCheckbox.id = 'save-hidden-checkbox';
+        saveHiddenCheckbox.checked = localStorage['KG.save_race_in_blog_custom.save-hidden'] == 'true';
+        saveHiddenCheckbox.addEventListener('change', function () {
+            console.debug('saveHiddenLabel change', saveHiddenCheckbox.checked);
+            localStorage['KG.save_race_in_blog_custom.save-hidden'] = saveHiddenCheckbox.checked;
+        });
+        let saveHiddenLabel = document.createElement('label');
+        saveHiddenLabel.setAttribute('for', 'save-hidden-checkbox');
+        saveHiddenLabel.innerText = 'Скрытая запись';
+        saveHiddenLabel.style.verticalAlign = 'middle';
 
-	var stats = {
-		time: matches[1],
-		speed: matches[2],
-		errors: matches[3],
-	};
+        saveHiddenElement.appendChild(saveHiddenCheckbox);
+        saveHiddenElement.appendChild(saveHiddenLabel);
 
-	var resultData = {
-		stats: stats,
-        best: bestSpeed,
-		typedHtml: typed.innerHTML,
-		gameType: gameType,
-		vocName: vocName,
-		vocId: vocId,
-		pic: pic,
-		author: author,
-		title: title
-	};
+        if (gameType == 'marathon')
+        {
+            var raceTime = document.querySelector('.player.you.ng-scope').querySelector('.bitmore');
+            raceTime.textContent = 0 + raceTime.textContent;
+            var typed = { innerHTML: 'Упс! Текст потерялся...' };
+            var pic = document.querySelector('.imobilco-book').querySelector('img').src;
+            var author = document.querySelector('.author').innerText;
+            var title = document.querySelector('#book .name').innerText;
+        } else {
+            if(storeCover) {
+                pic = document.querySelector('.imobilco-book').querySelector('img').src;
+                author = document.querySelector('.author').innerText;
+                title = document.querySelector('#book .name').innerText;
+            }
+            var typed = document.querySelector('#errors_text p');
+            if (!typed) {
+                throw new Error('#errors_text p element not found.');
+            }
+        }
 
-	link.addEventListener('click', saveResult.bind(null, resultData, false));
-	container.appendChild(link);
-	if(storeCover) {
-		container.insertAdjacentHTML('beforeend', '<span>&nbsp;</span>');
-		linkWithPicture.addEventListener('click', saveResult.bind(null, resultData, true));
-		container.appendChild(linkWithPicture);
-	}
-	container.insertAdjacentHTML('beforeend', '<span>&nbsp;</span>');
-	container.appendChild(saveHiddenElement);
+        var statsContainer = document.querySelector('.player.you .stats');
+        if (!statsContainer) {
+            throw new Error('.player.you .stats element not found.');
+        }
 
-	var again = document.getElementById('again');
-	if (!again) {
-        	again = document.getElementById('bookinfo');
-        	if (!again)
-            		throw new Error('#again element not found.');
-	}
+        var matches = statsContainer.textContent.match(/(\d{2}:\d{2}\.\d)(\d+) зн\/мин(\d+ ошиб\S+ \([\d,%]+\))/);
+        if (!matches) {
+            throw new Error('result stats were not parsed.');
+        }
 
-	var cell = again.querySelector('td');
-	if (cell) {
-		container.style.float = 'left';
-		again.insertBefore(container, again.firstChild);
-	} else {
-		again.parentNode.appendChild(container);
-	}
-}
+        var span = document.querySelector('#gamedesc span');
+        if (!span) {
+            throw new Error('#gamedesc span element not found.');
+        }
 
-// Saving the original prototype method:
-var proxied = window.XMLHttpRequest.prototype.send;
+        var gameType = span.className.split('-').pop();
+        var vocName = gameType === 'voc' ? span.textContent.replace(/[«»]/g, '') : '';
+        var vocId = gameType === 'voc' ? parseInt(span.querySelector('a').href.match(/vocs\/(\d+)/)[1]) : '';
 
-window.XMLHttpRequest.prototype.send = function () {
-	this.addEventListener('load', function () {
-		var bestSpeed = checkJSON(this.responseText);
-		if (paramsFound && bestSpeed && (qual || practice || fullText)) {
-			init(bestSpeed);
-		}
-	}.bind(this));
-	return proxied.apply(this, [].slice.call(arguments));
-};
-}
+        var stats = {
+            time: matches[1],
+            speed: matches[2],
+            errors: matches[3],
+        };
 
-var script = document.createElement('script');
-script.textContent = '(' + saveRaceInBlog.toString() + ')();';
-document.body.appendChild(script);
+        var resultData = {
+            stats: stats,
+            best: bestSpeed,
+            typedHtml: typed.innerHTML,
+            gameType: gameType,
+            vocName: vocName,
+            vocId: vocId,
+            pic: pic,
+            author: author,
+            title: title
+        };
+
+        link.addEventListener('click', saveResult.bind(null, resultData, false));
+        container.appendChild(link);
+        if(storeCover) {
+            container.insertAdjacentHTML('beforeend', '<span>&nbsp;</span>');
+            linkWithPicture.addEventListener('click', saveResult.bind(null, resultData, true));
+            container.appendChild(linkWithPicture);
+        }
+        container.insertAdjacentHTML('beforeend', '<span>&nbsp;</span>');
+        container.appendChild(saveHiddenElement);
+
+        var again = document.getElementById('again');
+        if (!again) {
+            again = document.getElementById('bookinfo');
+            if (!again)
+                throw new Error('#again element not found.');
+        }
+
+        var cell = again.querySelector('td');
+        if (cell) {
+            container.style.float = 'left';
+            again.insertBefore(container, again.firstChild);
+        } else {
+            again.parentNode.appendChild(container);
+        }
+    }
+
+    // Saving the original prototype method:
+    var proxied = window.XMLHttpRequest.prototype.send;
+
+    window.XMLHttpRequest.prototype.send = function () {
+        this.addEventListener('load', function () {
+            if(!inited) {
+                var bestSpeed = checkJSON(this.responseText);
+                if(!textRequested && paramsFound && practice && !fullText) {
+                    textRequested = true;
+                    let gameId = document.URL.match(/(\d+)/)[0];
+                    let fullTextRequestUrl = `${location.protocol}//klavogonki.ru/g/${gameId}.info`;
+
+                    let fullTextRequest = new FormData();
+                    fullTextRequest.append("need_text", 1);
+
+                    console.log("save_race_in_blog_custom - force text request");
+                    httpPostForm(fullTextRequestUrl, fullTextRequest).then(textRequestResult => {
+                        fullText = textRequestResult?.text?.text;
+
+                        if (paramsFound && bestSpeed && (qual || practice || fullText)) {
+                            inited = true;
+                            init(bestSpeed);
+                        }
+                    });
+                    return;
+                }
+                if (paramsFound && bestSpeed && (qual || practice || fullText)) {
+                    inited = true;
+                    init(bestSpeed);
+                }
+            }
+        }.bind(this));
+        return proxied.apply(this, [].slice.call(arguments));
+    };
+})();
