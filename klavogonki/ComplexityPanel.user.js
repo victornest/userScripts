@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name           KG_ComplexityPanel
-// @version        2.1.0
+// @version        2.1.1
 // @namespace      klavogonki
 // @author         Silly_Sergio
 // @description    Добавляет панель прогноза сложности текста в заездах
 // @match          http*://klavogonki.ru/g/*
 // @grant          none
+// @icon64         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAACz0lEQVR4nOxbTW4TMRT+nHFEWXSBkEACVWHBppdAoidAYssOjkV3bDkCXXCJbFshuqhYIARVIZMazcTTcVx7xnmTxD/jTxo1zdjj97732c8eOxOMHJkA3wb4BvdtwLZxNgXHAsx4cwpxskCpfmUuGClq50vMITAzFmC4AMexSkJaClhFflbH2oSKGE0dox8DMgG+DfCNTIBvA3wjE+DbAN8YPQFJTYQo09pMwA7s8AZbfxYddZIiwKaALmUkRQBlRM8E7MAObxg9ATkLEOokRUBWAKFOUgRkBRDqJEVAVgChTlIEZAUQ6gRHwNk7cDDHYAqIk0/tNhdFAUG9EpPOzwH8cboY5nUdiYnjpSIoBRQFmNzYXNvb63ihMVPVojvX9SKkQVgEMDcd2xzTq7p0iaAImDYh1Dy0Oax/39efTc8JioCiCZkldH2S7ou46X5QBHAthJ0ONzcVr6JPg4XqQV83MIQz+olQoXrQ4Y1NGdEroOkCLunrrqBCVPwK6EjkRlI0j6NXQLFBIjcREr0CNu4CGuJXgMEDKxmGNBi9AkwEOM97U1AAZ2753oZhCvhYf9730VmBD+163qiAqpDjoEBXwGn9dy6Pme4TFzjFMd6vSKgJGDC80xVQ9Jyx3R1mqt1cLof3nwUKYotbhtoFnBZCGiyr6U7sjgBCGAtXDyxa71lNG9ESQNXdFsHufdgM9DNCQb0apYN+RiiQMWAooh8Eh2JIGkwCoyeAAn8EBJB1cEfANQQOcAmOZ3ttfYnvuGmpKG/rucCSOc5IBbBc3rb/XwLiMXD1AHgiKV4oxSf/gB8/GYRK/oqANyjxGS9xaBhIqwbKtkVcg4HLRwjZ7Q6J8fyNW7xtF0Nfzln56ki8fjjFwZqjAoyx+23cLPD36zdWNnJ6DpTnwIunwKQy+5ccF6rrESCuAHEk1n84SQFlByojVCQyB6TjfwAAAP//9M6LmXHvnP4AAAAASUVORK5CYII=
 // ==/UserScript==
 
 (async function () {
@@ -142,32 +143,41 @@
         this.addEventListener('load', function () {
             try {
                 var json = JSON.parse(this.responseText);
-                if('params' in json) {
-                    practice = json.params.type == 'practice';
-                }
 
                 if ('text' in json) {
-                    createPanel(json.text.text);
-                } else if (practice && !textRequested) {
                     textRequested = true;
-                    let gameId = document.URL.match(/(\d+)/)[0];
-                    let fullTextRequestUrl = `${location.protocol}//klavogonki.ru/g/${gameId}.info`;
-
-                    let fullTextRequest = new FormData();
-                    fullTextRequest.append("need_text", 1);
-
-                    console.log("KG_ComplexityPanel - force text request");
-                    httpPostForm(fullTextRequestUrl, fullTextRequest).then(textRequestResult => {
-                        var fullText = textRequestResult?.text?.text;
-                        if(fullText) {
-                            createPanel(fullText);
-                        }
-                    });
+                    createPanel(json.text.text);
                 }
             } catch (e) {}
         }.bind(this));
         return proxied.apply(this, [].slice.call(arguments));
     };
+
+    if(checkGameDesc(/одиночный/)) {
+        if(!textRequested) {
+            textRequested = true;
+            let gameId = document.URL.match(/(\d+)/)[0];
+            let fullTextRequestUrl = `${location.protocol}//klavogonki.ru/g/${gameId}.info`;
+
+            let fullTextRequest = new FormData();
+            fullTextRequest.append("need_text", 1);
+
+            console.log("KG_ComplexityPanel - force text request");
+            httpPostForm(fullTextRequestUrl, fullTextRequest).then(textRequestResult => {
+                console.log("KG_ComplexityPanel - received text");
+                // var fullText = textRequestResult?.text?.text;
+            });
+        }
+    }
+
+    function checkGameDesc (re) {
+        var desc = document.getElementById('gamedesc');
+        if (!desc) {
+            throw new Error('#gamedesc element not found.');
+        }
+
+        return re.test(desc.textContent);
+    }
 
     function httpPostForm(url, formData) {
         return new Promise((resolve, reject) => {
