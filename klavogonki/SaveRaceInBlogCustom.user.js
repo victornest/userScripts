@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       3.3.0
+// @version       3.3.1
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @match         http*://klavogonki.ru/g/*
 // @author        Lexin13, agile, 490344, vnest
+// @icon64        data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAEXUExURaCgoHJyckBAQB0dHQAAABMSEScnJ2NjY5qamlVVVWlpaTEvLEdHRzo6OrKysoeHhxoNBFcqEMBfLd5rKWZhW//77P/z5P/w3f/r0uXTva+hkNdoLP/87P/y2JyQgcpjLWZeVNVnLJxNI3BnXIJ3a6hUKHk8HbdbMbpdMsNhM+vg0r20qZaPhlhUT/bs3sS7r4aAeKaelKujmUxGP9jSynZxatLIvLRYKc1kLW41FJVJIYdEHoZCIp5PKn4+H3t7e5BHIBQKA0MgDF0yGXQ6IIJEKDQcFdFoMcJlO8RjMlQoD2c0G5RNL51SMq9ZL6ZVLbe3t8fHx9zKtfLfyMZiNGE0K/z8/NTU1OLi4vLy8u3t7f///wAAAJ7Wl6sAAABddFJOU///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////AOGvnZAAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAoVSURBVHhe7Z15e9rIHcfxgS+MDbHFOgnuJm3TbbkSH3Gy7WZT3Lt71Gxbr0l5/6+jI+aL/JvjJ6QImBkeff7IE9BoNB/PPRqJymQelY3NrW0vqe7s7iGRKaQbVvYRmcfsIq0caYYHiMN3akivHd4wgOxLOESabXCGezg3FJBsC4xhHSeGA9vm2A1xVlBwijbDI5wTGExxtHxdwRnBgfRrWAwRPjx2IKBiGiJ4iBxDQcEw9HSElg04KOiGuwgbJrZM1A0RlNJoChr44DmwoGiGZhltNJ+cCJr4OOU0ajnni7Ozp89qSFACNCiqodFRNJrPYz/dsI3LOEQYnp2f/wIpmrEBEYJquIOAMxpfSj8/8zB2fIYkzYAIQTVEMJBkoMBTw7PzF0gTgAhBMdQmTE3YxfhqePYUaQIwISiGCAUaL2EX463hmdrawIRADdURd+OXkJvireH5r5AoCVQI1HADoSS0jPps+GskSgIVAjVEIEnjFdwka2ioZmFpuHqKG/4GamAtDNWm9CuogTU0/C3UQFHDKGq32/E/keVceXAaAN/M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
 // ==/UserScript==
 
 (async function () {
@@ -13,7 +14,6 @@
 	var fullText;
 	var paramsFound = false;
 	var qual;
-	var practice;
     var inited;
     var textRequested;
 	var link = document.querySelector('.dropmenu a');
@@ -53,7 +53,6 @@
 
 			if('params' in json) {
 				qual = json.params.qual;
-				practice = json.params.type == 'practice';
 				paramsFound = true;
 			}
 
@@ -441,26 +440,8 @@
         this.addEventListener('load', function () {
             if(!inited) {
                 var bestSpeed = checkJSON(this.responseText);
-                if(!textRequested && paramsFound && practice && !fullText) {
-                    textRequested = true;
-                    let gameId = document.URL.match(/(\d+)/)[0];
-                    let fullTextRequestUrl = `${location.protocol}//klavogonki.ru/g/${gameId}.info`;
 
-                    let fullTextRequest = new FormData();
-                    fullTextRequest.append("need_text", 1);
-
-                    console.log("save_race_in_blog_custom - force text request");
-                    httpPostForm(fullTextRequestUrl, fullTextRequest).then(textRequestResult => {
-                        fullText = textRequestResult?.text?.text;
-
-                        if (paramsFound && bestSpeed && (qual || practice || fullText)) {
-                            inited = true;
-                            init(bestSpeed);
-                        }
-                    });
-                    return;
-                }
-                if (paramsFound && bestSpeed && (qual || practice || fullText)) {
+                if (paramsFound && bestSpeed && (qual || fullText)) {
                     inited = true;
                     init(bestSpeed);
                 }
@@ -468,4 +449,30 @@
         }.bind(this));
         return proxied.apply(this, [].slice.call(arguments));
     };
+
+    if(checkGameDesc(/одиночный/)) {
+        if(!textRequested) {
+            textRequested = true;
+            let gameId = document.URL.match(/(\d+)/)[0];
+            let fullTextRequestUrl = `${location.protocol}//klavogonki.ru/g/${gameId}.info`;
+
+            let fullTextRequest = new FormData();
+            fullTextRequest.append("need_text", 1);
+
+            console.log("save_race_in_blog_custom - force text request");
+            httpPostForm(fullTextRequestUrl, fullTextRequest).then(textRequestResult => {
+                console.log("save_race_in_blog_custom - received text");
+                // var fullText = textRequestResult?.text?.text;
+            });
+        }
+    }
+
+    function checkGameDesc (re) {
+        var desc = document.getElementById('gamedesc');
+        if (!desc) {
+            throw new Error('#gamedesc element not found.');
+        }
+
+        return re.test(desc.textContent);
+    }
 })();
