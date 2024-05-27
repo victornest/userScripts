@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           KG_ComplexityPanel
-// @version        3.2.1
+// @version        3.2.2
 // @namespace      klavogonki
 // @author         Silly_Sergio
 // @description    Добавляет панель прогноза сложности текста в заездах
@@ -217,27 +217,26 @@
                     textRequested = true;
                     createPanel(json.text.text);
                 }
+
+                if(!textRequested && checkGameDesc(/одиночный/)) {
+                    textRequested = true;
+                    let gameId = document.URL.match(/(\d+)/)[0];
+                    let fullTextRequestUrl = `${location.protocol}//klavogonki.ru/g/${gameId}.info`;
+
+                    let fullTextRequest = new FormData();
+                    fullTextRequest.append("need_text", 1);
+
+                    console.log("KG_ComplexityPanel - force text request");
+                    httpPostForm(fullTextRequestUrl, fullTextRequest).then(textRequestResult => {
+                        console.log("KG_ComplexityPanel - received text");
+                        // var fullText = textRequestResult?.text?.text;
+                    });
+                }
+
             } catch (e) {}
         }.bind(this));
         return proxied.apply(this, [].slice.call(arguments));
     };
-
-    if(checkGameDesc(/одиночный/)) {
-        if(!textRequested) {
-            textRequested = true;
-            let gameId = document.URL.match(/(\d+)/)[0];
-            let fullTextRequestUrl = `${location.protocol}//klavogonki.ru/g/${gameId}.info`;
-
-            let fullTextRequest = new FormData();
-            fullTextRequest.append("need_text", 1);
-
-            console.log("KG_ComplexityPanel - force text request");
-            httpPostForm(fullTextRequestUrl, fullTextRequest).then(textRequestResult => {
-                console.log("KG_ComplexityPanel - received text");
-                // var fullText = textRequestResult?.text?.text;
-            });
-        }
-    }
 
     function checkGameDesc (re) {
         var desc = document.getElementById('gamedesc');
