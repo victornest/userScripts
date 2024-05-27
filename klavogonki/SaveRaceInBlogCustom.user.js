@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name          save_race_in_blog_custom
 // @namespace     klavogonki
-// @version       3.3.1
+// @version       3.3.2
 // @description   добавляет кнопку для сохранения результата любого заезда в бортжурнале
 // @match         http*://klavogonki.ru/g/*
 // @author        Lexin13, agile, 490344, vnest
@@ -445,27 +445,25 @@
                     inited = true;
                     init(bestSpeed);
                 }
+
+                if(!inited && !textRequested && checkGameDesc(/одиночный/)) {
+                    textRequested = true;
+                    let gameId = document.URL.match(/(\d+)/)[0];
+                    let fullTextRequestUrl = `${location.protocol}//klavogonki.ru/g/${gameId}.info`;
+
+                    let fullTextRequest = new FormData();
+                    fullTextRequest.append("need_text", 1);
+
+                    console.log("save_race_in_blog_custom - force text request");
+                    httpPostForm(fullTextRequestUrl, fullTextRequest).then(textRequestResult => {
+                        console.log("save_race_in_blog_custom - received text");
+                        // var fullText = textRequestResult?.text?.text;
+                    });
+                }
             }
         }.bind(this));
         return proxied.apply(this, [].slice.call(arguments));
     };
-
-    if(checkGameDesc(/одиночный/)) {
-        if(!textRequested) {
-            textRequested = true;
-            let gameId = document.URL.match(/(\d+)/)[0];
-            let fullTextRequestUrl = `${location.protocol}//klavogonki.ru/g/${gameId}.info`;
-
-            let fullTextRequest = new FormData();
-            fullTextRequest.append("need_text", 1);
-
-            console.log("save_race_in_blog_custom - force text request");
-            httpPostForm(fullTextRequestUrl, fullTextRequest).then(textRequestResult => {
-                console.log("save_race_in_blog_custom - received text");
-                // var fullText = textRequestResult?.text?.text;
-            });
-        }
-    }
 
     function checkGameDesc (re) {
         var desc = document.getElementById('gamedesc');
